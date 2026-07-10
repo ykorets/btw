@@ -1,0 +1,10 @@
+[project]
+name = "btw-engine"
+version = "0.1.0"
+requires-python = ">=3.11"
+dependencies = [
+  "httpx", "pyyaml", "psycopg[binary]", "boto3",
+  "anthropic", "pypdf", "rapidfuzz",
+]
+[project.optional-dependencies]
+dev = ["pytest", "playwright"]
