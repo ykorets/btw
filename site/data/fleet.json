@@ -1,0 +1,64 @@
+{
+  "dataset": "Behind the Watt \u2014 US operating BTM fleet (pilot)",
+  "license": "CC BY 4.0",
+  "cite_as": "Behind the Watt, behindthewatt.com",
+  "as_of": "2026-07-10",
+  "rows": [
+    {
+      "facility": "xAI Colossus 1",
+      "location": "Memphis, TN",
+      "operator": "xAI / MZX Tech",
+      "offtaker": "xAI",
+      "operating_mw": "247 permitted / up to 421 observed",
+      "equipment_permitted": "15x Solar SMT-130 w/ SCR",
+      "permit_authority": "Shelby County Health Department",
+      "permit_id": "01156-01PC",
+      "permit_status": "issued 2025-07-02; under appeal; CAA litigation",
+      "permit_to_power_months": "-12",
+      "verified": "operating",
+      "source_url": "https://www.selc.org/news/inside-memphis-fight-against-xai/"
+    },
+    {
+      "facility": "xAI Colossus 2",
+      "location": "Southaven, MS",
+      "operator": "xAI",
+      "offtaker": "xAI",
+      "operating_mw": "422 observed",
+      "equipment_permitted": "41 turbines permitted; 27 mobile units observed",
+      "permit_authority": "Mississippi DEQ",
+      "permit_id": "MDEQ air permit (41 units)",
+      "permit_status": "approved ~2026-01; appealed",
+      "permit_to_power_months": "-9",
+      "verified": "operating",
+      "source_url": "https://mgrid.org/2026/04/14/xai-operates-27-unpermitted-gas-turbines-at-memphis-data-center-generating-422-mw-without-air-permits/"
+    },
+    {
+      "facility": "Crusoe Stargate Abilene",
+      "location": "Abilene, TX",
+      "operator": "Abilene DC 1 LLC dba Crusoe",
+      "offtaker": "OpenAI via Oracle",
+      "operating_mw": "360",
+      "equipment_permitted": "6x Solar Titan 350 + 5x GE LM2500 @ 8760 hr/yr",
+      "permit_authority": "TCEQ",
+      "permit_id": "Standard Permit reg. 177263; Title V O4721",
+      "permit_status": "clean",
+      "permit_to_power_months": "13",
+      "verified": "operating",
+      "source_url": "https://records.tceq.texas.gov/cs/idcplg?IdcService=TCEQ_EXTERNAL_SEARCH_GET_FILE&dID=8600163&Rendition=Web"
+    },
+    {
+      "facility": "Fleet remainder",
+      "location": "US",
+      "operator": "unverified",
+      "offtaker": "unverified",
+      "operating_mw": "~140",
+      "equipment_permitted": "unknown",
+      "permit_authority": "unknown",
+      "permit_id": "unknown",
+      "permit_status": "under verification",
+      "permit_to_power_months": "",
+      "verified": "unverified",
+      "source_url": ""
+    }
+  ]
+}

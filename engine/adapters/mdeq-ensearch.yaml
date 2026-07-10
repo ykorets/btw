@@ -1,0 +1,9 @@
+id: mdeq-ensearch
+kind: search
+url: https://opc.deq.ms.gov/
+query: "air permit turbines data center"
+state: MS
+schedule: daily
+slo_interval_days: 14
+parser: mdeq-ensearch_v1
+status: stub   # implement per docs/architecture.md §4.1

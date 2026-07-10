@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Behind the Watt — design system</title>
+<link rel="icon" href="mark.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#14140F; --ink-2:#57564E; --ink-3:#8A897F;
+  --paper:#FBFAF7; --card:#FFFFFF; --line:#E6E4DC; --line-2:#D4D2C7;
+  --verified:#157A54; --verified-bg:#E4F3EC;
+  --violation:#B3362C; --violation-bg:#FAEAE8;
+  --pending:#9A6B10; --pending-bg:#F8EFDB;
+  --construction:#1F5FA8; --construction-bg:#E8F0FA;
+  --sans:'Inter',system-ui,sans-serif;
+  --serif:'Source Serif 4',Georgia,serif;
+  --mono:'IBM Plex Mono',ui-monospace,monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--sans);color:var(--ink);background:var(--paper);font-size:16px;line-height:1.6;padding-bottom:120px}
+.wrap{max-width:920px;margin:0 auto;padding:0 24px}
+section{padding:56px 0;border-top:1px solid var(--line)}
+h1{font-family:var(--serif);font-size:40px;font-weight:600}
+h2{font-size:24px;font-weight:600;margin-bottom:4px}
+h3{font-family:var(--mono);font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3);font-weight:500;margin:28px 0 12px}
+.kicker{font-family:var(--mono);font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3);margin-bottom:8px}
+p.note{color:var(--ink-2);font-size:14.5px;max-width:640px}
+.spec{font-family:var(--mono);font-size:12px;color:var(--ink-3)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:24px}
+.row{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;margin-top:14px}
+.don{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:14px}
+@media(max-width:640px){.don{grid-template-columns:1fr}}
+.don .card b{font-family:var(--mono);font-size:12px;letter-spacing:.06em}
+.don .yes b{color:var(--verified)} .don .no b{color:var(--violation)}
+.swatch{border-radius:10px;padding:14px;border:1px solid var(--line)}
+.swatch .chip{height:44px;border-radius:7px;margin-bottom:10px}
+.stamp{display:inline-block;font-family:var(--mono);font-size:12px;letter-spacing:.1em;padding:2px 10px;border:1.5px solid;border-radius:3px;transform:rotate(-2deg);text-transform:uppercase}
+.st-verified{border-color:var(--verified);color:var(--verified)}
+.st-violation{border-color:var(--violation);color:var(--violation)}
+.st-pending{border-color:var(--pending);color:var(--pending)}
+.docket{font-family:var(--mono);font-size:12px;color:var(--ink-3)}
+.docket a{color:var(--ink-3)}
+.meter-demo{display:flex;align-items:stretch;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:22px;gap:0;margin-top:14px}
+.meter-demo .l{flex:1;text-align:right;padding-right:20px}
+.meter-demo .r{flex:1;padding-left:20px}
+.meter{width:2px;background:var(--ink);border-radius:1px}
+.big{font-family:var(--serif);font-size:44px;font-weight:600;line-height:1.1}
+.type-row{display:flex;gap:18px;align-items:baseline;border-bottom:1px solid var(--line);padding:12px 0;flex-wrap:wrap}
+.type-row .spec{min-width:250px}
+table{width:100%;border-collapse:collapse;font-size:14px;margin-top:14px}
+th{font-family:var(--mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-3);font-weight:500;text-align:left;padding:9px 12px;border-bottom:1px solid var(--line-2)}
+td{padding:11px 12px;border-bottom:1px solid var(--line)}
+tr:hover td{background:#F5F4EF}
+.btn{display:inline-block;padding:10px 20px;border-radius:8px;border:1px solid var(--line-2);font-size:14px;font-weight:500;background:var(--card);cursor:pointer}
+.btn-primary{background:var(--ink);color:#fff;border-color:var(--ink)}
+.logo-tile{display:flex;align-items:center;justify-content:center;border-radius:12px;border:1px solid var(--line);min-height:130px;padding:20px}
+code{font-family:var(--mono);font-size:13px;background:#F1F0EA;padding:1px 6px;border-radius:4px}
+</style>
+</head>
+<body>
+
+<section style="border-top:none;padding-top:72px">
+  <div class="wrap">
+    <div class="kicker">Behind the Watt · brand & design system · v1.1</div>
+    <h1 style="font-family:var(--mono);font-weight:500;font-size:34px"><span style="color:var(--ink-3)">behind</span><span style="display:inline-block;width:2.5px;height:34px;background:var(--ink);border-radius:1px;margin:0 12px;vertical-align:-5px"></span>the watt</h1>
+    <p class="note" style="margin-top:14px">One idea holds everything together: <b>the meter line</b>. A thin vertical rule that separates announcements from verified fact. Left of the line — what they said. Right of the line — what the permits show. Editorial journal for trust, public-record details for character.</p>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <h2>01 · The meter line</h2>
+    <p class="note">The core brand device. A 2px ink vertical rule. It appears in exactly four places — never as decoration.</p>
+    <div class="meter-demo">
+      <div class="l">
+        <div class="spec">ANNOUNCED</div>
+        <div class="big" style="color:var(--ink-3)">90 GW</div>
+        <div class="spec">press releases</div>
+      </div>
+      <div class="meter"></div>
+      <div class="r">
+        <div class="spec" style="color:var(--verified)">OPERATING <span class="stamp st-verified" style="font-size:10px">verified</span></div>
+        <div class="big" style="color:var(--verified)">2.0 GW</div>
+        <div class="docket">TCEQ 177263 · SCHD 01156-01PC</div>
+      </div>
+    </div>
+    <h3>Where it lives</h3>
+    <p class="note">1. The wordmark separator. 2. The hero divider (claims left, facts right). 3. The zero axis of every chart — especially Time-to-Power bars. 4. Blockquote rule on "as filed" excerpts. Anywhere else: don't.</p>
+    <div class="don">
+      <div class="card yes"><b>DO</b><p class="note" style="font-size:13.5px;margin-top:6px">Grayed, right-aligned content left of the line. Ink or green, left-aligned right of the line. The line is always full-height of its block, always 2px, always ink.</p></div>
+      <div class="card no"><b>DON'T</b><p class="note" style="font-size:13.5px;margin-top:6px">Don't use it as a generic divider between random sections. Don't color it. Don't make it dashed. If both sides are the same kind of content, use a hairline (1px, --line) instead.</p></div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <h2>02 · Logo</h2>
+    <p class="note">Wordmark: IBM Plex Mono medium, lowercase. "behind" in ink-3, the meter line, "the watt" in ink. The brand speaks the voice of the record — the wordmark is set in mono because the project itself is a quote from public filings. Short form: <code>btw.</code>, lowercase with a period. Mark: the meter line beside a W.</p>
+    <div class="row">
+      <div class="logo-tile" style="background:var(--card)"><img src="wordmark.svg" alt="behind the watt wordmark" style="max-width:100%"></div>
+      <div class="logo-tile" style="background:var(--card)"><img src="mark-light.svg" alt="mark on light" width="72" height="72"></div>
+      <div class="logo-tile" style="background:var(--ink)"><img src="mark.svg" alt="mark on dark" width="72" height="72"></div>
+    </div>
+    <h3>Rules</h3>
+    <p class="note">Always lowercase. Never letterspace the wordmark. Clear space = height of the W on all sides. The mark never appears without the line. <code>btw.</code> keeps its period — it's a sentence, not an acronym.</p>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <h2>03 · Color</h2>
+    <p class="note">Color is a verification status, never decoration. If a color appears, it makes a claim about the data. Everything else is ink on paper.</p>
+    <div class="row">
+      <div class="swatch"><div class="chip" style="background:var(--ink)"></div><b>Ink</b><div class="spec">#14140F · text, meter line</div></div>
+      <div class="swatch"><div class="chip" style="background:var(--ink-3)"></div><b>Ink 3</b><div class="spec">#8A897F · announced, muted</div></div>
+      <div class="swatch"><div class="chip" style="background:var(--paper);border:1px solid var(--line)"></div><b>Paper</b><div class="spec">#FBFAF7 · background</div></div>
+      <div class="swatch"><div class="chip" style="background:var(--verified)"></div><b>Verified</b><div class="spec">#157A54 · operating, confirmed</div></div>
+      <div class="swatch"><div class="chip" style="background:var(--violation)"></div><b>Violation</b><div class="spec">#B3362C · litigation, unpermitted</div></div>
+      <div class="swatch"><div class="chip" style="background:var(--pending)"></div><b>Pending</b><div class="spec">#9A6B10 · applied, awaiting</div></div>
+      <div class="swatch"><div class="chip" style="background:var(--construction)"></div><b>Construction</b><div class="spec">#1F5FA8 · building, on track</div></div>
+    </div>
+    <h3>The one rule</h3>
+    <p class="note">Green means "we verified it." Red means "the record shows a violation." Never use them for anything else — no green buttons, no red sale banners. The palette is the credibility.</p>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <h2>04 · Typography</h2>
+    <p class="note">Three voices. The journal speaks serif, the interface speaks sans, the record speaks mono.</p>
+    <div class="type-row"><span class="spec">Source Serif 4 · 600 · 76/64/44px</span><span style="font-family:var(--serif);font-size:40px;font-weight:600">2.0 GW verified</span></div>
+    <div class="type-row"><span class="spec">Source Serif 4 · 600 · 26–19px</span><span style="font-family:var(--serif);font-size:22px;font-weight:600">Research headlines and pull numbers</span></div>
+    <div class="type-row"><span class="spec">Inter · 400/500/600 · 16/14px</span><span>Interface, body copy, table cells — everything conversational.</span></div>
+    <div class="type-row"><span class="spec">IBM Plex Mono · 400/500 · 13–11px</span><span class="docket" style="font-size:13px">DOCKET 26-0169-EL-BLN · FILED 2026-03-27 · 296 MW — anything that quotes the record</span></div>
+    <h3>Rules</h3>
+    <p class="note">Serif is reserved for numbers that matter and headlines that get quoted. Mono is reserved for facts traceable to a document: IDs, dates, capacities, statuses. If it's mono, a source link must exist — the wordmark is the single exception, because the brand itself is a quote from the record. Sentence case everywhere — including headings. Tabular figures always (<code>font-variant-numeric: tabular-nums</code>).</p>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <h2>05 · Components</h2>
+
+    <h3>Stamps — verification states</h3>
+    <p class="note">1.5px border, mono uppercase, −2° rotation, letterspaced. Only four exist. Maximum one stamp per card or table row.</p>
+    <div style="display:flex;gap:14px;flex-wrap:wrap;margin-top:12px">
+      <span class="stamp st-verified">Verified</span>
+      <span class="stamp st-violation">In litigation</span>
+      <span class="stamp st-violation">Unpermitted</span>
+      <span class="stamp st-pending">Pending</span>
+    </div>
+
+    <h3>The docket — source line</h3>
+    <p class="note">Every data row carries one. Mono, ink-3, middle-dot separated, always linked to the primary document.</p>
+    <div class="docket" style="margin-top:8px">TCEQ reg. <a href="#">177263</a> · Title V <a href="#">O4721</a> · updated 2026-07-10</div>
+
+    <h3>Data table</h3>
+    <table>
+      <thead><tr><th>Facility</th><th>MW</th><th>Status</th><th>Source</th></tr></thead>
+      <tbody>
+        <tr><td><b>Crusoe Stargate Abilene</b><br><span class="docket">Abilene, TX</span></td><td style="font-family:var(--mono);font-size:13px">360</td><td><span class="stamp st-verified" style="font-size:11px">Verified</span></td><td class="docket"><a href="#">TCEQ 177263</a></td></tr>
+        <tr><td><b>xAI Colossus 1</b><br><span class="docket">Memphis, TN</span></td><td style="font-family:var(--mono);font-size:13px">247<span style="color:var(--violation)">+174</span></td><td><span class="stamp st-violation" style="font-size:11px">In litigation</span></td><td class="docket"><a href="#">SCHD 01156-01PC</a></td></tr>
+      </tbody>
+    </table>
+
+    <h3>Buttons</h3>
+    <div style="display:flex;gap:10px;margin-top:10px;flex-wrap:wrap">
+      <span class="btn btn-primary">Take the data</span>
+      <span class="btn">Read BTW Weekly</span>
+    </div>
+    <p class="note" style="margin-top:10px">One primary button per view. Primary is ink, never green — green belongs to verification.</p>
+
+    <h3>Charts</h3>
+    <p class="note">The zero axis is the meter line (2px ink). Announced/projected data is always ink-3 gray. Verified data is always green. Violations always red. Bars ≤24px, 3px radius on the data end only. No gridlines heavier than --line. No legends when direct labels fit.</p>
+
+    <h3>Motion</h3>
+    <p class="note">Two animations exist: hero numbers count up once on load (600ms, ease-out), and feed rows stamp in on scroll (opacity + 4px rise, 200ms, staggered). Nothing else moves. Seriousness is stillness.</p>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <h2>06 · Voice</h2>
+    <p class="note">Short declaratives. Numbers before adjectives. Every claim carries its receipt. Dry wit allowed once per page — usually in the BTW construction: "BTW, the turbines were running nine months before the permit."</p>
+    <div class="don">
+      <div class="card yes"><b>DO</b><p class="note" style="font-size:13.5px;margin-top:6px">"Operating capacity: 2.0 GW. That's 2.2% of what was announced." · "The permit record says something more interesting." · "Sourced from air permits, not press releases."</p></div>
+      <div class="card no"><b>DON'T</b><p class="note" style="font-size:13.5px;margin-top:6px">"Revolutionary insights into the booming BTM landscape!" · "Game-changing analytics platform" · Exclamation marks. The word "landscape." Hype verbs of any kind.</p></div>
+    </div>
+  </div>
+</section>
+
+<footer style="border-top:1px solid var(--line);padding:28px 0">
+  <div class="wrap docket">Behind the Watt design system v1.0 · Jul 2026 · fonts: Source Serif 4, Inter, IBM Plex Mono (all OFL)</div>
+</footer>
+
+</body>
+</html>

@@ -1,0 +1,9 @@
+id: opsb-dockets
+kind: search
+url: https://dis.puc.state.oh.us/CaseRecord.aspx
+query: "power siting BLN data center"
+state: OH
+schedule: daily
+slo_interval_days: 14
+parser: opsb-dockets_v1
+status: stub   # implement per docs/architecture.md §4.1

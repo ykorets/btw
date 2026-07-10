@@ -1,0 +1,9 @@
+id: shelby-health-air
+kind: pagehash
+url: https://www.shelbytnhealth.com/air-quality
+query: "construction permits page diff"
+state: TN
+schedule: daily
+slo_interval_days: 14
+parser: shelby-health-air_v1
+status: stub   # implement per docs/architecture.md §4.1

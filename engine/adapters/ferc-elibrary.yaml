@@ -1,0 +1,9 @@
+id: ferc-elibrary
+kind: search
+url: https://elibrary.ferc.gov/eLibrary/search
+query: "large load interconnection"
+state: US
+schedule: daily
+slo_interval_days: 14
+parser: ferc-elibrary_v1
+status: stub   # implement per docs/architecture.md §4.1
