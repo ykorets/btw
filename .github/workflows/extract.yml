@@ -19,7 +19,7 @@ jobs:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           BTW_MODELS_YAML: engine/models.yaml
-        run: PYTHONPATH=engine/src python -m btw_engine.extract --genres tceq_standard_permit_review,appeal_filing,advocacy_letter
+        run: PYTHONPATH=engine/src python -m btw_engine.extract --genres tceq_standard_permit_review,appeal_filing,advocacy_letter,mdeq_psd_permit
       - name: Score against hand-labeled expectations
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
