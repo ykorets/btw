@@ -235,6 +235,21 @@ numbers removed; deploy to Cloudflare Pages from `btw-data` merge trigger.
 DoD: site shows only engine-generated numbers; a hotfix event reaches the live
 site in < 15 minutes; first real BTW Weekly drafted by the machine.
 
+**Status 2026-07-11 — core SHIPPED.**
+Site rewire: hero operating-GW, as-of stamp and fleet MW cells now fetch the
+mirror branch at runtime (raw.githubusercontent, CORS-open) — the engine's
+Titan correction (360→329 MW Abilene, 1.0 GW fleet) reaches the page with no
+hand edits; the 90 GW "announced" figure stays editorial by design. Hot lane:
+`hotfix.py` stages an event and opens/refreshes today's review PR instantly
+(workflow_dispatch with form inputs); review --open/--promote now carry
+staged events end-to-end. Digest: `digest.py` drafts BTW Weekly from the
+week's published events + candidates + aggregate via the digest_writer role,
+opens a draft PR (Tuesday cron; the machine drafts, never publishes).
+Deploy: GitHub Pages via Actions on site/** pushes (staging URL; Cloudflare
+Pages + behindthewatt.com when the domain is bought). Hotfix<15min DoD:
+architecture supports it (stage→PR instant; merge→promote→mirror ~1min;
+page reads mirror live) — timed end-to-end run pending first real event.
+
 ## Working model
 
 All code lands via Claude Code sessions against this repo (branch per
