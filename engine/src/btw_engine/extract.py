@@ -112,6 +112,25 @@ def validate_claim(claim: dict, pages: list[str]) -> tuple[float, bool | None]:
     return score, num_ok
 
 
+def _parse_claims(raw: str) -> list[dict]:
+    raw = raw.strip()
+    raw = re.sub(r"^```(json)?|```$", "", raw, flags=re.M).strip()
+    try:
+        return json.loads(raw, strict=False).get("claims", [])
+    except json.JSONDecodeError:
+        pass
+    # Salvage a truncated/imperfect response: cut back to the last complete
+    # claim object and close the JSON. LLM outputs sometimes die mid-string.
+    ends = [m.start() for m in re.finditer(r"\}", raw)]
+    for i in reversed(ends[-80:]):
+        try:
+            got = json.loads(raw[: i + 1] + "]}", strict=False)
+            return got["claims"]
+        except (json.JSONDecodeError, KeyError, TypeError):
+            continue
+    raise ValueError(f"unparseable LLM response ({len(raw)} chars)")
+
+
 def extract_document(doc: dict) -> dict:
     body = s3().get_object(Bucket=BUCKET, Key=doc["r2_key"])["Body"].read()
     pages = page_texts(body)
@@ -119,16 +138,22 @@ def extract_document(doc: dict) -> dict:
     if len(marked) > MAX_CHARS_TO_LLM:
         marked = marked[:MAX_CHARS_TO_LLM]
 
-    raw = llm.complete(
-        "default_extractor",
-        [{"role": "user",
-          "content": PROMPT + "\n\nDOCUMENT:\n" + marked}],
-        purpose="extract",
-        document_id=doc["id"],
-    )
-    raw = raw.strip()
-    raw = re.sub(r"^```(json)?|```$", "", raw, flags=re.M).strip()
-    claims = json.loads(raw).get("claims", [])
+    claims: list[dict] = []
+    for attempt in (1, 2):
+        raw = llm.complete(
+            "default_extractor",
+            [{"role": "user",
+              "content": PROMPT + "\n\nDOCUMENT:\n" + marked}],
+            purpose="extract",
+            document_id=doc["id"],
+            response_format={"type": "json_object"},
+        )
+        try:
+            claims = _parse_claims(raw)
+            break
+        except ValueError:
+            if attempt == 2:
+                raise
 
     rows, validated = [], 0
     for c in claims:
