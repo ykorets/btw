@@ -1,0 +1,15 @@
+# CourtListener RECAP dockets naming watched parties — litigation is often
+# the earliest public record of a dispute (NAACP v. xAI pattern).
+# Anonymous v4 API, ~1 req/s courtesy delay in the adapter.
+id: courtlistener-parties
+kind: api
+adapter: courtlistener
+url: https://www.courtlistener.com/api/rest/v4/search/
+schedule: daily
+slo_interval_days: 7
+params:
+  parties:
+    - "xAI Corp"
+    - "CTC Property"
+    - "Abilene DC 1"
+    - "Crusoe Energy"

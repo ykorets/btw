@@ -6,4 +6,6 @@ state: US
 schedule: daily
 slo_interval_days: 14
 parser: ferc-elibrary_v1
-status: stub   # implement per docs/architecture.md §4.1
+status: stub   # M6 recon pending: frontend JSON API (eLibrarywebapi) exists
+               # but is undocumented; needs request capture before committing
+               # to a contract. Next candidate after ECHO discovery mode.

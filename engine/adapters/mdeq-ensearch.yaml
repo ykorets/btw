@@ -6,4 +6,6 @@ state: MS
 schedule: daily
 slo_interval_days: 14
 parser: mdeq-ensearch_v1
-status: stub   # implement per docs/architecture.md §4.1
+status: stub   # M6 recon: opc.deq.ms.gov is a JS app (enSearch); no stable
+               # GET/POST contract found yet. Mississippi coverage currently
+               # via epa-echo-compliance counters + gdelt-news.

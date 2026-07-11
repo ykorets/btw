@@ -53,6 +53,24 @@ def fetch():
     return facilities, events, aggregates
 
 
+def fetch_coverage() -> list[dict]:
+    """Which sources are watched since when — the M6 coverage artifact."""
+    sources = get("source",
+                  select="id,kind,adapter,url,schedule,slo_interval,"
+                         "last_hit_at,created_at",
+                  order="id")
+    for s in sources:
+        r = httpx.get(f"{BASE}/candidate",
+                      headers={**HEADERS, "Prefer": "count=exact",
+                               "Range": "0-0"},
+                      params={"select": "id", "source_id": f"eq.{s['id']}"},
+                      timeout=30)
+        r.raise_for_status()
+        s["candidates"] = int(
+            r.headers.get("content-range", "*/0").split("/")[1])
+    return sources
+
+
 def facility_mw(f: dict) -> float:
     return sum((u.get("unit_count") or 0) * float(u.get("mw_each") or 0)
                for u in f.get("unit", []))
@@ -81,8 +99,16 @@ def build_summary(facilities: list[dict], aggregates: list[dict]) -> dict:
     }
 
 
-def write_files(out: str, facilities, events, summary):
+def write_files(out: str, facilities, events, summary, coverage=None):
     os.makedirs(out, exist_ok=True)
+
+    if coverage is not None:
+        with open(f"{out}/coverage.json", "w") as fp:
+            json.dump({"license": "CC BY 4.0", "cite_as": CITE,
+                       "generated": date.today().isoformat(),
+                       "note": "registries watched by the engine; last_hit_at"
+                               " = last successful sweep",
+                       "sources": coverage}, fp, indent=2, default=str)
 
     with open(f"{out}/facilities.json", "w") as fp:
         json.dump({"license": "CC BY 4.0", "cite_as": CITE,
@@ -123,9 +149,11 @@ def main():
     args = ap.parse_args()
 
     facilities, events, aggregates = fetch()
+    coverage = fetch_coverage()
     summary = build_summary(facilities, aggregates)
-    write_files(args.out, facilities, events, summary)
+    write_files(args.out, facilities, events, summary, coverage)
     print(f"published {len(facilities)} facilities, {len(events)} events, "
+          f"{len(coverage)} sources in coverage, "
           f"operating_gw={summary['operating_gw']} -> {args.out}/")
 
 

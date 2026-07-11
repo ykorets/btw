@@ -1,0 +1,12 @@
+# GDELT DOC 2.0 news feed — candidate per article matching the BTM query.
+# Free, keyless, deduped by article-URL hash.
+id: gdelt-news
+kind: api
+adapter: gdelt_news
+url: https://api.gdeltproject.org/api/v2/doc/doc
+schedule: daily
+slo_interval_days: 3
+params:
+  query: '"data center" ("gas turbines" OR "behind the meter" OR "air permit" OR "on-site generation")'
+  timespan: 2d
+  maxrecords: 40
