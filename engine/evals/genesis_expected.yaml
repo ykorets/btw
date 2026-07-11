@@ -1,0 +1,30 @@
+# Hand-labeled expected facts per genesis document (M3 eval baseline).
+# match: substring of document.url identifying the doc.
+# Each expected item: field + either value_num (numeric, exact after comma
+# normalization) or value_contains (case-insensitive substring).
+# Recall = expected items found among VALIDATED claims.
+
+- match: "records.tceq.texas.gov"
+  name: tceq-177263-tech-review
+  expected:
+    - {field: unit.model, value_contains: "LM2500"}
+    - {field: unit.count, value_num: 5}
+    - {field: unit.mw_each, value_num: 34.1}
+    - {field: unit.hours_permitted, value_num: 8760}
+    - {field: facility.operator, value_contains: "Crusoe"}
+    - {field: permit.no, value_contains: "177263"}
+
+- match: "arstechnica"
+  name: schd-01156-01pc-appeal
+  expected:
+    - {field: permit.no, value_contains: "01156-01PC"}
+    - {field: unit.model, value_contains: "SMT-130"}
+    - {field: unit.count, value_num: 15}
+    - {field: observation.unit_count, value_num: 22}
+
+- match: "cleanenergy.org"
+  name: selc-schd-letter-2025-04-09
+  expected:
+    - {field: observation.unit_count, value_num: 35}
+    - {field: observation.mw, value_num: 421}
+    - {field: unit.model, value_contains: "SMT-130"}
