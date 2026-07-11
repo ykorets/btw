@@ -1,9 +1,22 @@
-id: tceq-egu
+# TCEQ NSR pending applications — the primary Texas watcher.
+# POSTs the public NSR search (ASCII output mode) for applications received
+# in the trailing window; every row becomes a candidate, keyword hits flagged.
+id: tceq-nsr-stdpmt
 kind: search
-url: https://records.tceq.texas.gov/cs/idcplg?IdcService=TCEQ_SEARCH
-query: "electric generating unit standard permit registration"
-state: TX
+adapter: tceq_nsr
+url: https://www2.tceq.texas.gov/airperm/index.cfm?fuseaction=airpermits.validate_search_criteria
 schedule: daily
-slo_interval_days: 14
-parser: tceq-egu_v1
-status: stub   # implement per docs/architecture.md §4.1
+slo_interval_days: 3
+params:
+  permit_type: STDPMT      # standard permits (incl. Electric Generating Units SP)
+  window_days: 30
+keywords:
+  - turbine
+  - generat
+  - electric
+  - power
+  - energy
+  - data cent
+  - crusoe
+  - vantor
+  - stargate
