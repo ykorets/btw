@@ -23,6 +23,7 @@ import litellm
 import yaml
 
 litellm.suppress_debug_info = True
+litellm.drop_params = True  # silently drop params a provider doesn't support
 
 _KEY_FOR_PREFIX = {
     "anthropic": "ANTHROPIC_API_KEY",
@@ -56,14 +57,17 @@ def _ledger(row: dict) -> None:
 
 
 def complete(role: str, messages: list[dict], purpose: str,
-             document_id: str | None = None, roles: dict | None = None) -> str:
+             document_id: str | None = None, roles: dict | None = None,
+             response_format: dict | None = None) -> str:
     cfg = (roles or load_roles())[role]
     model = cfg["model"]
+    extra = {"response_format": response_format} if response_format else {}
     resp = litellm.completion(
         model=model,
         messages=messages,
         temperature=cfg.get("temperature", 0),
         max_tokens=cfg.get("max_tokens", 4096),
+        **extra,
     )
     try:
         cost = litellm.completion_cost(completion_response=resp)
