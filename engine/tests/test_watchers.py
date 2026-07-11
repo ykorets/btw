@@ -36,6 +36,21 @@ def test_tceq_tolerates_short_rows():
     assert van["rules"] == ""
 
 
+def test_tceq_raw_http_format():
+    # Raw wire format: fields on separate \r\n\t lines, rows split by <br />,
+    # empty dates as &nbsp; chains. Regression for daily-intake run #2, where
+    # line-based parsing produced one empty phantom row.
+    rows = parse_tceq_ascii(_read("tceq_nsr_raw.html"))
+    assert len(rows) == 2
+    stella = next(r for r in rows if "STELLA" in r["customer_name"])
+    assert stella["project_number"] == "411957"
+    assert stella["county"] == "CALDWELL"
+    assert stella["rcv_date"] == "07/10/2026"
+    assert stella["complete_date"] == ""   # &nbsp; chain → empty
+    lhoist = next(r for r in rows if "LHOIST" in r["customer_name"])
+    assert lhoist["rules"].startswith("6001")
+
+
 def test_opsb_case_parses_filings():
     rows = parse_opsb_case_html(_read("opsb_case_25-0185.html"), "25-0185")
     assert len(rows) == 3

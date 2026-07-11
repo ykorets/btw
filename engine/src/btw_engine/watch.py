@@ -72,14 +72,22 @@ TCEQ_COLUMNS = [
 
 
 def parse_tceq_ascii(text: str) -> list[dict]:
-    """Parse the NSR search's ASCII (pipe-delimited) output."""
-    text = re.sub(r"<[^>]+>", "", text)  # tolerate HTML wrapping
+    """Parse the NSR search's ASCII (pipe-delimited) output.
+
+    In the raw HTTP response every field sits on its own line inside the row
+    (separated by \\r\\n\\t), rows are delimited by <br />, and empty dates are
+    rendered as chains of &nbsp;. So: normalize entities, drop tags, collapse
+    ALL whitespace, then split the stream at each "NSR|" row start. This also
+    parses the browser-rendered one-row-per-line form (fixtures).
+    """
+    text = text.replace("&nbsp;", " ")
+    text = re.sub(r"<[^>]+>", " ", text)
+    text = re.sub(r"\s+", " ", text)
     rows = []
-    for line in text.splitlines():
-        line = line.strip()
-        if not line.startswith("NSR|"):
+    for chunk in re.findall(r"NSR\|(?:(?!NSR\|).)*", text):
+        parts = [p.strip() for p in chunk.split("|")]
+        if len(parts) < 10:  # stray "NSR|" mention, not a data row
             continue
-        parts = [p.strip() for p in line.split("|")]
         if len(parts) < len(TCEQ_COLUMNS):
             parts += [""] * (len(TCEQ_COLUMNS) - len(parts))
         rows.append(dict(zip(TCEQ_COLUMNS, parts[: len(TCEQ_COLUMNS)])))
@@ -203,18 +211,32 @@ def touch_source(source_id: str) -> None:
 
 
 def slo_check() -> int:
-    """Exit non-zero if any live source hasn't succeeded within its SLO."""
+    """Exit non-zero if any live source hasn't succeeded within its SLO.
+
+    A source that has never succeeded gets a grace window of one SLO interval
+    from its creation — new/blocked adapters surface as warnings first and as
+    alarms only once they've been failing for the whole interval.
+    """
     stale = []
+    now = dt.datetime.now(dt.timezone.utc)
     for cfg in load_sources():
         rows = _rest("GET", "source", params={
-            "select": "id,last_hit_at",
+            "select": "id,last_hit_at,created_at",
             "id": f"eq.{cfg['id']}"}).json()
-        if not rows or not rows[0]["last_hit_at"]:
-            stale.append(f"{cfg['id']}: never succeeded")
-            continue
-        last = dt.datetime.fromisoformat(rows[0]["last_hit_at"])
         max_age = dt.timedelta(days=int(cfg.get("slo_interval_days", 14)))
-        age = dt.datetime.now(dt.timezone.utc) - last
+        if not rows:
+            print(f"WARN {cfg['id']}: no source row yet")
+            continue
+        row = rows[0]
+        if not row["last_hit_at"]:
+            born = dt.datetime.fromisoformat(row["created_at"])
+            if now - born > max_age:
+                stale.append(f"{cfg['id']}: never succeeded, "
+                             f"created {(now - born).days}d ago")
+            else:
+                print(f"WARN {cfg['id']}: never succeeded (grace window)")
+            continue
+        age = now - dt.datetime.fromisoformat(row["last_hit_at"])
         if age > max_age:
             stale.append(f"{cfg['id']}: last success {age.days}d ago "
                          f"(SLO {max_age.days}d)")
@@ -251,6 +273,8 @@ def main() -> None:
         if fn is None:
             print(f"SKIP {cfg['id']}: unknown adapter {cfg['adapter']}")
             continue
+        if not args.dry_run:
+            upsert_source(cfg)  # track the source even if today's run fails
         try:
             cands = fn(cfg)
             if args.dry_run:
@@ -258,7 +282,6 @@ def main() -> None:
                 for c in cands[:5]:
                     print("     ", c["external_id"], c["title"][:100])
                 continue
-            upsert_source(cfg)
             new = store_candidates(cfg["id"], cands)
             touch_source(cfg["id"])
             print(f"OK   {cfg['id']}: {len(cands)} rows, {new} new")
@@ -266,10 +289,12 @@ def main() -> None:
             failures += 1
             print(f"FAIL {cfg['id']}: {e}")
 
-    if not args.dry_run and not failures:
+    # Individual source failures do NOT fail the run — the SLO check is the
+    # alarm (grace window, then red). A run with zero successes still fails.
+    if not args.dry_run and failures:
+        print(f"{failures} source(s) failed (SLO check is the alarm)")
+    if not args.dry_run:
         heartbeat()
-    if failures:
-        sys.exit(f"{failures} source(s) failed")
 
 
 if __name__ == "__main__":
