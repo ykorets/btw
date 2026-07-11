@@ -18,6 +18,7 @@ jobs:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
           HEARTBEAT_URL: ${{ secrets.HEARTBEAT_URL }}
+          COURTLISTENER_TOKEN: ${{ secrets.COURTLISTENER_TOKEN }}
         run: PYTHONPATH=engine/src python -m btw_engine.watch
       - name: Normalize claims into provenance + staged facts
         env:
