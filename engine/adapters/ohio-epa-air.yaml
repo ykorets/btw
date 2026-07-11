@@ -1,9 +1,9 @@
+# Ohio EPA air permitting page — weekly permit issuance lists are linked
+# here; a change means new issuance documents. Also our Ohio fallback while
+# OPSB DIS blocks GitHub-runner HTTP (see opsb-dockets.yaml).
 id: ohio-epa-air
-kind: listing
+kind: pagehash
+adapter: pagehash
 url: https://epa.ohio.gov/divisions-and-offices/air-pollution-control/permitting
-query: "behind-the-meter generation"
-state: OH
 schedule: daily
-slo_interval_days: 14
-parser: ohio-epa-air_v1
-status: stub   # implement per docs/architecture.md §4.1
+slo_interval_days: 7
