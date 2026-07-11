@@ -1,0 +1,35 @@
+# LLM role config — decisions.md D8/D9. Roles over brands: code asks for a
+# role; which model answers is THIS file's business. Change a line, not code.
+#
+# Model ids use LiteLLM naming (provider/model). Verify against LiteLLM's
+# price table before M3 evals; evals pick final assignments.
+#
+# Quorum policy (implemented in extractor, M3): default_extractor and
+# cross_checker run independently — different families ON PURPOSE. Agreement
+# after anchor validation -> auto-accept claim; disagreement -> escalation
+# model; still ambiguous -> human review.
+
+roles:
+  default_extractor:
+    model: "gemini/gemini-2.5-flash"
+    temperature: 0
+    max_tokens: 8192
+    note: cheap volume extraction; requires GEMINI_API_KEY
+
+  cross_checker:
+    model: "anthropic/claude-haiku-4-5"
+    temperature: 0
+    max_tokens: 8192
+    note: independent second pass, different family; requires ANTHROPIC_API_KEY
+
+  escalation:
+    model: "anthropic/claude-sonnet-4-5"
+    temperature: 0
+    max_tokens: 8192
+    note: disagreements and low-OCR documents only
+
+  digest_writer:
+    model: "anthropic/claude-sonnet-4-5"
+    temperature: 0.4
+    max_tokens: 4096
+    note: BTW Weekly drafts; voice per site/brand/design-system.html §06
