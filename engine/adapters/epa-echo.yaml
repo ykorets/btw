@@ -1,9 +1,15 @@
-id: epa-echo
+# EPA ECHO air-compliance activity counters for watched operators.
+# A new inspection / enforcement action / penalty changes the counter hash →
+# one candidate. Discovery mode (all NAICS 518210 with air programs) needs
+# the right air-program filter param — deferred, see docs/plan.md M6 status.
+id: epa-echo-compliance
 kind: api
-url: https://echo.epa.gov/tools/web-services
-query: "CAA new sources by NAICS 5182"
-state: US
+adapter: echo_counters
+url: https://echodata.epa.gov/echo/air_rest_services.get_facilities
 schedule: daily
-slo_interval_days: 14
-parser: epa-echo_v1
-status: stub   # implement per docs/architecture.md §4.1
+slo_interval_days: 3
+params:
+  queries:
+    - {name: xai-colossus, p_fn: colossus, p_st: TN}
+    - {name: xai-ctc-property, p_fn: ctc property, p_st: TN}
+    - {name: crusoe-abilene, p_fn: abilene dc, p_st: TX}
