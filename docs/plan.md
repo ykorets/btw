@@ -91,6 +91,19 @@ all 6 docs costs < $1.
 Risk: table-heavy pages (unit lists) — `cell` anchors may slip to M3.5; quote
 anchors must not.
 
+**Status 2026-07-11 — DONE (extract-v1@quorumless, run #3 green).**
+Eval baseline: recall 11/13 (85%) — TCEQ 6/6, SELC 3/3, appeal 2/4. The two
+appeal misses (unit.count 15, SMT-130) were extracted but rejected by the
+quote anchor (<0.92 — quotes span page breaks in the 49-page filing): guard
+erring safe, not hallucination. Anchor also correctly rejected computed
+totals (170.5 = 5×34.1). Cost: 9 Gemini Flash calls, $0.20 total across 3
+runs (≈$0.07/run for 3 docs) — under the $1 DoD. Iterations that mattered:
+json_object response format + salvage parser + retry (PR #4); word-number
+inventory ("five"), max_tokens 32768 for thinking budget, corrected operator
+label to permit-holder-of-record (PR #5). Follow-ups → M3.5: cross-page quote
+matching (page±1 fallback), quorum cross-check per D9, fact_provenance
+rewiring off M1 manual stubs, per-model eval comparison.
+
 ## M4 — First two watchers: TCEQ + OPSB (days 8–10)
 
 Build: adapter runtime (YAML config + parser fn contract) · TCEQ query
