@@ -68,6 +68,12 @@ def staged_units() -> list[dict]:
     return out
 
 
+def staged_events() -> list[dict]:
+    return _rest("GET", "event", params={
+        "select": "id,event_date,event_type,headline,facility(slug)",
+        "fact_state": "eq.staging", "order": "event_date.desc"}).json()
+
+
 def fresh_candidates(hours: int = 36) -> list[dict]:
     since = (dt.datetime.now(dt.timezone.utc)
              - dt.timedelta(hours=hours)).isoformat()
@@ -78,8 +84,16 @@ def fresh_candidates(hours: int = 36) -> list[dict]:
         "order": "found_at.desc"}).json()
 
 
-def render(units: list[dict], cands: list[dict], day: str) -> str:
+def render(units: list[dict], cands: list[dict], day: str,
+           events: list[dict] | None = None) -> str:
     lines = [f"# Review — {day}", ""]
+    if events:
+        lines += ["## Staged events (hot lane)", ""]
+        for e in events:
+            fac = (e.get("facility") or {}).get("slug", "—")
+            lines.append(f"- **{e['event_date']}** [{e['event_type']}] "
+                         f"{fac}: {e['headline']}")
+        lines.append("")
     if units:
         lines += ["## Staged fact updates", ""]
         for u in units:
@@ -116,11 +130,12 @@ def render(units: list[dict], cands: list[dict], day: str) -> str:
 def open_pr() -> None:
     day = dt.date.today().isoformat()
     units = staged_units()
+    events = staged_events()
     cands = fresh_candidates()
-    if not units and not cands:
+    if not units and not cands and not events:
         print("nothing to review today")
         return
-    body = render(units, cands, day)
+    body = render(units, cands, day, events)
     repo = os.environ["GITHUB_REPOSITORY"]
     branch = f"review/{day}"
 
@@ -146,7 +161,7 @@ def open_pr() -> None:
 
     r = _gh("POST", f"/repos/{repo}/pulls", json={
         "title": f"Review {day}: {len(units)} staged update(s), "
-                 f"{len(cands)} new candidate(s)",
+                 f"{len(events)} event(s), {len(cands)} new candidate(s)",
         "head": branch, "base": "main",
         "body": "Daily review batch. See the markdown diff; quotes are "
                 "anchored to archived documents.\n\n"
@@ -167,11 +182,20 @@ def open_pr() -> None:
 # ---------------------------------------------------------------- promote --
 
 def promote() -> None:
+    ev = _rest("GET", "event", params={
+        "select": "id", "fact_state": "eq.staging"}).json()
+    for e in ev:
+        _rest("PATCH", "event", params={"id": f"eq.{e['id']}"},
+              json={"fact_state": "published"})
+    if ev:
+        print(f"promoted {len(ev)} event(s)")
+
     staged = _rest("GET", "unit", params={
         "select": "id,facility_id,model",
         "fact_state": "eq.staging"}).json()
     if not staged:
-        print("nothing staged to promote")
+        if not ev:
+            print("nothing staged to promote")
         return
     for s in staged:
         pub = _rest("GET", "unit", params={
