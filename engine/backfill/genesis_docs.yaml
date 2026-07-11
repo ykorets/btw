@@ -1,0 +1,37 @@
+# Genesis document backfill — architecture §4.3 / plan M2.
+# Every genesis fact must trace to an archived document, not a live URL.
+
+- id: tceq-177263-tech-review
+  url: "https://records.tceq.texas.gov/cs/idcplg?IdcService=TCEQ_EXTERNAL_SEARCH_GET_FILE&dID=8600163&Rendition=Web"
+  genre: tceq_standard_permit_review
+  note: Crusoe Abilene DC 1 — EGU standard permit technical review (unit list, MW, hours)
+
+- id: schd-01156-01pc-appeal
+  url: "https://cdn.arstechnica.net/wp-content/uploads/2025/07/NAACP-and-YGGs-xAI-Air-Permit-Appeal-7-15-2025.pdf"
+  genre: appeal_filing
+  note: NAACP/YGG appeal — quotes CTC permit 01156-01PC terms (15x SMT-130)
+
+- id: selc-schd-letter-2025-04-09
+  url: "https://cleanenergy.org/wp-content/uploads/2025-04-09-Letter-from-SELC-et-al.-to-SCHD-re-xAIs-New-Turbines.pdf"
+  genre: advocacy_letter
+  note: SELC letter — satellite count 35 turbines / 421 MW at Colossus 1
+
+- id: eip-btm-inventory-2026-05
+  url: "https://environmentalintegrity.org/wp-content/uploads/2026/06/2026.05.14_BTM-Gas-Power-Plants.xlsx"
+  genre: third_party_inventory
+  note: EIP proposed BTM gas plants inventory (cross-check baseline)
+
+- id: gem-gogpt-2026-01
+  url: "https://globalenergymonitor.org/sites/default/files/migration/reports/GEM-Global-Oil-Gas-Plant-Tracker-January-2026_8.pdf"
+  genre: third_party_report
+  note: GEM GOGPT Jan 2026 — US gas buildout context
+
+- id: opsb-25-0185-order
+  url: "TODO"
+  status: pending
+  note: OPSB Socrates South certificate — docket system needs session fetch (M4 adapter)
+
+- id: mdeq-xai-41-units
+  url: "TODO"
+  status: pending
+  note: MDEQ air permit 41 turbines — enSearch retrieval config needed
