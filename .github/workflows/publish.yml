@@ -1,0 +1,30 @@
+name: publish-mirror
+on:
+  workflow_dispatch: {}
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: "3.12"}
+      - run: pip install httpx
+      - name: Generate mirror files from Postgres
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+        run: PYTHONPATH=engine/src python -m btw_engine.publish --out out
+      - name: Push to btw-data
+        env:
+          GH_BOT_TOKEN: ${{ secrets.GH_BOT_TOKEN }}
+        run: |
+          git clone https://x-access-token:${GH_BOT_TOKEN}@github.com/ykorets/btw-data.git mirror-repo
+          mkdir -p mirror-repo/data
+          cp out/* mirror-repo/data/
+          cd mirror-repo
+          git config user.name "btw-bot"
+          git config user.email "bot@behindthewatt.com"
+          git add -A
+          git diff --cached --quiet && echo "no changes" && exit 0
+          git commit -m "publish: $(date -u +%F) mirror export"
+          git push
