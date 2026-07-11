@@ -38,6 +38,9 @@ def fetch():
                "permit(authority,permit_no,permit_type,status,filed_at,issued_at)",
         fact_state="eq.published",
         order="slug",
+        # embedded resources need their own filters or staging rows leak in
+        **{"unit.fact_state": "eq.published",
+           "permit.fact_state": "eq.published"},
     )
     events = get(
         "event",
