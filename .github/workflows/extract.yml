@@ -1,0 +1,27 @@
+name: extract-genesis
+on:
+  workflow_dispatch: {}
+jobs:
+  extract:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: "3.12"}
+      - run: pip install httpx boto3 pyyaml litellm pypdf rapidfuzz
+      - name: Extract anchored claims from archived genesis documents
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+          R2_ACCOUNT_ID: "5ee73f367499e0cda9acfbd5966274e5"
+          R2_ACCESS_KEY: ${{ secrets.R2_ACCESS_KEY }}
+          R2_SECRET: ${{ secrets.R2_SECRET }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          BTW_MODELS_YAML: engine/models.yaml
+        run: PYTHONPATH=engine/src python -m btw_engine.extract --genres tceq_standard_permit_review,appeal_filing,advocacy_letter
+      - name: Score against hand-labeled expectations
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+        run: PYTHONPATH=engine/src python -m btw_engine.evalrun
