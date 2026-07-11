@@ -75,6 +75,19 @@ def _norm(s: str) -> str:
 
 _NUM_RE = re.compile(r"\d[\d,]*\.?\d*")
 
+# Regulatory prose spells small counts out ("five (5) turbines" or just
+# "five turbines"). Without these, correct claims get numeric_check=false.
+_WORD_NUMS = {
+    "one": 1, "two": 2, "three": 3, "four": 4, "five": 5, "six": 6,
+    "seven": 7, "eight": 8, "nine": 9, "ten": 10, "eleven": 11,
+    "twelve": 12, "thirteen": 13, "fourteen": 14, "fifteen": 15,
+    "sixteen": 16, "seventeen": 17, "eighteen": 18, "nineteen": 19,
+    "twenty": 20, "thirty": 30, "forty": 40, "fifty": 50, "sixty": 60,
+    "seventy": 70, "eighty": 80, "ninety": 90, "hundred": 100,
+}
+_WORD_RE = re.compile(
+    r"\b(" + "|".join(_WORD_NUMS) + r")\b", re.IGNORECASE)
+
 
 def numeric_inventory(text: str) -> set[float]:
     out = set()
@@ -83,6 +96,8 @@ def numeric_inventory(text: str) -> set[float]:
             out.add(float(m.group().replace(",", "")))
         except ValueError:
             pass
+    for m in _WORD_RE.finditer(text):
+        out.add(float(_WORD_NUMS[m.group().lower()]))
     return out
 
 

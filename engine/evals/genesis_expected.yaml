@@ -11,7 +11,9 @@
     - {field: unit.count, value_num: 5}
     - {field: unit.mw_each, value_num: 34.1}
     - {field: unit.hours_permitted, value_num: 8760}
-    - {field: facility.operator, value_contains: "Crusoe"}
+    # Permit holder of record is Abilene DC 1, LLC (Crusoe's project LLC);
+    # "Crusoe" itself does not appear in the TCEQ review text.
+    - {field: facility.operator, value_contains: "Abilene DC"}
     - {field: permit.no, value_contains: "177263"}
 
 - match: "arstechnica"
