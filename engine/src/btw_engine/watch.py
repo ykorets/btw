@@ -289,6 +289,58 @@ def run_gdelt(cfg: dict) -> list[dict]:
     return gdelt_candidates(payload)
 
 
+# ------------------------------------------------- Sentinel-2 (Island Watch) --
+
+def stac_scene_candidates(site: str, payload: dict,
+                          max_cloud: float) -> list[dict]:
+    """Pure mapper: Earth Search items → one candidate per usable scene."""
+    out = []
+    for f in payload.get("features", []):
+        props = f.get("properties", {})
+        cc = props.get("eo:cloud_cover")
+        if cc is not None and cc > max_cloud:
+            continue
+        thumb = (f.get("assets", {}).get("thumbnail") or {}).get("href")
+        dt_str = (props.get("datetime") or "")[:10]
+        out.append({
+            "external_id": f"{site}:{f.get('id')}",
+            "url": thumb,
+            "title": f"S2 scene over {site}: {dt_str}, "
+                     f"cloud {round(cc, 1) if cc is not None else '?'}%",
+            "payload": {"site": site, "scene_id": f.get("id"),
+                        "datetime": props.get("datetime"),
+                        "cloud_cover": cc, "preview": thumb},
+        })
+    return out
+
+
+def run_sentinel_stac(cfg: dict) -> list[dict]:
+    """New Sentinel-2 L2A scenes over watched site AOIs (Earth Search, keyless).
+
+    v1 is scene-availability + preview: each new usable scene becomes a
+    candidate the reviewer can eyeball from the review PR. Spectral change
+    detection over the AOI (windowed COG reads) is the planned v1.1 upgrade.
+    """
+    p = cfg.get("params", {})
+    window = int(p.get("window_days", 12))
+    max_cloud = float(p.get("max_cloud", 60))
+    since = (dt.datetime.now(dt.timezone.utc)
+             - dt.timedelta(days=window)).strftime("%Y-%m-%dT00:00:00Z")
+    out = []
+    for site in p.get("sites", []):
+        d = 0.01
+        bbox = (f"{site['lon']-d},{site['lat']-d},"
+                f"{site['lon']+d},{site['lat']+d}")
+        r = httpx.get(cfg["url"], params={
+            "bbox": bbox, "limit": "10",
+            "datetime": f"{since}/.."},
+            headers=BROWSER_HEADERS, timeout=60)
+        r.raise_for_status()
+        out.extend(stac_scene_candidates(site["name"], r.json(), max_cloud))
+        time.sleep(1)
+    return out
+
+
 # --------------------------------------------------------- CourtListener --
 
 def courtlistener_candidates(party: str, payload: dict) -> list[dict]:
@@ -334,6 +386,7 @@ ADAPTERS = {
     "echo_counters": run_echo_counters,
     "gdelt_news": run_gdelt,
     "courtlistener": run_courtlistener,
+    "sentinel_stac": run_sentinel_stac,
 }
 
 
