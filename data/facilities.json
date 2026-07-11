@@ -20,16 +20,16 @@
       "first_power": "2025-09-01",
       "unit": [
         {
-          "oem": "Solar Turbines",
-          "model": "Titan 350",
-          "mw_each": 31.7,
-          "unit_count": 6,
-          "hours_permitted": 8760
-        },
-        {
           "oem": "GE Vernova",
           "model": "LM2500",
           "mw_each": 34.1,
+          "unit_count": 5,
+          "hours_permitted": 8760
+        },
+        {
+          "oem": "Solar Turbines",
+          "model": "Titan 350",
+          "mw_each": 31.7,
           "unit_count": 5,
           "hours_permitted": 8760
         }
