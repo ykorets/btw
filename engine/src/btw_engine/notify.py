@@ -48,7 +48,7 @@ def gather() -> str:
     staged_e = _rest("event", {"select": "id", "fact_state": "eq.staging"})
 
     cost = _rest("llm_call", {
-        "select": "cost_usd", "created_at": "gt." + _iso_ago(24 * 7)})
+        "select": "cost_usd", "called_at": "gt." + _iso_ago(24 * 7)})
     spend = sum(float(c["cost_usd"] or 0) for c in cost)
 
     agg = _rest("aggregate", {
