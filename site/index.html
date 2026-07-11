@@ -159,7 +159,7 @@ footer a{color:var(--ink-2)}
     <div class="hero-num live" style="text-align:left"><div class="lbl">Actually operating</div><div class="val"><span id="n-op">0</span> GW</div><div class="lbl" style="margin-top:4px;color:var(--ink-3)">air permits · verified</div></div>
   </div>
   <p class="tagline">Who's actually online, how fast they got there, and what their power really costs. We track the difference between announcements and megawatts.</p>
-  <div class="trust">Tracked daily. Sourced from air permits, not press releases.</div>
+  <div class="trust">Tracked daily. Sourced from air permits, not press releases. <span id="asof" style="color:var(--ink-3)"></span></div>
   <div class="badges">
     <span class="tag tag-green">Open data</span>
     <span class="tag tag-blue">CC BY 4.0</span>
@@ -212,7 +212,7 @@ footer a{color:var(--ink-2)}
       <tbody>
         <tr>
           <td><b>xAI Colossus 1</b><br><span class="src">Memphis, TN · xAI</span></td>
-          <td class="mono">247 <span style="color:var(--red)">+174 obs.</span></td>
+          <td class="mono"><span class="mw-live" data-slug="xai-colossus-1">247</span> <span style="color:var(--red)">+174 obs.</span></td>
           <td>15× Solar SMT-130 w/ SCR; up to 35 mobile units observed by satellite</td>
           <td><span class="tag tag-red">In litigation</span><br><span class="src">SCHD 01156-01PC · NAACP v. xAI</span></td>
           <td class="mono" style="color:var(--red)">−12 mo</td>
@@ -220,7 +220,7 @@ footer a{color:var(--ink-2)}
         </tr>
         <tr>
           <td><b>xAI Colossus 2</b><br><span class="src">Southaven, MS · xAI</span></td>
-          <td class="mono">422</td>
+          <td class="mono"><span class="mw-live" data-slug="xai-colossus-2">422</span></td>
           <td>27 mobile turbines observed; 41 units permitted at Southaven plant</td>
           <td><span class="tag tag-red">Appealed</span><br><span class="src">MDEQ · appeal pending</span></td>
           <td class="mono" style="color:var(--red)">−9 mo</td>
@@ -228,7 +228,7 @@ footer a{color:var(--ink-2)}
         </tr>
         <tr>
           <td><b>Crusoe Stargate Abilene</b><br><span class="src">Abilene, TX · OpenAI via Oracle</span></td>
-          <td class="mono">360</td>
+          <td class="mono"><span class="mw-live" data-slug="crusoe-stargate-abilene">360</span></td>
           <td>6× Solar Titan 350 + 5× GE LM2500, 8,760 hr/yr, NSPS KKKK</td>
           <td><span class="tag tag-green">Clean</span><br><span class="src">TCEQ reg. 177263 · Title V O4721</span></td>
           <td class="mono">13 mo</td>
@@ -539,7 +539,19 @@ function countUp(el,target,decimals,dur){
   requestAnimationFrame(step);
 }
 countUp($("n-ann"),90,0,600);
-countUp($("n-op"),2.0,1,600);
+// Engine-generated numbers: the mirror branch is the only source of truth.
+const MIRROR="https://raw.githubusercontent.com/ykorets/btw/mirror/data";
+fetch(MIRROR+"/summary.json").then(r=>r.json()).then(s=>{
+  countUp($("n-op"),s.operating_gw,1,600);
+  $("asof").textContent="Data as of "+s.as_of+" · engine-generated";
+}).catch(()=>{countUp($("n-op"),1.0,1,600);});
+fetch(MIRROR+"/facilities.json").then(r=>r.json()).then(d=>{
+  const mw={};(d.facilities||[]).forEach(f=>{
+    mw[f.slug]=(f.unit||[]).reduce((a,u)=>a+(u.unit_count||0)*(+u.mw_each||0),0);});
+  document.querySelectorAll(".mw-live").forEach(el=>{
+    const v=mw[el.dataset.slug];
+    if(v!==undefined)el.textContent=Math.round(v);});
+}).catch(()=>{});
 </script>
 </body>
 </html>
