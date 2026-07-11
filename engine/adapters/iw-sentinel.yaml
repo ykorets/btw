@@ -1,0 +1,19 @@
+# Island Watch v1 — new Sentinel-2 L2A scenes over watched site AOIs.
+# Earth Search (Element84) STAC on AWS open data: keyless search, public
+# preview thumbnails. One candidate per usable scene per site; the reviewer
+# eyeballs the preview from the review PR. Spectral change detection over
+# the AOI (windowed COG reads, NDBI-style stats) is the v1.1 upgrade.
+# Coordinates from docs/island-watch/audit-2026-07.md.
+id: iw-sentinel
+kind: api
+adapter: sentinel_stac
+url: https://earth-search.aws.element84.com/v1/collections/sentinel-2-l2a/items
+schedule: daily
+slo_interval_days: 7
+params:
+  window_days: 12
+  max_cloud: 60
+  sites:
+    - {name: xai-colossus-1, lat: 35.0574, lon: -90.1563}
+    - {name: xai-colossus-2, lat: 34.9821, lon: -90.0381}
+    - {name: crusoe-stargate-abilene, lat: 32.5015, lon: -99.7891}

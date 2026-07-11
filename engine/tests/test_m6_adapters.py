@@ -48,6 +48,26 @@ def test_gdelt_candidates_dedupe_key_is_url_hash():
     assert len(cands[0]["external_id"]) == 16
 
 
+def test_stac_scene_candidates_cloud_filter_and_mapping():
+    from btw_engine.watch import stac_scene_candidates
+    payload = {"features": [
+        {"id": "S2B_15SYU_20260708_0_L2A",
+         "properties": {"datetime": "2026-07-08T16:53:59Z",
+                        "eo:cloud_cover": 31.2},
+         "assets": {"thumbnail": {"href": "https://x/preview.jpg"}}},
+        {"id": "S2A_15SYU_20260703_0_L2A",
+         "properties": {"datetime": "2026-07-03T16:54:01Z",
+                        "eo:cloud_cover": 92.0},
+         "assets": {}},
+    ]}
+    cands = stac_scene_candidates("xai-colossus-2", payload, max_cloud=60)
+    assert len(cands) == 1  # 92% cloud scene filtered out
+    c = cands[0]
+    assert c["external_id"] == "xai-colossus-2:S2B_15SYU_20260708_0_L2A"
+    assert c["url"] == "https://x/preview.jpg"
+    assert "2026-07-08" in c["title"] and "31.2" in c["title"]
+
+
 def test_courtlistener_candidates():
     payload = {"results": [{
         "docket_id": 70000001, "caseName": "NAACP v. xAI Corp",

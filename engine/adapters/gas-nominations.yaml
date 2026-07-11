@@ -1,0 +1,14 @@
+id: gas-nominations
+kind: api
+url: TBD
+query: "pipeline EBB operationally-available / scheduled quantities at delivery points"
+schedule: daily
+slo_interval_days: 14
+parser: gas-ebb_v1
+status: stub   # IW-v1 recon pending: identify the pipeline + delivery-point
+               # IDs serving each island (Southaven C2 — candidate systems:
+               # Texas Gas Transmission / Trunkline zone; Abilene — candidate:
+               # Atmos/ONEOK laterals), then capture the EBB posting page
+               # contract (most are Informational Postings sites with daily
+               # CSV/HTML). This is the continuous "is it running" pulse
+               # between satellite snapshots (docs/plan.md IW-v1).

@@ -210,6 +210,21 @@ independent evidence classes, per the state machine rules.
 DoD: "operating" status for all 3 genesis facilities carries ≥2 independent
 evidence classes recorded as claims.
 
+**Status 2026-07-11 — v1 core SHIPPED; DoD 1/3, gaps have named unblockers.**
+`iw-sentinel` adapter live: Earth Search STAC (keyless, AWS open data), new
+S2 L2A scenes over the 3 site AOIs → candidate with public preview thumbnail
+(reviewer eyeballs it from the review PR); cloud-cover filter; spectral
+change detection over the AOI (windowed COG reads) → v1.1. Evidence classes
+wired into fact_provenance on facility.status: xai-colossus-1 = 2 classes ✓
+(satellite figure-claims from the IW-v0 audit + regulatory doc claims);
+xai-colossus-2 = satellite only (unblocker: archive the MDEQ permit —
+genesis_docs entry still status:pending); crusoe-stargate-abilene =
+regulatory only (unblocker: TCEQ 177263 emission-point coords → Wayback jump
+to the power block, per audit next-step). Gas nominations = documented stub:
+pipeline + delivery-point IDs for Southaven (Texas Gas/Trunkline zone) and
+Abilene (Atmos/ONEOK laterals) need recon before an EBB contract can be
+captured. Scene-purchase list unchanged (2 × ~$15–30, 2026-Q3 captures).
+
 ## M8 — Hot lane + digest + site rewire (days 16–18)
 
 `btw hotfix` CLI (one event + evidence → instant PR) · Tuesday digest drafter
