@@ -3,12 +3,23 @@ on:
   schedule: [{cron: "20 11 * * *"}]   # 06:20 CT daily
   workflow_dispatch: {}
 jobs:
-  intake:
+  watch:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with: {python-version: "3.12"}
-      - run: pip install -e engine[dev]
-      - run: echo "TODO wire btw_engine.watch → fetch → extract → normalize → review PR"
-      # secrets: SUPABASE_URL, SUPABASE_KEY, R2_*, ANTHROPIC_API_KEY, GH_BOT_TOKEN
+      - run: pip install httpx pyyaml
+      - name: Run watchers
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+          HEARTBEAT_URL: ${{ secrets.HEARTBEAT_URL }}
+        run: PYTHONPATH=engine/src python -m btw_engine.watch
+      - name: SLO staleness check
+        if: always()
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+        run: PYTHONPATH=engine/src python -m btw_engine.watch --slo
+      # TODO(M5): fetch → extract → normalize → review PR
