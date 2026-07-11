@@ -32,6 +32,7 @@
   note: OPSB Socrates South certificate — docket system needs session fetch (M4 adapter)
 
 - id: mdeq-xai-41-units
-  url: "TODO"
-  status: pending
-  note: MDEQ air permit 41 turbines — enSearch retrieval config needed
+  url: "https://opcgis.deq.state.ms.us/ensearchonline/get_doc.aspx?dt=dpermit&id=1825411"
+  doc_genre: mdeq_psd_permit
+  note: MDEQ PSD Construction Permit 0680-00119 (MZX Tech / xAI Southaven,
+    41 turbines 1.2 GW) — direct get_doc URL, found 2026-07-11
