@@ -1,0 +1,32 @@
+name: btw-hotfix
+on:
+  workflow_dispatch:
+    inputs:
+      facility: {description: "facility slug (optional)", required: false, default: ""}
+      date: {description: "event date YYYY-MM-DD", required: true}
+      type: {description: "event type (enforcement/filing/observation/...)", required: true}
+      headline: {description: "one-line headline", required: true}
+      url: {description: "evidence URL (optional)", required: false, default: ""}
+permissions:
+  contents: write
+  pull-requests: write
+jobs:
+  hotfix:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: "3.12"}
+      - run: pip install httpx
+      - name: Stage event + open review PR
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+          GITHUB_TOKEN: ${{ github.token }}
+        run: >
+          PYTHONPATH=engine/src python -m btw_engine.hotfix
+          ${{ inputs.facility && format('--facility {0}', inputs.facility) || '' }}
+          --date "${{ inputs.date }}"
+          --type "${{ inputs.type }}"
+          --headline "${{ inputs.headline }}"
+          ${{ inputs.url && format('--url {0}', inputs.url) || '' }}

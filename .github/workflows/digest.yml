@@ -1,0 +1,24 @@
+name: btw-weekly-digest
+on:
+  schedule: [{cron: "0 13 * * 2"}]   # Tuesdays 08:00 CT
+  workflow_dispatch: {}
+permissions:
+  contents: write
+  pull-requests: write
+jobs:
+  digest:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: "3.12"}
+      - run: pip install httpx pyyaml litellm
+      - name: Draft BTW Weekly
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          BTW_MODELS_YAML: engine/models.yaml
+          GITHUB_TOKEN: ${{ github.token }}
+        run: PYTHONPATH=engine/src python -m btw_engine.digest
