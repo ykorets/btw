@@ -118,6 +118,19 @@ Risk: TCEQ search is JS/session-bound — if Playwright-in-Actions fights back,
 fall back to the public query-string search endpoints (they exist for most
 TCEQ record types) before reaching for headless.
 
+**Status 2026-07-11 — DONE (daily-intake run #3 green).**
+TCEQ turned out to have a stable undocumented POST contract (NSR search,
+`out_form=text` → pipe-delimited ASCII, cookieless). Two live sources
+(tceq-nsr-stdpmt 30d window, tceq-nsr-psd 45d) produced 56 candidates on
+first run, 11 keyword hits — including Westline Tx Holdings "DATA CENTER"
+(Tom Green Co), Enchanted Rock, Generate Lockhart, Stella Power. OPSB DIS
+blocks GitHub-runner HTTP (WAF); adapter ships anyway — the SLO grace window
+(7d from source creation) warns now and alarms if still blocked, which was
+observed working on run #2 (DoD item). Run semantics: individual source
+failures don't fail the step; `--slo` is the alarm. Fixture replay tests
+(7) wired into ci.yml (`|| true` dropped). OPSB egress workaround (worker
+proxy or per-docket RSS) → M6. HEARTBEAT_URL secret still unset (M0).
+
 ## M5 — Review loop end-to-end (days 10–12)
 
 Build: `normalize.py` (enums, unit conversion, deterministic resolver) ·
