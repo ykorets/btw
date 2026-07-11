@@ -1,0 +1,48 @@
+{
+  "license": "CC BY 4.0",
+  "cite_as": "Behind the Watt, behindthewatt.com, CC BY 4.0",
+  "events": [
+    {
+      "date": "2026-07-02",
+      "type": "permit_approved",
+      "headline": "Ohio clears its fifth behind-the-meter gas plant in New Albany \u2014 EdgeConneX PowerConneX joins the Williams fleet.",
+      "facility": null
+    },
+    {
+      "date": "2026-06-26",
+      "type": "permit_approved",
+      "headline": "Williams STY approved with 36 conditions: 296 MW of turbines + 116 MW battery for Meta's campus.",
+      "facility": null
+    },
+    {
+      "date": "2026-06-23",
+      "type": "permit_filed",
+      "headline": "Williams files Neo \u2014 666 MW of simple-cycle turbines + 260 MW BESS. The largest Socrates tranche yet.",
+      "facility": null
+    },
+    {
+      "date": "2026-06-18",
+      "type": "regulatory",
+      "headline": "FERC orders six grid operators to fast-track large-load interconnection and report spare capacity within 30 days.",
+      "facility": null
+    },
+    {
+      "date": "2026-06-15",
+      "type": "litigation",
+      "headline": "NAACP moves for a preliminary injunction to shut down xAI's Memphis turbines under the Clean Air Act.",
+      "facility": "xai-colossus-1"
+    },
+    {
+      "date": "2025-12-29",
+      "type": "satellite_observation",
+      "headline": "Satellite (Vantor LG01, 0.3 m): equipment yard imaged; visible units exceed 15-unit permit footprint; active vapor plume.",
+      "facility": "xai-colossus-1"
+    },
+    {
+      "date": "2025-11-27",
+      "type": "satellite_observation",
+      "headline": "Satellite (Vantor WV02, 0.3 m): ~35-40 major modules on site; four graded expansion pads consistent with 41-unit permit envelope.",
+      "facility": "xai-colossus-2"
+    }
+  ]
+}

@@ -1,0 +1,9 @@
+{
+  "as_of": "2026-07-11",
+  "operating_gw": 1.03,
+  "operating_facilities": 3,
+  "facilities_tracked": 3,
+  "method": "sum(unit_count*mw_each) over facilities with status=operating; unit ratings from permits/observations, per-facility method in provenance",
+  "license": "CC BY 4.0",
+  "cite_as": "Behind the Watt, behindthewatt.com, CC BY 4.0"
+}

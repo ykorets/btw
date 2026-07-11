@@ -1,0 +1,133 @@
+{
+  "license": "CC BY 4.0",
+  "cite_as": "Behind the Watt, behindthewatt.com, CC BY 4.0",
+  "facilities": [
+    {
+      "slug": "crusoe-stargate-abilene",
+      "name": "Crusoe Stargate Abilene",
+      "aliases": [
+        "Longhorn Data Center",
+        "Abilene DC 1, LLC",
+        "Lancium Clean Campus"
+      ],
+      "state": "TX",
+      "county": "Taylor",
+      "developer": "Crusoe / Lancium",
+      "offtaker": "OpenAI via Oracle",
+      "status": "operating",
+      "flags": [],
+      "first_permit_filed": "2024-08-01",
+      "first_power": "2025-09-01",
+      "unit": [
+        {
+          "oem": "Solar Turbines",
+          "model": "Titan 350",
+          "mw_each": 31.7,
+          "unit_count": 6,
+          "hours_permitted": 8760
+        },
+        {
+          "oem": "GE Vernova",
+          "model": "LM2500",
+          "mw_each": 34.1,
+          "unit_count": 5,
+          "hours_permitted": 8760
+        }
+      ],
+      "permit": [
+        {
+          "status": "issued",
+          "filed_at": "2024-08-01",
+          "authority": "TCEQ",
+          "issued_at": null,
+          "permit_no": "177263",
+          "permit_type": "EGU Standard Permit registration"
+        },
+        {
+          "status": "issued",
+          "filed_at": null,
+          "authority": "TCEQ",
+          "issued_at": null,
+          "permit_no": "O4721",
+          "permit_type": "Title V"
+        }
+      ]
+    },
+    {
+      "slug": "xai-colossus-1",
+      "name": "xAI Colossus 1",
+      "aliases": [
+        "CTC Property LLC",
+        "Colossus Memphis"
+      ],
+      "state": "TN",
+      "county": "Shelby",
+      "developer": "xAI / MZX Tech",
+      "offtaker": "xAI",
+      "status": "operating",
+      "flags": [
+        "in_litigation",
+        "unpermitted_operation"
+      ],
+      "first_permit_filed": "2025-01-31",
+      "first_power": "2024-07-01",
+      "unit": [
+        {
+          "oem": "Solar Turbines",
+          "model": "SMT-130",
+          "mw_each": 16.5,
+          "unit_count": 15,
+          "hours_permitted": 8760
+        }
+      ],
+      "permit": [
+        {
+          "status": "issued; under appeal; CAA litigation",
+          "filed_at": "2025-01-31",
+          "authority": "Shelby County Health Department",
+          "issued_at": "2025-07-02",
+          "permit_no": "01156-01PC",
+          "permit_type": "Air construction permit"
+        }
+      ]
+    },
+    {
+      "slug": "xai-colossus-2",
+      "name": "xAI Colossus 2",
+      "aliases": [
+        "Southaven power plant",
+        "MACROHARDRR"
+      ],
+      "state": "MS",
+      "county": "DeSoto",
+      "developer": "xAI",
+      "offtaker": "xAI",
+      "status": "operating",
+      "flags": [
+        "appealed",
+        "unpermitted_operation"
+      ],
+      "first_permit_filed": null,
+      "first_power": null,
+      "unit": [
+        {
+          "oem": "mixed mobile",
+          "model": "unverified",
+          "mw_each": 15.6,
+          "unit_count": 27,
+          "hours_permitted": null
+        }
+      ],
+      "permit": [
+        {
+          "status": "approved; appealed",
+          "filed_at": null,
+          "authority": "Mississippi DEQ",
+          "issued_at": "2026-01-15",
+          "permit_no": "MDEQ-41-units",
+          "permit_type": "Air permit (41 turbines)"
+        }
+      ]
+    }
+  ]
+}
