@@ -15,7 +15,8 @@ Usage:
   python -m btw_engine.watch --dry-run       # print candidates, no DB writes
   python -m btw_engine.watch --slo           # staleness check; exit 1 if stale
 
-Env: SUPABASE_URL, SUPABASE_SERVICE_KEY; optional HEARTBEAT_URL.
+Env: SUPABASE_URL, SUPABASE_SERVICE_KEY; optional HEARTBEAT_URL,
+COURTLISTENER_TOKEN.
 """
 
 import argparse
@@ -310,12 +311,16 @@ def courtlistener_candidates(party: str, payload: dict) -> list[dict]:
 
 
 def run_courtlistener(cfg: dict) -> list[dict]:
+    headers = dict(BROWSER_HEADERS)
+    token = os.environ.get("COURTLISTENER_TOKEN")
+    if token:  # anonymous access is throttled/blocked from datacenter IPs
+        headers["Authorization"] = f"Token {token}"
     out = []
     for party in cfg.get("params", {}).get("parties", []):
         r = httpx.get(cfg["url"], params={
             "q": f'"{party}"', "type": "r",
             "order_by": "dateFiled desc"},
-            headers=BROWSER_HEADERS, timeout=60)
+            headers=headers, timeout=60)
         r.raise_for_status()
         out.extend(courtlistener_candidates(party, r.json()))
         time.sleep(1)
