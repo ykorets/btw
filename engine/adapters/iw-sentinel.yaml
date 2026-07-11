@@ -16,4 +16,5 @@ params:
   sites:
     - {name: xai-colossus-1, lat: 35.0574, lon: -90.1563}
     - {name: xai-colossus-2, lat: 34.9821, lon: -90.0381}
-    - {name: crusoe-stargate-abilene, lat: 32.5015, lon: -99.7891}
+    # power block localized 2026-07-11 via TCEQ RN112029061 (615 FM 2404)
+    - {name: crusoe-stargate-abilene, lat: 32.5049, lon: -99.7752}
