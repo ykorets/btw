@@ -2,6 +2,9 @@ name: daily-intake
 on:
   schedule: [{cron: "20 11 * * *"}]   # 06:20 CT daily
   workflow_dispatch: {}
+permissions:
+  contents: write
+  pull-requests: write
 jobs:
   watch:
     runs-on: ubuntu-latest
@@ -16,10 +19,21 @@ jobs:
           SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
           HEARTBEAT_URL: ${{ secrets.HEARTBEAT_URL }}
         run: PYTHONPATH=engine/src python -m btw_engine.watch
+      - name: Normalize claims into provenance + staged facts
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+        run: PYTHONPATH=engine/src python -m btw_engine.normalize
+      - name: Open review PR
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+          GITHUB_TOKEN: ${{ github.token }}
+          AUTOMERGE: "false"
+        run: PYTHONPATH=engine/src python -m btw_engine.review --open
       - name: SLO staleness check
         if: always()
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
         run: PYTHONPATH=engine/src python -m btw_engine.watch --slo
-      # TODO(M5): fetch → extract → normalize → review PR
