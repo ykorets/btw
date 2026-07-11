@@ -1,9 +1,15 @@
+# OPSB docket watcher — per-case filings via GET CaseRecord.aspx?CaseNo=N.
+# DIS fronts a WAF that rejects generic HTTP clients; the adapter sends
+# browser-like headers. If DIS still blocks GitHub runners, the SLO staleness
+# alert fires and we renegotiate (docs/plan.md kill criteria).
+# New-case discovery (not just known dockets) is M6 scope.
 id: opsb-dockets
-kind: search
+kind: listing
+adapter: opsb_case
 url: https://dis.puc.state.oh.us/CaseRecord.aspx
-query: "power siting BLN data center"
-state: OH
 schedule: daily
-slo_interval_days: 14
-parser: opsb-dockets_v1
-status: stub   # implement per docs/architecture.md §4.1
+slo_interval_days: 7
+params:
+  cases:
+    - "25-0185"   # Oregon/New Albany EL-BLN (genesis)
+    - "26-0169"   # follow-on order docket (genesis)
