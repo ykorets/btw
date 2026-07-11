@@ -167,6 +167,22 @@ GDELT/news candidate feed · CourtListener alerts on known parties.
 DoD: coverage page data (which sources watched since when) generated into
 mirror; a week of daily runs with zero silent failures.
 
+**Status 2026-07-11 — adapters SHIPPED; week-of-clean-runs accruing.**
+Four new adapter types, all probed live before coding: pagehash (SCHD public
+notices, Ohio EPA permitting, EIA-860M page — one candidate per distinct
+content version, hash = external_id), echo_counters (EPA ECHO air-compliance
+activity per watched operator; probe found COLOSSUS DATA CENTER, RegistryID
+110071992829, NAICS 518210, NSPS/SIP, 1 inspection + 1 informal EA on
+record), gdelt_news (DOC 2.0 artlist, keyless), courtlistener (RECAP dockets
+per party). First sweep: 7/9 live sources green, 75 candidates total.
+coverage.json now generated into the mirror (DoD artifact). Known gaps:
+CourtListener anonymous access failed from the runner — set
+COURTLISTENER_TOKEN secret (free account) to enable; OPSB DIS still
+WAF-blocked (grace window ticking); FERC eLibrary + MDEQ enSearch remain
+documented stubs (undocumented JSON API / JS app); ECHO national NAICS-518210
+discovery mode needs the air-program filter param (279k raw FRS rows without
+it). The "week of daily runs with zero silent failures" clock starts now.
+
 ## Island Watch — promoted to core differentiator (was: verification add-on)
 
 Permits say what's allowed; satellites say what's on the ground; gas flows say
