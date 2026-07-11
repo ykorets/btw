@@ -1,0 +1,17 @@
+# TCEQ PSD pending applications — large sources (big-build islands file PSD).
+id: tceq-nsr-psd
+kind: search
+adapter: tceq_nsr
+url: https://www2.tceq.texas.gov/airperm/index.cfm?fuseaction=airpermits.validate_search_criteria
+schedule: daily
+slo_interval_days: 3
+params:
+  permit_type: PSD
+  window_days: 45
+keywords:
+  - turbine
+  - generat
+  - electric
+  - power
+  - energy
+  - data cent
