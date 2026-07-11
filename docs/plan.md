@@ -142,6 +142,23 @@ DoD: **the full loop breathes**: a real new filing appears in a registry →
 next morning a PR with anchored facts → merge → files update → site (still
 old shell) could read them. This is the engine's "first heartbeat" moment.
 
+**Status 2026-07-11 — DONE. First heartbeat observed end-to-end.**
+Chain proven on real data: archived TCEQ 177263 review → anchored claim
+("Reduce the count of Titan 350 ... from six to five", match 1.0) →
+normalize staged unit_count 6→5 → review PR #11 (quote + source link inline,
+plus 11 fresh watcher candidates) → human merge → review-promote workflow →
+staging→published swap → operating_gw aggregate recomputed → mirror
+regenerated (summary.json 1.03 → 1.0 GW). Design deviations from plan, both
+deliberate: (1) review PRs open in btw itself, not btw-data (GH_BOT_TOKEN
+still lacks btw-data write — M0 leftover); (2) no Cloudflare Worker webhook —
+promote runs as a workflow on merged review/* PRs, simpler and just as
+event-driven. Normalize is deterministic-only: doc→facility via unique
+permit-no match, numeric claims bind only when the unit's model token appears
+in the claim's own quote; equal→provenance link (M1 manual stubs replaced),
+different→staged; unresolved reported, never guessed. Known gap: claims whose
+quote lacks a model token stay unbound (e.g. Titan mw_each 38) — quorum +
+sentence-context binding → M3.5/M6. AUTOMERGE stays false.
+
 ## M6 — Remaining launch adapters + safety nets (days 12–14)
 
 MDEQ, Shelby page-hash, FERC eLibrary, EPA ECHO · EIA-860M monthly diff job ·
