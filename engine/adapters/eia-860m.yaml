@@ -1,0 +1,9 @@
+# EIA-860M monthly generator inventory — page changes when a new monthly
+# file posts; the candidate is the cue to diff the new month (manual for now,
+# scripted diff is a later refinement).
+id: eia-860m
+kind: pagehash
+adapter: pagehash
+url: https://www.eia.gov/electricity/data/eia860m/
+schedule: daily
+slo_interval_days: 45
