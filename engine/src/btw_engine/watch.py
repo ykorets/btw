@@ -21,9 +21,12 @@ Env: SUPABASE_URL, SUPABASE_SERVICE_KEY; optional HEARTBEAT_URL.
 import argparse
 import datetime as dt
 import glob
+import hashlib
+import json
 import os
 import re
 import sys
+import time
 
 import httpx
 import yaml
@@ -168,9 +171,164 @@ def run_opsb_case(cfg: dict) -> list[dict]:
     return out
 
 
+# --------------------------------------------------------------- pagehash --
+
+def normalize_page_text(html: str) -> str:
+    """Visible-ish text: scripts/styles out, tags out, whitespace collapsed."""
+    html = re.sub(r"<(script|style)\b.*?</\1>", " ", html,
+                  flags=re.S | re.I)
+    html = re.sub(r"<!--.*?-->", " ", html, flags=re.S)
+    html = re.sub(r"<[^>]+>", " ", html)
+    html = html.replace("&nbsp;", " ").replace("&amp;", "&")
+    return re.sub(r"\s+", " ", html).strip()
+
+
+def run_pagehash(cfg: dict) -> list[dict]:
+    """One candidate per distinct content version of a page.
+
+    external_id = content hash prefix, so the unique constraint stores each
+    version exactly once: first run records the baseline, later runs add a
+    candidate only when the page actually changes.
+    """
+    r = httpx.get(cfg["url"], headers=BROWSER_HEADERS, timeout=60,
+                  follow_redirects=True)
+    r.raise_for_status()
+    text = normalize_page_text(r.text)
+    if len(text) < 200:
+        raise RuntimeError(f"suspiciously short page ({len(text)} chars) — "
+                           f"error page or block")
+    h = hashlib.sha256(text.encode()).hexdigest()
+    return [{
+        "external_id": h[:16],
+        "url": cfg["url"],
+        "title": f"{cfg['id']}: content version {h[:8]} ({len(text)} chars)",
+        "payload": {"hash": h, "chars": len(text), "excerpt": text[:400]},
+    }]
+
+
+# ------------------------------------------------------- ECHO compliance --
+
+ECHO_COUNTER_KEYS = ("QueryRows", "SVRows", "CVRows", "V3Rows", "FEARows",
+                     "InfFEARows", "INSPRows", "FCERows", "TotalPenalties")
+
+
+def echo_counter_candidate(name: str, results: dict, query: dict) -> dict:
+    """Pure mapper: ECHO get_facilities summary counters → candidate."""
+    counters = {k: results.get(k) for k in ECHO_COUNTER_KEYS}
+    h = hashlib.sha256(
+        json.dumps(counters, sort_keys=True).encode()).hexdigest()
+    return {
+        "external_id": f"{name}:{h[:12]}",
+        "url": None,
+        "title": (f"ECHO {name}: facilities {counters['QueryRows']}, "
+                  f"inspections {counters['INSPRows']}, informal EA "
+                  f"{counters['InfFEARows']}, formal EA {counters['FEARows']},"
+                  f" penalties {counters['TotalPenalties']}"),
+        "payload": {"query": query, "counters": counters},
+    }
+
+
+def run_echo_counters(cfg: dict) -> list[dict]:
+    """Watch EPA ECHO air-compliance activity counters per named query.
+
+    A new inspection / enforcement action / penalty at a watched operator
+    changes the counters → new counter-hash → one candidate. Baseline row on
+    first run.
+    """
+    out = []
+    for q in cfg.get("params", {}).get("queries", []):
+        params = {"output": "JSON"}
+        params.update({k: v for k, v in q.items() if k != "name"})
+        r = httpx.get(cfg["url"], params=params, headers=BROWSER_HEADERS,
+                      timeout=60)
+        r.raise_for_status()
+        results = r.json().get("Results", {})
+        if "Error" in results:
+            raise RuntimeError(f"ECHO {q['name']}: "
+                               f"{results['Error'].get('ErrorMessage')}")
+        out.append(echo_counter_candidate(q["name"], results, q))
+        time.sleep(1)
+    return out
+
+
+# ------------------------------------------------------------ GDELT news --
+
+def gdelt_candidates(payload: dict) -> list[dict]:
+    out = []
+    for a in payload.get("articles", []):
+        url = a.get("url") or ""
+        if not url:
+            continue
+        h = hashlib.sha256(url.encode()).hexdigest()[:16]
+        out.append({
+            "external_id": h,
+            "url": url,
+            "title": f"{(a.get('title') or '')[:140]} "
+                     f"({a.get('domain')}, {a.get('seendate')})",
+            "payload": {"domain": a.get("domain"),
+                        "seendate": a.get("seendate"),
+                        "title": a.get("title")},
+        })
+    return out
+
+
+def run_gdelt(cfg: dict) -> list[dict]:
+    p = cfg.get("params", {})
+    r = httpx.get(cfg["url"], params={
+        "query": p.get("query", ""),
+        "mode": "artlist", "format": "json",
+        "timespan": p.get("timespan", "2d"),
+        "maxrecords": str(p.get("maxrecords", 40)),
+    }, headers=BROWSER_HEADERS, timeout=60)
+    r.raise_for_status()
+    try:
+        payload = r.json()
+    except ValueError as e:
+        raise RuntimeError(f"GDELT non-JSON reply: {r.text[:120]}") from e
+    return gdelt_candidates(payload)
+
+
+# --------------------------------------------------------- CourtListener --
+
+def courtlistener_candidates(party: str, payload: dict) -> list[dict]:
+    out = []
+    for res in payload.get("results", [])[:10]:
+        did = res.get("docket_id") or res.get("id")
+        out.append({
+            "external_id": f"cl-{did}",
+            "url": "https://www.courtlistener.com"
+                   + (res.get("docket_absolute_url")
+                      or res.get("absolute_url") or ""),
+            "title": f"{party}: {res.get('caseName')} "
+                     f"({res.get('court')}, filed {res.get('dateFiled')})",
+            "payload": {"party": party, "docket_id": did,
+                        "case_name": res.get("caseName"),
+                        "court": res.get("court"),
+                        "date_filed": res.get("dateFiled")},
+        })
+    return out
+
+
+def run_courtlistener(cfg: dict) -> list[dict]:
+    out = []
+    for party in cfg.get("params", {}).get("parties", []):
+        r = httpx.get(cfg["url"], params={
+            "q": f'"{party}"', "type": "r",
+            "order_by": "dateFiled desc"},
+            headers=BROWSER_HEADERS, timeout=60)
+        r.raise_for_status()
+        out.extend(courtlistener_candidates(party, r.json()))
+        time.sleep(1)
+    return out
+
+
 ADAPTERS = {
     "tceq_nsr": run_tceq_nsr,
     "opsb_case": run_opsb_case,
+    "pagehash": run_pagehash,
+    "echo_counters": run_echo_counters,
+    "gdelt_news": run_gdelt,
+    "courtlistener": run_courtlistener,
 }
 
 
