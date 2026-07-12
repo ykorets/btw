@@ -247,20 +247,24 @@ independent evidence classes, per the state machine rules.
 DoD: "operating" status for all 3 genesis facilities carries ≥2 independent
 evidence classes recorded as claims.
 
-**Status 2026-07-11 — v1 core SHIPPED; DoD 1/3, gaps have named unblockers.**
+**Status 2026-07-12 — DoD 3/3 ✓; gas recon done, parser is the last v1 gap.**
 `iw-sentinel` adapter live: Earth Search STAC (keyless, AWS open data), new
 S2 L2A scenes over the 3 site AOIs → candidate with public preview thumbnail
 (reviewer eyeballs it from the review PR); cloud-cover filter; spectral
 change detection over the AOI (windowed COG reads) → v1.1. Evidence classes
-wired into fact_provenance on facility.status: xai-colossus-1 = 2 classes ✓
-(satellite figure-claims from the IW-v0 audit + regulatory doc claims);
-xai-colossus-2 = satellite only (unblocker: archive the MDEQ permit —
-genesis_docs entry still status:pending); crusoe-stargate-abilene =
-regulatory only (unblocker: TCEQ 177263 emission-point coords → Wayback jump
-to the power block, per audit next-step). Gas nominations = documented stub:
-pipeline + delivery-point IDs for Southaven (Texas Gas/Trunkline zone) and
-Abilene (Atmos/ONEOK laterals) need recon before an EBB contract can be
-captured. Scene-purchase list unchanged (2 × ~$15–30, 2026-Q3 captures).
+on facility.status, all three facilities at 2 classes: xai-colossus-1 ✓
+(IW-v0 satellite + appeal-filing claims); xai-colossus-2 ✓ (MDEQ PSD
+0680-00119 archived + extracted — 41-unit envelope in 4 unit groups — plus
+IW-v0 satellite module count); crusoe-stargate-abilene ✓ (power block
+localized at 615 FM 2404 via TCEQ RN112029061 — ~10–11 packages, consistent
+with the permitted 11 — plus TCEQ 177263 regulatory claims). Gas recon
+(docs/island-watch/gas-recon-2026-07.md): Southaven is capturable — Texas
+Gas Transmission (Boardwalk, TSP 100000), delivery meter "MZX Southaven"
+confirmed in daily postings; EBB migrated to GasQuest, adapter contract
+documented, parser probe = remaining work. Abilene has NO public pulse
+(private lateral + planned private 42" Permian line, intrastate candidates
+carry no FERC EBB obligation) — published as an honest limit; pulse stays
+satellite-first. Scene-purchase list unchanged (2 × ~$15–30, 2026-Q3).
 
 ## M8 — Hot lane + digest + site rewire (days 16–18)
 
