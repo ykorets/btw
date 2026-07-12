@@ -199,8 +199,15 @@ def _make_context_of():
     context binding silently stays off) when R2 credentials are absent."""
     if not (os.environ.get("R2_ACCESS_KEY") and os.environ.get("R2_SECRET")):
         return None
-    from btw_engine.extract import page_texts  # pypdf import stays lazy
+    import io
+    from pypdf import PdfReader  # lazy: only needed when R2 creds present
     from btw_engine.fetch import s3, BUCKET
+
+    def page_texts(pdf_bytes: bytes) -> list[str]:
+        # local copy — importing btw_engine.extract would drag in the LLM
+        # stack (litellm), which the daily job deliberately doesn't install
+        reader = PdfReader(io.BytesIO(pdf_bytes))
+        return [(p.extract_text() or "") for p in reader.pages]
 
     r2_keys: dict[str, str] = {}
     pages_cache: dict[str, list[str]] = {}
