@@ -1,6 +1,10 @@
-"""M5 — deterministic planner tests for normalize."""
+"""M5 — deterministic planner tests for normalize (+M3.5 context binding)."""
 
-from btw_engine.normalize import plan_unit_changes, resolve_facility
+from btw_engine.normalize import (
+    locate_context,
+    plan_unit_changes,
+    resolve_facility,
+)
 
 TITAN = {"id": "u-titan", "facility_id": "f1", "oem": "Solar Turbines",
          "model": "Titan 350", "unit_count": 6, "mw_each": 31.7,
@@ -59,6 +63,55 @@ def test_model_claim_links():
     claims = [_c("c7", "unit.model", "350", None, "Titan 350")]
     links, _u, _x = plan_unit_changes([TITAN, LM], claims)
     assert [(u["id"], f) for u, f, c in links] == [("u-titan", "model")]
+
+
+PAGE = ("The permittee proposes changes to the Titan 350 simple-cycle "
+        "turbine fleet. Specifically, the application would increase the "
+        "site-rated power to 38 MW per turbine and adjust stack parameters "
+        "accordingly. No changes are proposed for other emission units.")
+
+PAGE_AMBIGUOUS = ("The site hosts Titan 350 and LM2500 machines. The "
+                  "application would increase the site-rated power to 38 MW "
+                  "per turbine for certain units at the facility.")
+
+
+def test_locate_context_finds_window():
+    ctx = locate_context(PAGE, "increase the site-rated power to 38 MW")
+    assert ctx is not None and "titan 350" in ctx
+
+
+def test_locate_context_rejects_absent_quote():
+    assert locate_context(PAGE, "forty MegaMax 9000 units installed") is None
+
+
+def test_context_binding_stages_update_when_quote_lacks_token():
+    # The M5 known gap: quote names no model -> stayed unbound. With context
+    # binding the surrounding sentence names exactly one model -> binds.
+    claims = [_c("c11", "unit.mw_each", "38 MW", 38.0,
+                 "increase the site-rated power to 38 MW per turbine")]
+    ctx = {c["id"]: locate_context(PAGE, c["quote"]) for c in claims}
+    links, updates, conflicts = plan_unit_changes(
+        [TITAN, LM], claims, context_of=lambda c: ctx[c["id"]])
+    assert not conflicts and not links
+    assert updates["u-titan"]["mw_each"][0] == 38.0
+    assert updates["u-titan"]["mw_each"][2] == "context"
+
+
+def test_ambiguous_context_never_binds():
+    claims = [_c("c12", "unit.mw_each", "38 MW", 38.0,
+                 "increase the site-rated power to 38 MW per turbine")]
+    ctx = {c["id"]: locate_context(PAGE_AMBIGUOUS, c["quote"])
+           for c in claims}
+    links, updates, conflicts = plan_unit_changes(
+        [TITAN, LM], claims, context_of=lambda c: ctx[c["id"]])
+    assert not links and not updates and not conflicts
+
+
+def test_no_context_callable_keeps_m5_behavior():
+    claims = [_c("c13", "unit.mw_each", "38 MW", 38.0,
+                 "increase the site-rated power to 38 MW per turbine")]
+    links, updates, conflicts = plan_unit_changes([TITAN, LM], claims)
+    assert not links and not updates and not conflicts
 
 
 def test_resolve_facility_unique_permit():

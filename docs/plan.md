@@ -104,6 +104,43 @@ label to permit-holder-of-record (PR #5). Follow-ups → M3.5: cross-page quote
 matching (page±1 fallback), quorum cross-check per D9, fact_provenance
 rewiring off M1 manual stubs, per-model eval comparison.
 
+## M3.5 — Quorum + anchoring upgrades (follow-ups from M3/M5)
+
+Build: cross-page quote matching (claimed page first; page±1 span rescues
+quotes straddling a break, numeric check runs against the matched span) ·
+quorum per D9 (`--quorum`): cross_checker second family → agree/solo auto-
+accept, same-passage contradiction → one escalation pass, surviving
+contradiction held at status `extracted` for human review; verdict recorded
+in `claim.quorum` (005) · sentence-context binding in normalize: quote
+without a model token binds iff exactly one unit's model appears in the
+fuzzy-located window around the quote in the archived page (R2); ambiguity
+never binds · per-model evals: `extract --role X`, `extractor_version`
+stamped `extract-v2[+quorum]@model`, `evalrun --compare` prints per-version
+recall/precision + ledger cost per model.
+
+DoD: the two M3 appeal misses (unit.count 15, SMT-130) recovered by the span
+fallback; Titan mw_each 38 binds via context; quorum run on all genesis docs
+with verdicts recorded; per-model table exists to (re)pick role assignments.
+
+**Status 2026-07-12 — DONE (run #6 green, quorum live). Recall 13/13.**
+All four pieces implemented with pure-function tests (32 green): span
+fallback keeps the claimed page authoritative and flags `[quote spans page
+break ±1]` in entity_hint; quorum policy distinguishes contradiction (same
+passage via quote-overlap ≥0.85, different value) from coverage variance
+(absence → solo, anchor already vouched); escalation fires once per doc and
+only on contradiction — cost-bounded; checker/escalation claims are never
+stored, only their ledger rows. Context binding is deterministic and
+R2-optional (creds absent → binding off, quote-token path intact).
+Live run (005 applied, extract-genesis #6, quorum=true): **recall 13/13
+(100%)** — both M3 appeal misses recovered (unit.count 15 validated match
+1.0 quorum=agree; SMT-130 validated), page-break flag observed working on
+two SELC claims; verdicts 70 agree / 32 solo / 0 disagree (no escalation
+needed), 2 anchor-rejects — the guard still bites. Cost ≈ $0.33/quorum-run
+(4 Gemini primary + 4 Haiku checker), under the $1 DoD. Remaining: Titan
+mw_each 38 context bind confirms on the next normalize run (needs R2 creds
+in that job); a second per-model row lands whenever extract runs with
+--role cross_checker for the D8 comparison table.
+
 ## M4 — First two watchers: TCEQ + OPSB (days 8–10)
 
 Build: adapter runtime (YAML config + parser fn contract) · TCEQ query
