@@ -1,14 +1,20 @@
 id: gas-nominations
 kind: api
-url: TBD
-query: "pipeline EBB operationally-available / scheduled quantities at delivery points"
+url: "https://www.gasquest.com/informational-posting"  # Boardwalk GasQuest (ex-infopost.bwpipelines.com)
+query: "TGT (TSP 100000) operationally-available / scheduled quantities, location ~ 'MZX'"
 schedule: daily
 slo_interval_days: 14
 parser: gas-ebb_v1
-status: stub   # IW-v1 recon pending: identify the pipeline + delivery-point
-               # IDs serving each island (Southaven C2 — candidate systems:
-               # Texas Gas Transmission / Trunkline zone; Abilene — candidate:
-               # Atmos/ONEOK laterals), then capture the EBB posting page
-               # contract (most are Informational Postings sites with daily
-               # CSV/HTML). This is the continuous "is it running" pulse
-               # between satellite snapshots (docs/plan.md IW-v1).
+status: recon_done  # IW-v1 recon 2026-07-12 (docs/island-watch/gas-recon-2026-07.md):
+                    # SOUTHAVEN C2 — capturable: Texas Gas Transmission (Boardwalk,
+                    # FERC TSP 100000), delivery meter "MZX Southaven" (MZX Tech,
+                    # DeSoto Co MS) confirmed present in daily postings via a
+                    # third-party flow tracker (Feb 2026). Capture: daily OA/
+                    # scheduled-quantities per NAESB cycle -> filter location name
+                    # contains 'MZX' -> flow value = operation pulse. Parser TODO:
+                    # probe GasQuest (JS app) for the CSV/JSON endpoint behind the
+                    # UI before considering headless.
+                    # ABILENE — no public pulse (honest limit): private lateral
+                    # (Primoris/Longhorn) + planned private 42" Permian line;
+                    # intrastate candidates (Atmos Pipeline-Texas, ONEOK WesTex)
+                    # have no FERC EBB obligation. Pulse stays satellite-first.
