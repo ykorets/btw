@@ -1,6 +1,18 @@
 name: extract-genesis
 on:
-  workflow_dispatch: {}
+  workflow_dispatch:
+    inputs:
+      role:
+        description: "models.yaml role for the primary pass (per-model evals)"
+        default: "default_extractor"
+      quorum:
+        description: "cross-check with a second family per D9"
+        type: boolean
+        default: false
+      compare:
+        description: "print per-extractor_version recall/precision/cost table"
+        type: boolean
+        default: false
 jobs:
   extract:
     runs-on: ubuntu-latest
@@ -18,10 +30,21 @@ jobs:
           R2_SECRET: ${{ secrets.R2_SECRET }}
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           BTW_MODELS_YAML: engine/models.yaml
-        run: PYTHONPATH=engine/src python -m btw_engine.extract --genres tceq_standard_permit_review,appeal_filing,advocacy_letter,mdeq_psd_permit
+        run: >
+          PYTHONPATH=engine/src python -m btw_engine.extract
+          --genres tceq_standard_permit_review,appeal_filing,advocacy_letter,mdeq_psd_permit
+          --role "${{ inputs.role || 'default_extractor' }}"
+          ${{ inputs.quorum && '--quorum' || '' }}
       - name: Score against hand-labeled expectations
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
         run: PYTHONPATH=engine/src python -m btw_engine.evalrun
+      - name: Per-model comparison (recall / precision / ledger cost)
+        if: ${{ inputs.compare }}
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+        run: PYTHONPATH=engine/src python -m btw_engine.evalrun --compare
