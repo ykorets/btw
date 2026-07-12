@@ -122,7 +122,7 @@ DoD: the two M3 appeal misses (unit.count 15, SMT-130) recovered by the span
 fallback; Titan mw_each 38 binds via context; quorum run on all genesis docs
 with verdicts recorded; per-model table exists to (re)pick role assignments.
 
-**Status 2026-07-11 — code SHIPPED; live DoD run pending.**
+**Status 2026-07-12 — DONE (run #6 green, quorum live). Recall 13/13.**
 All four pieces implemented with pure-function tests (32 green): span
 fallback keeps the claimed page authoritative and flags `[quote spans page
 break ±1]` in entity_hint; quorum policy distinguishes contradiction (same
@@ -131,9 +131,15 @@ passage via quote-overlap ≥0.85, different value) from coverage variance
 only on contradiction — cost-bounded; checker/escalation claims are never
 stored, only their ledger rows. Context binding is deterministic and
 R2-optional (creds absent → binding off, quote-token path intact).
-Remaining to close DoD: apply `schema/005_claim_quorum.sql` to Supabase, run
-extract-genesis with quorum=true, confirm appeal recall 4/4 and the Titan 38
-context bind, then `evalrun --compare` to re-pick models.yaml assignments.
+Live run (005 applied, extract-genesis #6, quorum=true): **recall 13/13
+(100%)** — both M3 appeal misses recovered (unit.count 15 validated match
+1.0 quorum=agree; SMT-130 validated), page-break flag observed working on
+two SELC claims; verdicts 70 agree / 32 solo / 0 disagree (no escalation
+needed), 2 anchor-rejects — the guard still bites. Cost ≈ $0.33/quorum-run
+(4 Gemini primary + 4 Haiku checker), under the $1 DoD. Remaining: Titan
+mw_each 38 context bind confirms on the next normalize run (needs R2 creds
+in that job); a second per-model row lands whenever extract runs with
+--role cross_checker for the D8 comparison table.
 
 ## M4 — First two watchers: TCEQ + OPSB (days 8–10)
 
