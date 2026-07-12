@@ -58,7 +58,7 @@ def load_sources() -> list[dict]:
     out = []
     for path in sorted(glob.glob(os.path.join(ADAPTER_DIR, "*.yaml"))):
         cfg = yaml.safe_load(open(path))
-        if cfg.get("status") == "stub":
+        if cfg.get("status"):  # any status (stub/recon_done/...) = not live
             continue
         out.append(cfg)
     return out
@@ -364,17 +364,30 @@ def courtlistener_candidates(party: str, payload: dict) -> list[dict]:
 
 def run_courtlistener(cfg: dict) -> list[dict]:
     headers = dict(BROWSER_HEADERS)
+    headers["Accept"] = "application/json"
     token = os.environ.get("COURTLISTENER_TOKEN")
     if token:  # anonymous access is throttled/blocked from datacenter IPs
-        headers["Authorization"] = f"Token {token}"
+        headers["Authorization"] = f"Token {token.strip()}"
+    else:
+        print("courtlistener: COURTLISTENER_TOKEN not set — expect blocks")
     out = []
     for party in cfg.get("params", {}).get("parties", []):
         r = httpx.get(cfg["url"], params={
             "q": f'"{party}"', "type": "r",
             "order_by": "dateFiled desc"},
-            headers=headers, timeout=60)
+            headers=headers, timeout=60, follow_redirects=True)
         r.raise_for_status()
-        out.extend(courtlistener_candidates(party, r.json()))
+        try:
+            data = r.json()
+        except ValueError:
+            # 200 with an HTML body = block/challenge page. Surface what
+            # came back so the failure is diagnosable from the run log.
+            ct = r.headers.get("content-type", "?")
+            raise RuntimeError(
+                f"non-JSON response for {party!r}: HTTP {r.status_code}, "
+                f"content-type {ct}, body starts "
+                f"{r.text[:120]!r}") from None
+        out.extend(courtlistener_candidates(party, data))
         time.sleep(1)
     return out
 
@@ -485,9 +498,10 @@ def main() -> None:
     for cfg in load_sources():
         if args.source and cfg["id"] != args.source:
             continue
-        fn = ADAPTERS.get(cfg["adapter"])
-        if fn is None:
-            print(f"SKIP {cfg['id']}: unknown adapter {cfg['adapter']}")
+        adapter = cfg.get("adapter")
+        fn = ADAPTERS.get(adapter) if adapter else None
+        if fn is None:  # missing or unknown adapter must not kill the sweep
+            print(f"SKIP {cfg['id']}: unknown adapter {adapter!r}")
             continue
         if not args.dry_run:
             upsert_source(cfg)  # track the source even if today's run fails
