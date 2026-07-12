@@ -291,6 +291,14 @@ Pages + behindthewatt.com when the domain is bought). Hotfix<15min DoD:
 architecture supports it (stage→PR instant; merge→promote→mirror ~1min;
 page reads mirror live) — timed end-to-end run pending first real event.
 
+**Hotfix<15min DoD — CLOSED 2026-07-12 with the first real event.**
+Southaven 57-turbine court record (NAACP v. xAI Doc 52, anchored claim
+observation.unit_count=57 match 1.0) ran the full hot lane: dispatch
+20:54:50 UTC → event staged + review PR refreshed <2 min → human merge
+21:16:28 → review-promote 13 s → mirror events.json carried the event by
+~21:17. Machine segments total <3 min; the 20-minute human review gap is
+the design, not latency. First real event end-to-end.
+
 ## Working model
 
 All code lands via Claude Code sessions against this repo (branch per
