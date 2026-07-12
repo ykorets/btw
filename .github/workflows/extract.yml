@@ -13,6 +13,9 @@ on:
         description: "print per-extractor_version recall/precision/cost table"
         type: boolean
         default: false
+      genres:
+        description: "comma list of doc_genre values to extract"
+        default: "tceq_standard_permit_review,appeal_filing,advocacy_letter,mdeq_psd_permit"
 jobs:
   extract:
     runs-on: ubuntu-latest
@@ -34,7 +37,7 @@ jobs:
           BTW_MODELS_YAML: engine/models.yaml
         run: >
           PYTHONPATH=engine/src python -m btw_engine.extract
-          --genres tceq_standard_permit_review,appeal_filing,advocacy_letter,mdeq_psd_permit
+          --genres "${{ inputs.genres || 'tceq_standard_permit_review,appeal_filing,advocacy_letter,mdeq_psd_permit' }}"
           --role "${{ inputs.role || 'default_extractor' }}"
           ${{ inputs.quorum && '--quorum' || '' }}
       - name: Score against hand-labeled expectations
