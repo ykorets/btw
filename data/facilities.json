@@ -122,9 +122,9 @@
         {
           "status": "approved; appealed",
           "filed_at": null,
-          "authority": "Mississippi DEQ",
+          "authority": "MDEQ",
           "issued_at": "2026-01-15",
-          "permit_no": "MDEQ-41-units",
+          "permit_no": "0680-00119",
           "permit_type": "Air permit (41 turbines)"
         }
       ]

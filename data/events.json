@@ -33,6 +33,12 @@
       "facility": "xai-colossus-1"
     },
     {
+      "date": "2026-05-15",
+      "type": "filing",
+      "headline": "Court record: 57 turbines on site at Southaven vs 41 permitted (consultants' 2026-05-15 inventory, NAACP v. xAI Doc 52) [https://storage.courtlistener.com/recap/gov.uscourts.msnd.52261/gov.uscourts.msnd.52261.52.0_2.pdf]",
+      "facility": "xai-colossus-2"
+    },
+    {
       "date": "2025-12-29",
       "type": "satellite_observation",
       "headline": "Satellite (Vantor LG01, 0.3 m): equipment yard imaged; visible units exceed 15-unit permit footprint; active vapor plume.",
