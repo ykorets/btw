@@ -36,3 +36,21 @@
   doc_genre: mdeq_psd_permit
   note: MDEQ PSD Construction Permit 0680-00119 (MZX Tech / xAI Southaven,
     41 turbines 1.2 GW) — direct get_doc URL, found 2026-07-11
+
+- id: naacp-v-xai-complaint-2026-04-14
+  url: "https://naacp.org/sites/default/files/documents/1%20-%20Complaint.pdf"
+  genre: court_filing
+  note: NAACP v. xAI/MZX Tech complaint, N.D. Miss. 3:26-cv-00074 (27 unpermitted
+    turbines Aug-Dec 2025, Colossus Gas Plant)
+
+- id: naacp-v-xai-amended-pi-doc52-2026-06-12
+  url: "https://storage.courtlistener.com/recap/gov.uscourts.msnd.52261/gov.uscourts.msnd.52261.52.0_2.pdf"
+  genre: court_filing
+  note: Amended preliminary-injunction brief Doc 52 (turbine progression 18->27->
+    33->57; consultants' 2026-05-15 inventory of 57 units + 2 planned)
+
+- id: selc-noi-xai-southaven-2026-02-13
+  url: "https://earthjustice.org/wp-content/uploads/2026/02/2026.02.13-final-xai-southaven-noi-with-exhibit-a.pdf"
+  genre: court_filing
+  note: CAA notice of intent to sue (27-unit breakdown - 14 SMT-130, 1 M35,
+    12 TM2500 Gen6/7/8, 495 MW)
