@@ -7,5 +7,5 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with: {python-version: "3.12"}
-      - run: pip install httpx pyyaml pytest
+      - run: pip install httpx pyyaml pytest rapidfuzz pypdf litellm boto3
       - run: PYTHONPATH=engine/src pytest engine/tests -q
