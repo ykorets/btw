@@ -158,7 +158,7 @@ footer a{color:var(--ink-2)}
 <section class="hero wrap">
   <div class="kicker">The open database of behind-the-meter data center power</div>
   <div class="hero-nums">
-    <div class="hero-num ghost" style="text-align:right"><div class="lbl">Announced</div><div class="val"><span id="n-ann">0</span> GW</div><div class="lbl" style="margin-top:4px"><a href="#watchlist" style="text-decoration:none;color:inherit">press releases</a></div></div>
+    <div class="hero-num ghost" style="text-align:right"><div class="lbl">Announced</div><div class="val">~<span id="n-ann">0</span> GW</div><div class="lbl" style="margin-top:4px"><a href="https://environmentalintegrity.org/wp-content/uploads/2026/06/2026.05.14_BTM-Gas-Power-Plants.xlsx" target="_blank" rel="noopener" style="text-decoration:none;color:inherit;border-bottom:1px dotted var(--line-2)">third-party estimate · EIP, May 2026</a></div></div>
     <div style="width:2.5px;background:var(--ink);border-radius:1px;align-self:stretch"></div>
     <div class="hero-num live" style="text-align:left"><div class="lbl">Actually operating</div><div class="val"><span id="n-op">0</span> GW</div><div class="lbl" style="margin-top:4px;color:var(--ink-3)"><a href="#tracker" style="text-decoration:none;color:inherit;border-bottom:1px dotted var(--line-2)">air permits · verified — sources</a></div></div>
   </div>
@@ -202,6 +202,7 @@ footer a{color:var(--ink-2)}
         <span><span class="dot" style="background:#c9971c"></span>Permitted</span>
         <span><span class="dot" style="background:#b4b2a6"></span>Announced</span>
       </div>
+      <p class="src" style="margin-top:10px">Operating dots: engine-verified capacity, coordinates from the permit/satellite trail. Other stages: as announced or filed — editorial, pending full database records.</p>
     </div>
   </div>
 </section>
@@ -217,25 +218,25 @@ footer a{color:var(--ink-2)}
         <tr>
           <td><b>xAI Colossus 1</b><br><span class="src">Memphis, TN · xAI</span></td>
           <td class="mono"><span class="mw-live" data-slug="xai-colossus-1">247</span> <span style="color:var(--red)">+174 obs.</span></td>
-          <td>15× Solar SMT-130 w/ SCR; up to 35 mobile units observed by satellite</td>
+          <td class="equip-live" data-slug="xai-colossus-1" data-note="up to 35 mobile units observed by satellite">15× Solar SMT-130 w/ SCR; up to 35 mobile units observed by satellite</td>
           <td><span class="tag tag-red">In litigation</span><br><span class="src">SCHD 01156-01PC · NAACP v. xAI</span></td>
-          <td class="mono" style="color:var(--red)">−12 mo</td>
+          <td class="mono ttp-cell" data-slug="xai-colossus-1" style="color:var(--red)">−7 mo</td>
           <td class="src src-live" data-slug="xai-colossus-1"><a href="https://www.selc.org/news/inside-memphis-fight-against-xai/">SELC</a></td>
         </tr>
         <tr>
           <td><b>xAI Colossus 2</b><br><span class="src">Southaven, MS · xAI</span></td>
           <td class="mono"><span class="mw-live" data-slug="xai-colossus-2">422</span></td>
-          <td>27 mobile turbines observed; 41 units permitted at Southaven plant</td>
+          <td class="equip-live" data-slug="xai-colossus-2" data-note="41 units permitted at Southaven plant">27 mobile turbines observed; 41 units permitted at Southaven plant</td>
           <td><span class="tag tag-red">Appealed</span><br><span class="src">MDEQ · appeal pending</span></td>
-          <td class="mono" style="color:var(--red)">−9 mo</td>
+          <td class="mono ttp-cell" data-slug="xai-colossus-2" style="color:var(--ink-3)">—</td>
           <td class="src src-live" data-slug="xai-colossus-2"><a href="https://mgrid.org/2026/04/14/xai-operates-27-unpermitted-gas-turbines-at-memphis-data-center-generating-422-mw-without-air-permits/">mgrid</a></td>
         </tr>
         <tr>
           <td><b>Crusoe Stargate Abilene</b><br><span class="src">Abilene, TX · OpenAI via Oracle</span></td>
           <td class="mono"><span class="mw-live" data-slug="crusoe-stargate-abilene">360</span></td>
-          <td>6× Solar Titan 350 + 5× GE LM2500, 8,760 hr/yr, NSPS KKKK</td>
+          <td class="equip-live" data-slug="crusoe-stargate-abilene" data-note="8,760 hr/yr, NSPS KKKK">5× Solar Titan 350 + 5× GE LM2500, 8,760 hr/yr, NSPS KKKK</td>
           <td><span class="tag tag-green">Clean</span><br><span class="src">TCEQ reg. 177263 · Title V O4721</span></td>
-          <td class="mono">13 mo</td>
+          <td class="mono ttp-cell" data-slug="crusoe-stargate-abilene">13 mo</td>
           <td class="src src-live" data-slug="crusoe-stargate-abilene"><a href="https://records.tceq.texas.gov/cs/idcplg?IdcService=TCEQ_EXTERNAL_SEARCH_GET_FILE&dID=8600163&Rendition=Web">TCEQ</a></td>
         </tr>
         <tr>
@@ -263,15 +264,11 @@ footer a{color:var(--ink-2)}
     <h2>Months from air permit to first megawatt</h2>
     <p class="sub">The industry promises "months, not years." Here's what the record actually shows. Negative numbers mean the turbines ran before the permit existed.</p>
     <div style="margin-top:26px">
+      <div id="ttp-live">
       <div class="ttp-row">
         <span><b>xAI Colossus 1</b> <span class="src">TN</span></span>
-        <div class="ttp-track"><div class="ttp-zero"></div><div class="ttp-bar" style="right:60%;width:20%;background:var(--red)"></div></div>
-        <span class="ttp-val" style="color:var(--red)">−12 mo</span>
-      </div>
-      <div class="ttp-row">
-        <span><b>xAI Colossus 2</b> <span class="src">MS</span></span>
-        <div class="ttp-track"><div class="ttp-zero"></div><div class="ttp-bar" style="right:60%;width:15%;background:var(--red)"></div></div>
-        <span class="ttp-val" style="color:var(--red)">−9 mo</span>
+        <div class="ttp-track"><div class="ttp-zero"></div><div class="ttp-bar" style="right:60%;width:13%;background:var(--red)"></div></div>
+        <span class="ttp-val" style="color:var(--red)">−7 mo</span>
       </div>
       <div class="ttp-row">
         <span><b>Crusoe Stargate Abilene</b> <span class="src">TX</span></span>
@@ -279,11 +276,17 @@ footer a{color:var(--ink-2)}
         <span class="ttp-val">13 mo</span>
       </div>
       <div class="ttp-row">
+        <span><b>xAI Colossus 2</b> <span class="src">MS</span></span>
+        <div class="ttp-track"><div class="ttp-zero"></div></div>
+        <span class="ttp-val" style="color:var(--ink-3)">dates under verification</span>
+      </div>
+      </div>
+      <div class="ttp-row">
         <span><b>Williams Socrates South</b> <span class="src">OH · projected</span></span>
         <div class="ttp-track"><div class="ttp-zero"></div><div class="ttp-bar" style="left:40%;width:30%;background:#c9d6c4"></div></div>
         <span class="ttp-val" style="color:var(--ink-3)">~18 mo</span>
       </div>
-      <p class="src" style="margin-top:14px">Zero = first air-permit filing. Grid interconnection median for comparison: 60+ months. Red = operation preceded permit; both xAI sites are in active Clean Air Act litigation.</p>
+      <p class="src" style="margin-top:14px">Zero = first air-permit filing; months computed from engine-verified dates — rows show a number only when both dates are published with sources. Grid interconnection median for comparison: 60+ months. Red = operation preceded permit; both xAI sites are in active Clean Air Act litigation.</p>
     </div>
   </div>
 </section>
@@ -467,10 +470,12 @@ footer a{color:var(--ink-2)}
 <script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
 <script src="https://cdn.jsdelivr.net/npm/topojson-client@3"></script>
 <script>
-const projects=[
- {n:"xAI Colossus 1",c:[-90.05,35.15],mw:421,s:"op"},
- {n:"xAI Colossus 2",c:[-89.99,34.99],mw:422,s:"op"},
- {n:"Crusoe Stargate Abilene",c:[-99.73,32.45],mw:360,s:"op"},
+// The mirror branch is the only source of truth for verified facts.
+const MIRROR="https://raw.githubusercontent.com/ykorets/btw/mirror/data";
+const FAC=fetch(MIRROR+"/facilities.json").then(r=>r.json()).catch(()=>({facilities:[]}));
+// Editorial layer: stages below "operating", pending full database records
+// (research/backfill tracked in plan). Operating dots come from the mirror.
+const editorial=[
  {n:"Williams Socrates (Meta)",c:[-82.76,40.08],mw:1486,s:"uc"},
  {n:"Vantage Frontier",c:[-99.35,32.73],mw:1400,s:"uc"},
  {n:"Stargate Doña Ana",c:[-106.8,32.3],mw:2200,s:"uc"},
@@ -484,16 +489,22 @@ const projects=[
 const col={op:"#157a54",uc:"#1f5fa8",pm:"#c9971c",an:"#b4b2a6"};
 const svg=d3.select("#usmap");
 const path=d3.geoPath(d3.geoAlbersUsa().scale(1280).translate([487,305]));
-d3.json("https://cdn.jsdelivr.net/npm/us-atlas@3/states-10m.json").then(us=>{
+Promise.all([d3.json("https://cdn.jsdelivr.net/npm/us-atlas@3/states-10m.json"),FAC]).then(([us,d])=>{
   svg.selectAll("path").data(topojson.feature(us,us.objects.states).features).join("path")
     .attr("d",path).attr("fill","#f1f0ea").attr("stroke","#dedcd2").attr("stroke-width",.7);
   const proj=d3.geoAlbersUsa().scale(1280).translate([487,305]);
   const r=d3.scaleSqrt([100,8000],[5,26]);
-  svg.selectAll("circle").data(projects).join("circle")
+  const ops=(d.facilities||[]).flatMap(f=>{
+    const m=/\((-?[0-9.]+),(-?[0-9.]+)\)/.exec(f.geo||"");
+    if(!m||f.status!=="operating")return[];
+    const mw=(f.unit||[]).reduce((a,u)=>a+(u.unit_count||0)*(+u.mw_each||0),0);
+    return[{n:f.name,c:[+m[1],+m[2]],mw:Math.round(mw),s:"op",v:1}];
+  });
+  svg.selectAll("circle").data(ops.concat(editorial)).join("circle")
     .attr("cx",d=>proj(d.c)[0]).attr("cy",d=>proj(d.c)[1])
     .attr("r",d=>r(d.mw)).attr("fill",d=>col[d.s]).attr("fill-opacity",.75)
     .attr("stroke","#fff").attr("stroke-width",1.2)
-    .append("title").text(d=>d.n+" — "+d.mw.toLocaleString()+" MW");
+    .append("title").text(d=>d.n+" — "+d.mw.toLocaleString()+" MW"+(d.v?" · engine-verified (permit-trail coordinates)":" · as announced/filed, pending verification"));
 });
 
 const $=id=>document.getElementById(id);
@@ -545,16 +556,47 @@ function countUp(el,target,decimals,dur){
   requestAnimationFrame(step);
 }
 countUp($("n-ann"),90,0,600);
-// Engine-generated numbers: the mirror branch is the only source of truth.
-const MIRROR="https://raw.githubusercontent.com/ykorets/btw/mirror/data";
 fetch(MIRROR+"/summary.json").then(r=>r.json()).then(s=>{
   countUp($("n-op"),s.operating_gw,1,600);
   $("asof").textContent="Data as of "+s.as_of+" · engine-generated";
 }).catch(()=>{countUp($("n-op"),1.0,1,600);});
 const esc=s=>String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const GENRE={tceq_standard_permit_review:"TCEQ permit",permit:"MDEQ permit",appeal_filing:"Permit appeal",court_filing:"Court filing",satellite_scene:"Satellite",advocacy_letter:"SELC letter",third_party_inventory:"EIP inventory",third_party_report:"GEM report"};
-fetch(MIRROR+"/facilities.json").then(r=>r.json()).then(d=>{
+FAC.then(d=>{
   const bySlug={};(d.facilities||[]).forEach(f=>bySlug[f.slug]=f);
+  const months=f=>{
+    if(!f.first_permit_filed||!f.first_power)return null;
+    return Math.round((new Date(f.first_power)-new Date(f.first_permit_filed))/2629800000);
+  };
+  // equipment cells: unit list is engine-verified; data-note is editorial context
+  document.querySelectorAll(".equip-live").forEach(td=>{
+    const f=bySlug[td.dataset.slug], units=(f&&f.unit)||[];
+    if(!units.length)return;
+    const s=units.map(u=>u.unit_count+"× "+((u.model&&u.model!=="unverified")?u.model:u.oem)).join(" + ");
+    td.textContent=s+(td.dataset.note?", "+td.dataset.note:"");
+  });
+  // permit -> power: computed from published dates only
+  document.querySelectorAll(".ttp-cell").forEach(td=>{
+    const f=bySlug[td.dataset.slug];
+    if(!f)return;
+    const mo=months(f);
+    if(mo===null){td.textContent="—";td.style.color="var(--ink-3)";td.title="permit/power dates not yet verified";return;}
+    td.textContent=(mo<0?"−":"")+Math.abs(mo)+" mo";
+    td.style.color=mo<0?"var(--red)":"var(--ink)";
+  });
+  // time-to-power board: rows rebuilt from the same dates
+  const live=document.getElementById("ttp-live");
+  if(live&&(d.facilities||[]).length){
+    const rows=d.facilities.filter(f=>f.status==="operating").map(f=>({f,mo:months(f)}));
+    rows.sort((a,b)=>(a.mo===null?99:a.mo)-(b.mo===null?99:b.mo));
+    live.innerHTML=rows.map(({f,mo})=>{
+      const head='<span><b>'+esc(f.name)+'</b> <span class="src">'+esc(f.state||"")+'</span></span>';
+      if(mo===null)return '<div class="ttp-row">'+head+'<div class="ttp-track"><div class="ttp-zero"></div></div><span class="ttp-val" style="color:var(--ink-3)">dates under verification</span></div>';
+      const w=Math.min(Math.abs(mo)*1.8,38);
+      const bar=mo<0?'right:60%;width:'+w+'%;background:var(--red)':'left:40%;width:'+w+'%;background:var(--green)';
+      return '<div class="ttp-row">'+head+'<div class="ttp-track"><div class="ttp-zero"></div><div class="ttp-bar" style="'+bar+'"></div></div><span class="ttp-val"'+(mo<0?' style="color:var(--red)"':'')+'>'+(mo<0?"−":"")+Math.abs(mo)+' mo</span></div>';
+    }).join("");
+  }
   document.querySelectorAll(".mw-live").forEach(el=>{
     const f=bySlug[el.dataset.slug];
     if(!f)return;
