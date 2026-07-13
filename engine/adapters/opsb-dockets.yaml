@@ -1,14 +1,16 @@
 # OPSB docket watcher — per-case filings via GET CaseRecord.aspx?CaseNo=N.
-# DIS fronts a WAF that rejects generic HTTP clients; the adapter sends
-# browser-like headers. If DIS still blocks GitHub runners, the SLO staleness
-# alert fires and we renegotiate (docs/plan.md kill criteria).
-# New-case discovery (not just known dockets) is M6 scope.
+# HONEST LIMIT (probed 2026-07-13): DIS fronts an F5 WAF that serves
+# residential browsers fine but rejects datacenter IPs (GitHub runners,
+# cloud sandboxes → "Request Rejected"); no RSS endpoint exists. Until a
+# relay with a non-DC egress appears, coverage is: gdelt-news (live) +
+# ferc-elibrary + a manual weekly glance at the two dockets. SLO relaxed
+# to 30d so the staleness alarm documents the gap without daily noise.
 id: opsb-dockets
 kind: listing
 adapter: opsb_case
 url: https://dis.puc.state.oh.us/CaseRecord.aspx
 schedule: daily
-slo_interval_days: 7
+slo_interval_days: 30
 params:
   cases:
     - "25-0185"   # Oregon/New Albany EL-BLN (genesis)

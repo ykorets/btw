@@ -1,11 +1,20 @@
+# MDEQ draft-permit public notices. Probe 2026-07-13: enSearch's "EPD
+# Permits at Public Notice" page is server-rendered ASPX (GridView table,
+# no JS needed) — name / media+permit type / city / county / notice end
+# date. Live check: 33 rows incl. "Entergy Mississippi, Traceview Advanced
+# Power Station — Air-Construction PSD". One candidate per (name, permit
+# type, end date). This is the registry the 0680-00119 (xAI Southaven)
+# permit would have surfaced through.
 id: mdeq-ensearch
-kind: search
-url: https://opc.deq.ms.gov/
-query: "air permit turbines data center"
-state: MS
+kind: listing
+adapter: mdeq_notice
+url: https://opcgis.deq.state.ms.us/ensearchonline/epd-permits-at-public-notice.aspx
 schedule: daily
-slo_interval_days: 14
-parser: mdeq-ensearch_v1
-status: stub   # M6 recon: opc.deq.ms.gov is a JS app (enSearch); no stable
-               # GET/POST contract found yet. Mississippi coverage currently
-               # via epa-echo-compliance counters + gdelt-news.
+slo_interval_days: 7
+keywords:
+  - data center
+  - computing
+  - turbine
+  - power station
+  - electric generation
+  - combined cycle

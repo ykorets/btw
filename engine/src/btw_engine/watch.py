@@ -392,6 +392,121 @@ def run_courtlistener(cfg: dict) -> list[dict]:
     return out
 
 
+# ----------------------------------------------------------- FERC eLibrary --
+
+def ferc_candidates(payload: dict, kws: list[str]) -> list[dict]:
+    """Pure mapper: AdvancedSearch hits → candidates. NB: the API really
+    does spell it 'acesssionNumber' (probe 2026-07-13)."""
+    out = []
+    for hit in payload.get("searchHits", []):
+        desc = re.sub(r"\s+", " ", (hit.get("description") or "")).strip()
+        acc = (hit.get("acesssionNumber") or hit.get("accessionNumber")
+               or hit.get("documentId"))
+        dockets = [d for d in (hit.get("docketNumbers") or []) if d]
+        blob = f"{desc} {' '.join(dockets)}".lower()
+        out.append({
+            "external_id": f"ferc-{acc}",
+            "url": ("https://elibrary.ferc.gov/eLibrary/filelist"
+                    f"?accession_number={acc}"),
+            "title": f"FERC {dockets[0] if dockets else '—'} "
+                     f"{hit.get('filedDate', '')}: {desc[:140]}",
+            "payload": {"accession": acc, "dockets": dockets,
+                        "filed": hit.get("filedDate"),
+                        "category": hit.get("category"),
+                        "description": desc,
+                        "kw_hit": any(k in blob for k in kws)},
+        })
+    return out
+
+
+def run_ferc_search(cfg: dict) -> list[dict]:
+    """FERC eLibrary keyword watcher (undocumented JSON API, probe
+    2026-07-13): POST eLibraryWebAPI/api/Search/AdvancedSearch — keyless,
+    description search over a trailing filed-date window."""
+    p = cfg.get("params", {})
+    today = dt.date.today()
+    frm = today - dt.timedelta(days=int(p.get("window_days", 7)))
+    body = {
+        "searchText": p.get("query", ""),
+        "searchFullText": bool(p.get("full_text", False)),
+        "searchDescription": True,
+        "dateSearches": [{"dateType": "filed_date",
+                          "startDate": frm.isoformat(),
+                          "endDate": today.isoformat()}],
+        "availability": None, "affiliations": [], "categories": [],
+        "libraries": [], "accessionNumber": None, "eFiling": False,
+        "docketSearches": [{"docketNumber": "", "subDocketNumbers": []}],
+        "resultsPerPage": int(p.get("max_results", 100)), "curPage": 1,
+        "classTypes": [], "sortBy": "", "groupBy": "NONE",
+        "idolResultID": "", "allDates": False,
+    }
+    headers = dict(BROWSER_HEADERS)
+    headers["Accept"] = "application/json"
+    r = httpx.post(cfg["url"], json=body, headers=headers, timeout=60)
+    r.raise_for_status()
+    payload = r.json()
+    if not payload.get("success", True):
+        raise RuntimeError(f"FERC search error: "
+                           f"{payload.get('errorMessage')}")
+    kws = [k.lower() for k in cfg.get("keywords", [])]
+    return ferc_candidates(payload, kws)
+
+
+# ---------------------------------------------- MDEQ draft-permit notices --
+
+_MDEQ_ROW = re.compile(r"<tr[^>]*>(.*?)</tr>", re.S | re.I)
+_MDEQ_CELL = re.compile(r"<t[dh][^>]*>(.*?)</t[dh]>", re.S | re.I)
+
+
+def parse_mdeq_notice(html: str) -> list[dict]:
+    """Pure parser: enSearch 'EPD Permits at Public Notice' GridView →
+    one dict per draft permit row (server-rendered aspx, no JS)."""
+    out = []
+    for row_html in _MDEQ_ROW.findall(html):
+        cells = [re.sub(r"\s+", " ",
+                        re.sub(r"<[^>]+>", " ",
+                               c.replace("&amp;", "&"))).strip()
+                 for c in _MDEQ_CELL.findall(row_html)]
+        if len(cells) < 5 or cells[0] in ("", "Name"):
+            continue
+        out.append({"name": cells[0], "permit_type": cells[1],
+                    "city": cells[2], "county": cells[3],
+                    "end_date": cells[4]})
+    return out
+
+
+def mdeq_candidates(rows: list[dict], kws: list[str],
+                    page_url: str) -> list[dict]:
+    """Pure mapper: one candidate per (name, permit type, notice end date).
+    Idempotent across daily reruns via the content-derived external_id."""
+    out = []
+    for row in rows:
+        key = f"{row['name']}|{row['permit_type']}|{row['end_date']}"
+        h = hashlib.sha256(key.encode()).hexdigest()[:16]
+        blob = " ".join(row.values()).lower()
+        out.append({
+            "external_id": f"mdeq-{h}",
+            "url": page_url,
+            "title": f"MDEQ draft permit: {row['name']} — "
+                     f"{row['permit_type']} ({row['county']}, "
+                     f"notice ends {row['end_date']})",
+            "payload": {**row, "kw_hit": any(k in blob for k in kws)},
+        })
+    return out
+
+
+def run_mdeq_notice(cfg: dict) -> list[dict]:
+    r = httpx.get(cfg["url"], headers=BROWSER_HEADERS, timeout=60,
+                  follow_redirects=True)
+    r.raise_for_status()
+    rows = parse_mdeq_notice(r.text)
+    if not rows:
+        raise RuntimeError(f"MDEQ notice page: 0 rows parsed — layout "
+                           f"change? ({len(r.text)} bytes)")
+    kws = [k.lower() for k in cfg.get("keywords", [])]
+    return mdeq_candidates(rows, kws, cfg["url"])
+
+
 # ----------------------------------------------- Gas EBB (Island Watch) --
 
 def parse_gas_ebb_csv(text: str, needles: list[str]) -> list[dict]:
@@ -482,6 +597,8 @@ ADAPTERS = {
     "courtlistener": run_courtlistener,
     "sentinel_stac": run_sentinel_stac,
     "gas_ebb": run_gas_ebb,
+    "ferc_search": run_ferc_search,
+    "mdeq_notice": run_mdeq_notice,
 }
 
 
