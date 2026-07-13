@@ -29,7 +29,7 @@
         {
           "oem": "Solar Turbines",
           "model": "Titan 350",
-          "mw_each": 31.7,
+          "mw_each": 38,
           "unit_count": 5,
           "hours_permitted": 8760
         }

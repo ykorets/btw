@@ -1,4 +1,4 @@
 slug,name,state,status,flags,mw,units,permits,first_permit_filed,first_power
-crusoe-stargate-abilene,Crusoe Stargate Abilene,TX,operating,,329.0,5x GE Vernova LM2500; 5x Solar Turbines Titan 350,TCEQ 177263 (issued); TCEQ O4721 (issued),2024-08-01,2025-09-01
+crusoe-stargate-abilene,Crusoe Stargate Abilene,TX,operating,,360.5,5x GE Vernova LM2500; 5x Solar Turbines Titan 350,TCEQ 177263 (issued); TCEQ O4721 (issued),2024-08-01,2025-09-01
 xai-colossus-1,xAI Colossus 1,TN,operating,in_litigation|unpermitted_operation,247.5,15x Solar Turbines SMT-130,Shelby County Health Department 01156-01PC (issued; under appeal; CAA litigation),2025-01-31,2024-07-01
 xai-colossus-2,xAI Colossus 2,MS,operating,appealed|unpermitted_operation,421.2,27x mixed mobile unverified,MDEQ 0680-00119 (approved; appealed),,
