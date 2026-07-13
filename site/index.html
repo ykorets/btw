@@ -69,6 +69,15 @@ header.site{position:sticky;top:0;background:rgba(251,250,247,.92);backdrop-filt
 .feed .d{font-family:var(--mono);font-size:12px;color:var(--ink-3);min-width:86px}
 .feed .doc{margin-left:auto;font-family:var(--mono);font-size:12px;color:var(--ink-3);white-space:nowrap}
 #map-box{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px;margin-top:22px}
+#usmap circle{cursor:pointer;transition:stroke-width .12s}
+#usmap circle:hover{stroke:var(--ink);stroke-width:2}
+#usmap circle.sel{stroke:var(--ink);stroke-width:2.5}
+#map-info{margin-top:14px;padding:14px 18px;background:var(--bg);border:1px solid var(--line);border-radius:10px;font-size:13.5px;color:var(--ink-2)}
+#map-info .mi-h{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+#map-info b{font-size:15px;color:var(--ink)}
+#map-info .mi-mw{font-family:var(--mono);font-size:14px;color:var(--ink)}
+#map-info .mi-src{margin-top:6px;font-size:12px}
+#map-info .mi-src a{color:var(--ink-2)}
 .legend{display:flex;gap:18px;flex-wrap:wrap;font-size:13px;color:var(--ink-2);margin-top:10px}
 .legend span{display:flex;align-items:center;gap:6px}
 .dot{width:11px;height:11px;border-radius:50%;display:inline-block}
@@ -202,6 +211,7 @@ footer a{color:var(--ink-2)}
         <span><span class="dot" style="background:#c9971c"></span>Permitted</span>
         <span><span class="dot" style="background:#b4b2a6"></span>Announced</span>
       </div>
+      <div id="map-info">Click a dot to see the project — capacity, stage, and the documents behind it.</div>
       <p class="src" style="margin-top:10px">Operating dots: engine-verified capacity, coordinates from the permit/satellite trail. Other stages: as announced or filed — editorial, pending full database records.</p>
     </div>
   </div>
@@ -473,6 +483,8 @@ footer a{color:var(--ink-2)}
 // The mirror branch is the only source of truth for verified facts.
 const MIRROR="https://raw.githubusercontent.com/ykorets/btw/mirror/data";
 const FAC=fetch(MIRROR+"/facilities.json").then(r=>r.json()).catch(()=>({facilities:[]}));
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const GENRE={tceq_standard_permit_review:"TCEQ permit",permit:"MDEQ permit",appeal_filing:"Permit appeal",court_filing:"Court filing",satellite_scene:"Satellite",advocacy_letter:"SELC letter",third_party_inventory:"EIP inventory",third_party_report:"GEM report"};
 // Editorial layer: stages below "operating", pending full database records
 // (research/backfill tracked in plan). Operating dots come from the mirror.
 const editorial=[
@@ -498,13 +510,35 @@ Promise.all([d3.json("https://cdn.jsdelivr.net/npm/us-atlas@3/states-10m.json"),
     const m=/\((-?[0-9.]+),(-?[0-9.]+)\)/.exec(f.geo||"");
     if(!m||f.status!=="operating")return[];
     const mw=(f.unit||[]).reduce((a,u)=>a+(u.unit_count||0)*(+u.mw_each||0),0);
-    return[{n:f.name,c:[+m[1],+m[2]],mw:Math.round(mw),s:"op",v:1}];
+    return[{n:f.name,c:[+m[1],+m[2]],mw:Math.round(mw),s:"op",v:1,f}];
   });
-  svg.selectAll("circle").data(ops.concat(editorial)).join("circle")
+  const stageLbl={op:"Operating",uc:"Under construction",pm:"Permitted",an:"Announced"};
+  const stageTag={op:"tag-green",uc:"tag-blue",pm:"tag-amber",an:"tag-amber"};
+  const info=document.getElementById("map-info");
+  function showInfo(d){
+    let h='<div class="mi-h"><b>'+esc(d.n)+'</b><span class="tag '+stageTag[d.s]+'">'+stageLbl[d.s]+'</span><span class="mi-mw">'+d.mw.toLocaleString()+' MW'+(d.v?' verified':' as announced/filed')+'</span></div>';
+    if(d.v&&d.f){
+      const f=d.f, units=(f.unit||[]).map(u=>u.unit_count+"× "+((u.model&&u.model!=="unverified")?u.model:u.oem)).join(" + ");
+      h+='<div style="margin-top:4px">'+esc([f.county,f.state].filter(Boolean).join(" County, "))+
+         (f.developer?' · '+esc(f.developer):'')+(f.offtaker?' → '+esc(f.offtaker):'')+'</div>';
+      if(units)h+='<div>'+esc(units)+'</div>';
+      if(f.first_permit_filed&&f.first_power){
+        const mo=Math.round((new Date(f.first_power)-new Date(f.first_permit_filed))/2629800000);
+        h+='<div>Permit → power: '+(mo<0?"−":"")+Math.abs(mo)+' mo</div>';
+      }
+      const srcs=f.sources||[];
+      if(srcs.length)h+='<div class="mi-src">Sources: '+srcs.map(s=>'<a href="'+esc(s.url)+'" target="_blank" rel="noopener">'+esc(GENRE[s.doc_genre]||s.doc_genre||"document")+'</a>').join(" · ")+'</div>';
+    }else{
+      h+='<div style="margin-top:4px">Editorial entry — capacity as announced or filed, no verified megawatts yet. Graduates to the operating layer when the engine links it to a permit and verified operation.</div>';
+    }
+    info.innerHTML=h;
+  }
+  const circles=svg.selectAll("circle").data(editorial.concat(ops)).join("circle")
     .attr("cx",d=>proj(d.c)[0]).attr("cy",d=>proj(d.c)[1])
-    .attr("r",d=>r(d.mw)).attr("fill",d=>col[d.s]).attr("fill-opacity",.75)
+    .attr("r",d=>Math.max(r(d.mw),6)).attr("fill",d=>col[d.s]).attr("fill-opacity",d=>d.v?.9:.7)
     .attr("stroke","#fff").attr("stroke-width",1.2)
-    .append("title").text(d=>d.n+" — "+d.mw.toLocaleString()+" MW"+(d.v?" · engine-verified (permit-trail coordinates)":" · as announced/filed, pending verification"));
+    .on("click",function(e,d){circles.classed("sel",false);d3.select(this).classed("sel",true);showInfo(d);});
+  circles.append("title").text(d=>d.n+" — "+d.mw.toLocaleString()+" MW"+(d.v?" · engine-verified":" · as announced/filed"));
 });
 
 const $=id=>document.getElementById(id);
@@ -560,8 +594,6 @@ fetch(MIRROR+"/summary.json").then(r=>r.json()).then(s=>{
   countUp($("n-op"),s.operating_gw,1,600);
   $("asof").textContent="Data as of "+s.as_of+" · engine-generated";
 }).catch(()=>{countUp($("n-op"),1.0,1,600);});
-const esc=s=>String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
-const GENRE={tceq_standard_permit_review:"TCEQ permit",permit:"MDEQ permit",appeal_filing:"Permit appeal",court_filing:"Court filing",satellite_scene:"Satellite",advocacy_letter:"SELC letter",third_party_inventory:"EIP inventory",third_party_report:"GEM report"};
 FAC.then(d=>{
   const bySlug={};(d.facilities||[]).forEach(f=>bySlug[f.slug]=f);
   const months=f=>{
