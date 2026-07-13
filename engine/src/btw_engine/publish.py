@@ -33,9 +33,10 @@ def get(table: str, **params) -> list[dict]:
 def fetch():
     facilities = get(
         "facility",
-        select="slug,name,aliases,state,county,developer,offtaker,status,flags,"
-               "first_permit_filed,first_power,unit(oem,model,unit_count,mw_each,hours_permitted),"
-               "permit(authority,permit_no,permit_type,status,filed_at,issued_at)",
+        select="id,slug,name,aliases,state,county,developer,offtaker,status,flags,"
+               "first_permit_filed,first_power,"
+               "unit(id,oem,model,unit_count,mw_each,hours_permitted),"
+               "permit(id,authority,permit_no,permit_type,status,filed_at,issued_at)",
         fact_state="eq.published",
         order="slug",
         # embedded resources need their own filters or staging rows leak in
@@ -44,13 +45,64 @@ def fetch():
     )
     events = get(
         "event",
-        select="event_date,event_type,headline,facility(slug)",
+        select="event_date,event_type,headline,source_url,facility(slug)",
         fact_state="eq.published",
         order="event_date.desc",
     )
     aggregates = get("aggregate", select="metric,value,method,inputs_note,computed_at",
                      order="computed_at.desc")
     return facilities, events, aggregates
+
+
+def fetch_provenance() -> list[dict]:
+    """The receipt for every fact: fact_provenance -> claim -> document."""
+    return get("fact_provenance",
+               select="fact_table,fact_id,fact_field,note,"
+                      "claim(quote,page,document(url,doc_genre))")
+
+
+def attach_sources(facilities: list[dict], prov: list[dict]) -> None:
+    """Fold provenance rows into each facility as a deduped sources[] list.
+
+    Every published number on the site must be inspectable: for each source
+    document we keep the URL, genre, which facts it supports, and the first
+    anchored quote. Internal ids are stripped afterwards so the mirror
+    schema stays stable.
+    """
+    owner: dict = {}
+    for f in facilities:
+        owner[("facility", f["id"])] = f
+        for u in f.get("unit", []):
+            owner[("unit", u["id"])] = f
+        for p in f.get("permit", []):
+            owner[("permit", p["id"])] = f
+
+    for row in prov:
+        claim = row.get("claim") or {}
+        doc = claim.get("document") or {}
+        url = doc.get("url")
+        f = owner.get((row["fact_table"], row["fact_id"]))
+        if not url or f is None:
+            continue
+        srcs = f.setdefault("sources", [])
+        hit = next((s for s in srcs if s["url"] == url), None)
+        if hit is None:
+            hit = {"url": url, "doc_genre": doc.get("doc_genre"), "facts": []}
+            srcs.append(hit)
+        label = f"{row['fact_table']}.{row['fact_field']}"
+        if label not in hit["facts"]:
+            hit["facts"].append(label)
+        if claim.get("quote") and "quote" not in hit:
+            hit["quote"] = claim["quote"][:280]
+            if claim.get("page"):
+                hit["page"] = claim["page"]
+
+    for f in facilities:
+        f.pop("id", None)
+        for u in f.get("unit", []):
+            u.pop("id", None)
+        for p in f.get("permit", []):
+            p.pop("id", None)
 
 
 def fetch_coverage() -> list[dict]:
@@ -119,6 +171,7 @@ def write_files(out: str, facilities, events, summary, coverage=None):
                    "events": [
                        {"date": e["event_date"], "type": e["event_type"],
                         "headline": e["headline"],
+                        "source_url": e.get("source_url"),
                         "facility": (e.get("facility") or {}).get("slug")}
                        for e in events]}, fp, indent=2, default=str)
 
@@ -149,6 +202,7 @@ def main():
     args = ap.parse_args()
 
     facilities, events, aggregates = fetch()
+    attach_sources(facilities, fetch_provenance())
     coverage = fetch_coverage()
     summary = build_summary(facilities, aggregates)
     write_files(args.out, facilities, events, summary, coverage)

@@ -6,7 +6,7 @@
 <title>Behind the Watt — the open database of behind-the-meter data center power</title>
 <meta name="description" content="The economics tracker for behind-the-meter data center power. Who's actually online, how fast they got there, and what their power really costs. Open data, CC BY 4.0, free forever.">
 <meta property="og:title" content="Behind the Watt">
-<meta property="og:description" content="90 GW announced. 2.0 GW operating. We track the difference — from air permits, not press releases.">
+<meta property="og:description" content="90 GW announced. ~1 GW verified operating. We track the difference — from air permits, not press releases.">
 <meta property="og:type" content="website">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -78,11 +78,15 @@ header.site{position:sticky;top:0;background:rgba(251,250,247,.92);backdrop-filt
 .ttp-bar{position:absolute;top:3px;height:16px;border-radius:3px}
 .ttp-val{font-family:var(--mono);font-size:13px;text-align:right}
 @media(max-width:700px){.ttp-row{grid-template-columns:1fr}.ttp-track{order:3}}
-.calc-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:10px 32px;margin:24px 0}
-.crow{display:flex;align-items:center;gap:12px}
-.crow label{font-size:13px;color:var(--ink-2);width:150px;flex-shrink:0}
-.crow input[type=range]{flex:1;accent-color:var(--ink)}
-.crow output{font-family:var(--mono);font-size:13px;font-weight:500;min-width:56px;text-align:right}
+.calc-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px 40px;margin:24px 0}
+.crow{display:grid;grid-template-columns:1fr auto;row-gap:4px;align-items:baseline}
+.crow label{font-size:13px;color:var(--ink-2)}
+.crow output{font-family:var(--mono);font-size:13px;font-weight:500;text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums}
+.crow input[type=range]{grid-column:1/-1;width:100%;margin:0;accent-color:var(--ink)}
+.calc-src{font-size:12px;color:var(--ink-3);max-width:720px;margin:-4px 0 18px}
+.calc-src a{color:var(--ink-2)}
+.feed a.doc{margin-left:auto;font-family:var(--mono);font-size:12px;color:var(--ink-2);white-space:nowrap;text-decoration:none;border-bottom:1px dotted var(--line-2)}
+.feed a.doc:hover{color:var(--ink);border-bottom-color:var(--ink-3)}
 .presets{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px}
 .preset{font-family:var(--mono);font-size:12px;padding:6px 12px;border:1px solid var(--line-2);border-radius:99px;background:var(--card);cursor:pointer}
 .preset:hover{background:var(--bg)}
@@ -154,9 +158,9 @@ footer a{color:var(--ink-2)}
 <section class="hero wrap">
   <div class="kicker">The open database of behind-the-meter data center power</div>
   <div class="hero-nums">
-    <div class="hero-num ghost" style="text-align:right"><div class="lbl">Announced</div><div class="val"><span id="n-ann">0</span> GW</div><div class="lbl" style="margin-top:4px">press releases</div></div>
+    <div class="hero-num ghost" style="text-align:right"><div class="lbl">Announced</div><div class="val"><span id="n-ann">0</span> GW</div><div class="lbl" style="margin-top:4px"><a href="#watchlist" style="text-decoration:none;color:inherit">press releases</a></div></div>
     <div style="width:2.5px;background:var(--ink);border-radius:1px;align-self:stretch"></div>
-    <div class="hero-num live" style="text-align:left"><div class="lbl">Actually operating</div><div class="val"><span id="n-op">0</span> GW</div><div class="lbl" style="margin-top:4px;color:var(--ink-3)">air permits · verified</div></div>
+    <div class="hero-num live" style="text-align:left"><div class="lbl">Actually operating</div><div class="val"><span id="n-op">0</span> GW</div><div class="lbl" style="margin-top:4px;color:var(--ink-3)"><a href="#tracker" style="text-decoration:none;color:inherit;border-bottom:1px dotted var(--line-2)">air permits · verified — sources</a></div></div>
   </div>
   <p class="tagline">Who's actually online, how fast they got there, and what their power really costs. We track the difference between announcements and megawatts.</p>
   <div class="trust">Tracked daily. Sourced from air permits, not press releases. <span id="asof" style="color:var(--ink-3)"></span></div>
@@ -216,7 +220,7 @@ footer a{color:var(--ink-2)}
           <td>15× Solar SMT-130 w/ SCR; up to 35 mobile units observed by satellite</td>
           <td><span class="tag tag-red">In litigation</span><br><span class="src">SCHD 01156-01PC · NAACP v. xAI</span></td>
           <td class="mono" style="color:var(--red)">−12 mo</td>
-          <td class="src"><a href="https://www.selc.org/news/inside-memphis-fight-against-xai/">SELC</a></td>
+          <td class="src src-live" data-slug="xai-colossus-1"><a href="https://www.selc.org/news/inside-memphis-fight-against-xai/">SELC</a></td>
         </tr>
         <tr>
           <td><b>xAI Colossus 2</b><br><span class="src">Southaven, MS · xAI</span></td>
@@ -224,7 +228,7 @@ footer a{color:var(--ink-2)}
           <td>27 mobile turbines observed; 41 units permitted at Southaven plant</td>
           <td><span class="tag tag-red">Appealed</span><br><span class="src">MDEQ · appeal pending</span></td>
           <td class="mono" style="color:var(--red)">−9 mo</td>
-          <td class="src"><a href="https://mgrid.org/2026/04/14/xai-operates-27-unpermitted-gas-turbines-at-memphis-data-center-generating-422-mw-without-air-permits/">mgrid</a></td>
+          <td class="src src-live" data-slug="xai-colossus-2"><a href="https://mgrid.org/2026/04/14/xai-operates-27-unpermitted-gas-turbines-at-memphis-data-center-generating-422-mw-without-air-permits/">mgrid</a></td>
         </tr>
         <tr>
           <td><b>Crusoe Stargate Abilene</b><br><span class="src">Abilene, TX · OpenAI via Oracle</span></td>
@@ -232,7 +236,7 @@ footer a{color:var(--ink-2)}
           <td>6× Solar Titan 350 + 5× GE LM2500, 8,760 hr/yr, NSPS KKKK</td>
           <td><span class="tag tag-green">Clean</span><br><span class="src">TCEQ reg. 177263 · Title V O4721</span></td>
           <td class="mono">13 mo</td>
-          <td class="src"><a href="https://records.tceq.texas.gov/cs/idcplg?IdcService=TCEQ_EXTERNAL_SEARCH_GET_FILE&dID=8600163&Rendition=Web">TCEQ</a></td>
+          <td class="src src-live" data-slug="crusoe-stargate-abilene"><a href="https://records.tceq.texas.gov/cs/idcplg?IdcService=TCEQ_EXTERNAL_SEARCH_GET_FILE&dID=8600163&Rendition=Web">TCEQ</a></td>
         </tr>
         <tr>
           <td><b>Fleet remainder</b><br><span class="src">under verification</span></td>
@@ -244,9 +248,10 @@ footer a{color:var(--ink-2)}
     </table>
     </div>
     <div id="data" style="display:flex;gap:10px;flex-wrap:wrap;margin-top:20px;align-items:center">
-      <a class="btn btn-primary" href="data/fleet.csv">Download CSV</a>
-      <a class="btn" href="data/fleet.json">JSON</a>
-      <a class="btn" href="https://github.com/behindthewatt">GitHub</a>
+      <a class="btn btn-primary" href="https://raw.githubusercontent.com/ykorets/btw/mirror/data/fleet.csv">Download CSV</a>
+      <a class="btn" href="https://raw.githubusercontent.com/ykorets/btw/mirror/data/facilities.json">JSON + sources</a>
+      <a class="btn" href="https://github.com/ykorets/btw/tree/mirror/data">All files</a>
+      <a class="btn" href="https://github.com/ykorets/btw">GitHub</a>
       <span class="cite">Cite as: Behind the Watt, behindthewatt.com, CC BY 4.0</span>
     </div>
   </div>
@@ -296,15 +301,16 @@ footer a{color:var(--ink-2)}
       <button class="preset" onclick="setPreset(1600,9500,4,10,60,65,20,20)">Underused island</button>
     </div>
     <div class="calc-grid">
-      <div class="crow"><label>Capex, $/kW</label><input type="range" id="capex" min="800" max="2500" step="50" value="1600"><output id="capex-out">1,600</output></div>
-      <div class="crow"><label>Heat rate, Btu/kWh</label><input type="range" id="hr" min="7500" max="11500" step="100" value="9500"><output id="hr-out">9,500</output></div>
-      <div class="crow"><label>Gas, $/MMBtu</label><input type="range" id="gas" min="2" max="8" step="0.25" value="4"><output id="gas-out">4.00</output></div>
-      <div class="crow"><label>O&M, $/MWh</label><input type="range" id="om" min="5" max="20" step="1" value="10"><output id="om-out">10</output></div>
-      <div class="crow"><label>Capacity factor, %</label><input type="range" id="cf" min="50" max="95" step="1" value="90"><output id="cf-out">90</output></div>
-      <div class="crow"><label>Grid tariff, $/MWh</label><input type="range" id="grid" min="40" max="120" step="1" value="65"><output id="grid-out">65</output></div>
-      <div class="crow"><label>Months saved vs queue</label><input type="range" id="mo" min="0" max="36" step="1" value="20"><output id="mo-out">20</output></div>
-      <div class="crow"><label>Compute revenue, $M/MW·yr</label><input type="range" id="rev" min="2" max="30" step="1" value="20"><output id="rev-out">20</output></div>
+      <div class="crow"><label for="capex">Capex, $/kW</label><output id="capex-out">1,600</output><input type="range" id="capex" min="800" max="2500" step="50" value="1600"></div>
+      <div class="crow"><label for="hr">Heat rate, Btu/kWh</label><output id="hr-out">9,500</output><input type="range" id="hr" min="7500" max="11500" step="100" value="9500"></div>
+      <div class="crow"><label for="gas">Gas, $/MMBtu</label><output id="gas-out">4.00</output><input type="range" id="gas" min="2" max="8" step="0.25" value="4"></div>
+      <div class="crow"><label for="om">O&M, $/MWh</label><output id="om-out">10</output><input type="range" id="om" min="5" max="20" step="1" value="10"></div>
+      <div class="crow"><label for="cf">Capacity factor, %</label><output id="cf-out">90</output><input type="range" id="cf" min="50" max="95" step="1" value="90"></div>
+      <div class="crow"><label for="grid">Grid tariff, $/MWh</label><output id="grid-out">65</output><input type="range" id="grid" min="40" max="120" step="1" value="65"></div>
+      <div class="crow"><label for="mo">Months saved vs queue</label><output id="mo-out">20</output><input type="range" id="mo" min="0" max="36" step="1" value="20"></div>
+      <div class="crow"><label for="rev">Compute revenue, $M/MW·yr</label><output id="rev-out">20</output><input type="range" id="rev" min="2" max="30" step="1" value="20"></div>
     </div>
+    <p class="calc-src">Where the defaults come from: heat rate and 8,760 hr/yr utilization — <a href="https://records.tceq.texas.gov/cs/idcplg?IdcService=TCEQ_EXTERNAL_SEARCH_GET_FILE&dID=8600163&Rendition=Web" target="_blank" rel="noopener">TCEQ reg. 177263 technical review</a> (Crusoe Abilene); gas price — <a href="https://www.eia.gov/dnav/ng/hist/rngwhhdD.htm" target="_blank" rel="noopener">EIA Henry Hub daily spot</a>; grid tariff band — <a href="https://www.eia.gov/electricity/monthly/epm_table_grapher.php?t=epmt_5_6_a" target="_blank" rel="noopener">EIA industrial average by state</a>. Capex and O&amp;M are model assumptions, not sourced facts — that's why they're sliders. Every output is arithmetic on your inputs.</p>
     <div class="legend">
       <span><span class="dot" style="background:#c9971c;border-radius:3px"></span>Fuel</span>
       <span><span class="dot" style="background:#1f5fa8;border-radius:3px"></span>Capex</span>
@@ -414,7 +420,7 @@ footer a{color:var(--ink-2)}
       </tbody>
     </table>
     </div>
-    <p class="src" style="margin-top:12px">Will they hit their dates? Subscribe and find out the day the first megawatt is verified.</p>
+    <p class="src" style="margin-top:12px">Capacities as filed or announced — unverified until the first megawatt. Rows graduate to the fleet table above, with full document sources, the day operation is verified. Will they hit their dates? Subscribe and find out.</p>
   </div>
 </section>
 
@@ -452,7 +458,7 @@ footer a{color:var(--ink-2)}
     <div style="display:flex;gap:24px;flex-wrap:wrap">
       <a href="#data">Data</a>
       <a href="#method">Methodology</a>
-      <a href="https://github.com/behindthewatt">GitHub</a>
+      <a href="https://github.com/ykorets/btw">GitHub</a>
       <a href="mailto:hello@behindthewatt.com">Contact</a>
     </div>
   </div>
@@ -545,12 +551,41 @@ fetch(MIRROR+"/summary.json").then(r=>r.json()).then(s=>{
   countUp($("n-op"),s.operating_gw,1,600);
   $("asof").textContent="Data as of "+s.as_of+" · engine-generated";
 }).catch(()=>{countUp($("n-op"),1.0,1,600);});
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const GENRE={tceq_standard_permit_review:"TCEQ permit",permit:"MDEQ permit",appeal_filing:"Permit appeal",court_filing:"Court filing",satellite_scene:"Satellite",advocacy_letter:"SELC letter",third_party_inventory:"EIP inventory",third_party_report:"GEM report"};
 fetch(MIRROR+"/facilities.json").then(r=>r.json()).then(d=>{
-  const mw={};(d.facilities||[]).forEach(f=>{
-    mw[f.slug]=(f.unit||[]).reduce((a,u)=>a+(u.unit_count||0)*(+u.mw_each||0),0);});
+  const bySlug={};(d.facilities||[]).forEach(f=>bySlug[f.slug]=f);
   document.querySelectorAll(".mw-live").forEach(el=>{
-    const v=mw[el.dataset.slug];
-    if(v!==undefined)el.textContent=Math.round(v);});
+    const f=bySlug[el.dataset.slug];
+    if(!f)return;
+    const units=f.unit||[];
+    const v=units.reduce((a,u)=>a+(u.unit_count||0)*(+u.mw_each||0),0);
+    el.textContent=Math.round(v);
+    el.title=units.map(u=>u.unit_count+"× "+((u.model||u.oem||"unit")+" @ "+u.mw_each+" MW")).join(" + ")+" — engine-verified, documents in the Source column";
+  });
+  // every number gets its receipt: engine provenance -> Source column
+  document.querySelectorAll(".src-live").forEach(td=>{
+    const f=bySlug[td.dataset.slug], srcs=(f&&f.sources)||[];
+    if(!srcs.length)return;
+    td.innerHTML=srcs.map(s=>{
+      const tip=(s.facts||[]).join(", ")+(s.quote?" — “"+s.quote+"”":"");
+      return '<a href="'+esc(s.url)+'" target="_blank" rel="noopener" title="'+esc(tip)+'">'+esc(GENRE[s.doc_genre]||s.doc_genre||"document")+'</a>';
+    }).join("<br>");
+  });
+}).catch(()=>{});
+// live feed from the mirror: headline + clickable source document
+const DOCLBL=[[/courtlistener|uscourts/,"Court record"],[/deq\.state\.ms/,"MDEQ"],[/tceq/,"TCEQ"],[/puco?\.|opsb/,"OPSB"],[/ferc/,"FERC"],[/arcgis/,"Satellite"],[/epa\.gov/,"EPA"]];
+fetch(MIRROR+"/events.json").then(r=>r.json()).then(d=>{
+  const evs=(d.events||[]).slice(0,6);
+  if(!evs.length)return;
+  document.querySelector(".feed").innerHTML=evs.map(e=>{
+    const dt=new Date(e.date+"T00:00:00").toLocaleDateString("en-US",{month:"short",day:"numeric",year:"numeric"});
+    let lbl=(e.type||"").replace(/_/g," ");
+    if(e.source_url){for(const [re,l] of DOCLBL){if(re.test(e.source_url)){lbl=l;break}}
+      if(lbl===(e.type||"").replace(/_/g," ")){try{lbl=new URL(e.source_url).hostname.replace(/^www\./,"")}catch(_){}}
+      return '<li><span class="d">'+dt+'</span><span>'+esc(e.headline)+'</span><a class="doc" href="'+esc(e.source_url)+'" target="_blank" rel="noopener">'+esc(lbl)+' ↗</a></li>';}
+    return '<li><span class="d">'+dt+'</span><span>'+esc(e.headline)+'</span><span class="doc">'+esc(lbl)+'</span></li>';
+  }).join("");
 }).catch(()=>{});
 </script>
 </body>
