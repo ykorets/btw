@@ -33,7 +33,7 @@ def get(table: str, **params) -> list[dict]:
 def fetch():
     facilities = get(
         "facility",
-        select="id,slug,name,aliases,state,county,developer,offtaker,status,flags,"
+        select="id,slug,name,aliases,state,county,geo,developer,offtaker,status,flags,"
                "first_permit_filed,first_power,"
                "unit(id,oem,model,unit_count,mw_each,hours_permitted),"
                "permit(id,authority,permit_no,permit_type,status,filed_at,issued_at)",
