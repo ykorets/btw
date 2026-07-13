@@ -1,7 +1,9 @@
 # EPA ECHO air-compliance activity counters for watched operators.
 # A new inspection / enforcement action / penalty changes the counter hash →
-# one candidate. Discovery mode (all NAICS 518210 with air programs) needs
-# the right air-program filter param — deferred, see docs/plan.md M6 status.
+# one candidate. Discovery mode (probe 2026-07-13): the working NAICS param
+# on air_rest_services is p_ncs (p_naics is silently ignored → 279k rows =
+# the whole CAA universe); p_ncs=518210 → 460 facilities nationwide. Any
+# new data-center air permit anywhere moves QueryRows → new hash → candidate.
 id: epa-echo-compliance
 kind: api
 adapter: echo_counters
@@ -13,3 +15,4 @@ params:
     - {name: xai-colossus, p_fn: colossus, p_st: TN}
     - {name: xai-ctc-property, p_fn: ctc property, p_st: TN}
     - {name: crusoe-abilene, p_fn: abilene dc, p_st: TX}
+    - {name: national-518210, p_ncs: "518210"}
