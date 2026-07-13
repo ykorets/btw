@@ -392,6 +392,87 @@ def run_courtlistener(cfg: dict) -> list[dict]:
     return out
 
 
+# ----------------------------------------------- Gas EBB (Island Watch) --
+
+def parse_gas_ebb_csv(text: str, needles: list[str]) -> list[dict]:
+    """Pure parser: NAESB operationally-available CSV → rows whose Loc Name
+    contains any needle (case-insensitive). Handles quoted commas and the
+    UTF-8 BOM."""
+    import csv as _csv
+    import io as _io
+    out = []
+    for row in _csv.DictReader(_io.StringIO(text.lstrip("﻿"))):
+        name = row.get("Loc Name") or ""
+        if any(n.lower() in name.lower() for n in needles):
+            out.append(row)
+    return out
+
+
+def gas_ebb_candidates(rows: list[dict], cycle: str, doc_url: str) -> list[dict]:
+    """Pure mapper: matched CSV rows → candidates. One candidate per
+    (location, gas day): dedupe by external_id keeps the first capture of
+    the day; later cycles are ignored. Zero scheduled flow at a watched
+    island IS the signal → kw_hit so it surfaces in the review PR."""
+    out = []
+    for row in rows:
+        gas_day = (row.get("Effective Gas Day") or "").strip()
+        loc = (row.get("Loc") or "").strip()
+        sched_raw = (row.get("Total Scheduled Quantity") or "").replace(",", "").strip()
+        try:
+            sched = float(sched_raw) if sched_raw else 0.0
+        except ValueError:
+            sched = 0.0
+        out.append({
+            "external_id": f"tgt-{loc}-{gas_day}",
+            "url": doc_url,
+            "title": f"Gas pulse {row.get('Loc Name')}: "
+                     f"{sched_raw or '0'} MMBtu scheduled, "
+                     f"gas day {gas_day} ({cycle})",
+            "payload": {"loc": loc, "loc_name": row.get("Loc Name"),
+                        "gas_day": gas_day, "cycle": cycle,
+                        "scheduled_mmbtu": sched,
+                        "kw_hit": sched == 0.0,  # silence = the anomaly
+                        "row": row},
+        })
+    return out
+
+
+def run_gas_ebb(cfg: dict) -> list[dict]:
+    """Daily gas pulse from a GasQuest-style EBB (probe 2026-07-13):
+    newest Operational Capacity posting → its CSV (served base64) → rows for
+    watched delivery locations. The continuous \"is it running\" signal
+    between satellite snapshots (docs/island-watch/gas-recon-2026-07.md)."""
+    import base64
+    p = cfg.get("params", {})
+    base = cfg["url"].rstrip("/")
+    body = {"infoPostID": int(p.get("info_post_id", 1)),
+            "tspId": int(p.get("tsp_id", 100000)),
+            "pageNumber": 1, "pageSize": 1,
+            "sortBy": "datetimePostingEffective",
+            "groupCode": "INFOPOST", "sortDescending": True}
+    r = httpx.post(base + "/infopostdetails", json=body,
+                   headers=BROWSER_HEADERS, timeout=60)
+    r.raise_for_status()
+    postings = r.json().get("postings", [])
+    if not postings:
+        raise RuntimeError("gas-ebb: no postings returned")
+    posting = postings[0]
+    csv_files = [f for f in posting.get("reportFiles", [])
+                 if "CSV" in (f.get("infoPostDocumentTypeTitle") or "")]
+    if not csv_files:
+        raise RuntimeError("gas-ebb: newest posting carries no CSV file")
+    doc_id = csv_files[0]["infoPostTrackerID"]
+    doc_url = f"{base}/postings?postingsDocumentId={doc_id}"
+    r2 = httpx.get(doc_url, headers=BROWSER_HEADERS, timeout=60)
+    r2.raise_for_status()
+    try:
+        text = base64.b64decode(r2.text, validate=True).decode("utf-8-sig")
+    except Exception:  # noqa: BLE001 — tolerate a switch to plain CSV
+        text = r2.text
+    rows = parse_gas_ebb_csv(text, p.get("locations", ["MZX"]))
+    return gas_ebb_candidates(rows, posting.get("cycleCode", ""), doc_url)
+
+
 ADAPTERS = {
     "tceq_nsr": run_tceq_nsr,
     "opsb_case": run_opsb_case,
@@ -400,6 +481,7 @@ ADAPTERS = {
     "gdelt_news": run_gdelt,
     "courtlistener": run_courtlistener,
     "sentinel_stac": run_sentinel_stac,
+    "gas_ebb": run_gas_ebb,
 }
 
 
