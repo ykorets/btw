@@ -3,6 +3,12 @@
   "cite_as": "Behind the Watt, behindthewatt.com, CC BY 4.0",
   "events": [
     {
+      "date": "2026-07-13",
+      "type": "permit_filed",
+      "headline": "MDEQ notices Air-Construction PSD for Entergy's Traceview Advanced Power Station \u2014 754 MW CCGT in Ridgeland, third dedicated gas plant for AWS's Madison County data centers (notice ends 07/14) [https://opcgis.deq.state.ms.us/ensearchonline/epd-permits-at-public-notice.aspx]",
+      "facility": null
+    },
+    {
       "date": "2026-07-02",
       "type": "permit_approved",
       "headline": "Ohio clears its fifth behind-the-meter gas plant in New Albany \u2014 EdgeConneX PowerConneX joins the Williams fleet.",
