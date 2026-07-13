@@ -51,6 +51,27 @@
           "permit_no": "O4721",
           "permit_type": "Title V"
         }
+      ],
+      "sources": [
+        {
+          "url": "https://records.tceq.texas.gov/cs/idcplg?IdcService=TCEQ_EXTERNAL_SEARCH_GET_FILE&dID=8600163&Rendition=Web",
+          "doc_genre": "tceq_standard_permit_review",
+          "facts": [
+            "unit.model",
+            "unit.unit_count",
+            "facility.status",
+            "unit.mw_each"
+          ],
+          "quote": "Reduce the count of GE LM2500 simple-cycle turbines from six to five, reduce the site-rated power to 34.1 MW  \"per turbine, and increase the annual hours of operation from 5,880 hours to 8,760 hours per turbine.",
+          "page": 1
+        },
+        {
+          "url": "https://livingatlas.arcgis.com/wayback/#mapCenter=-99.77520%2C32.50490%2C17&mode=explore&active=32246",
+          "doc_genre": "satellite_scene",
+          "facts": [
+            "facility.status"
+          ]
+        }
       ]
     },
     {
@@ -89,6 +110,26 @@
           "permit_no": "01156-01PC",
           "permit_type": "Air construction permit"
         }
+      ],
+      "sources": [
+        {
+          "url": "https://livingatlas.arcgis.com/wayback/#mapCenter=-90.15639%2C35.05759%2C19&mode=explore&active=32246",
+          "doc_genre": "satellite_scene",
+          "facts": [
+            "facility.status"
+          ]
+        },
+        {
+          "url": "https://cdn.arstechnica.net/wp-content/uploads/2025/07/NAACP-and-YGGs-xAI-Air-Permit-Appeal-7-15-2025.pdf",
+          "doc_genre": "appeal_filing",
+          "facts": [
+            "facility.status",
+            "unit.unit_count",
+            "unit.model"
+          ],
+          "quote": "Air Permit No. 01156-01PC",
+          "page": 1
+        }
       ]
     },
     {
@@ -126,6 +167,24 @@
           "issued_at": "2026-01-15",
           "permit_no": "0680-00119",
           "permit_type": "Air permit (41 turbines)"
+        }
+      ],
+      "sources": [
+        {
+          "url": "https://livingatlas.arcgis.com/wayback/#mapCenter=-90.03811%2C34.98208%2C19&mode=explore&active=32246",
+          "doc_genre": "satellite_scene",
+          "facts": [
+            "facility.status"
+          ]
+        },
+        {
+          "url": "https://opcgis.deq.state.ms.us/ensearchonline/get_doc.aspx?dt=dpermit&id=1825411",
+          "doc_genre": "permit",
+          "facts": [
+            "facility.status"
+          ],
+          "quote": "Permit No.: 0680-00119",
+          "page": 1
         }
       ]
     }
