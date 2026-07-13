@@ -15,16 +15,20 @@ lane are additive — they extend a working loop, never block it.
 
 ## Milestone 0 — infra prep (owner: Yaroslav, ~1 hour of clicking)
 
-- [ ] Supabase: dedicated project `btw` (do not reuse KPI project)
-- [ ] Cloudflare R2: bucket `btw-docs` + API token (read/write)
-- [ ] GitHub: repo `btw-data` (init WITH readme — avoids the empty-repo 409)
-- [ ] Shiva GitHub App on `btw` + `btw-data`: Contents + Pull requests, read/write
-- [ ] Actions secrets in `btw`: `SUPABASE_URL`, `SUPABASE_SERVICE_KEY`,
+- [x] Supabase: dedicated project `btw` (do not reuse KPI project)
+- [x] Cloudflare R2: bucket `btw-docs` + API token (read/write)
+- [x] ~~GitHub: repo `btw-data`~~ superseded: mirror lives on the `mirror`
+      branch of `btw` (M5 design deviation, see M5 status)
+- [x] Shiva GitHub App on `btw`: Contents + Pull requests + Workflows,
+      read/write (workflows permission added 2026-07-12)
+- [x] Actions secrets in `btw`: `SUPABASE_URL`, `SUPABASE_SERVICE_KEY`,
       `R2_ACCOUNT_ID`, `R2_ACCESS_KEY`, `R2_SECRET`, `ANTHROPIC_API_KEY`,
-      `GH_BOT_TOKEN` (fine-grained, btw-data write)
-- [ ] healthchecks.io (free) ping URL → secret `HEARTBEAT_URL`
+      `GEMINI_API_KEY`, `COURTLISTENER_TOKEN` (added 2026-07-12)
+- [x] `HEARTBEAT_URL` → self-hosted Healthchecks ("Watchtower",
+      hc.kpicreatives.com via Coolify; infra/healthchecks/) — closed
+      2026-07-13, first ping received from daily-intake #18
 
-Blocked until done: everything below. This is the only milestone I can't do.
+**M0 CLOSED 2026-07-13.** Nothing below is blocked anymore.
 
 ## M1 — Truth core + export + publish (days 1–3)
 
@@ -136,10 +140,19 @@ Live run (005 applied, extract-genesis #6, quorum=true): **recall 13/13
 1.0 quorum=agree; SMT-130 validated), page-break flag observed working on
 two SELC claims; verdicts 70 agree / 32 solo / 0 disagree (no escalation
 needed), 2 anchor-rejects — the guard still bites. Cost ≈ $0.33/quorum-run
-(4 Gemini primary + 4 Haiku checker), under the $1 DoD. Remaining: Titan
-mw_each 38 context bind confirms on the next normalize run (needs R2 creds
-in that job); a second per-model row lands whenever extract runs with
---role cross_checker for the D8 comparison table.
+(4 Gemini primary + 4 Haiku checker), under the $1 DoD.
+
+**Follow-ups closed 2026-07-13.** Per-model table (D8): Gemini Flash
+13/13 recall / 98% precision vs Haiku 4.5 10/13 / 100% precision (66/66
+validated, zero anchor-rejects — extracts less, never invents);
+models.yaml roles confirmed as-is: Gemini = extractor (coverage), Haiku =
+checker (its agree is worth a lot precisely because it rarely volunteers).
+Titan mw_each 38: context binding correctly REFUSED the bind — the ±240
+window contains both models (amendment items sit adjacent) and "ambiguity
+never binds" held; resolved by reviewer via elimination (LM2500 explicitly
+took 34.1), staged with provenance note, merged in review PR #26 —
+Abilene now published at 5×38 + 5×34.1 = 360.5 MW, fleet 1.03 GW. The
+deterministic layer hands multi-model windows to the human by design.
 
 ## M4 — First two watchers: TCEQ + OPSB (days 8–10)
 
@@ -167,6 +180,12 @@ observed working on run #2 (DoD item). Run semantics: individual source
 failures don't fail the step; `--slo` is the alarm. Fixture replay tests
 (7) wired into ci.yml (`|| true` dropped). OPSB egress workaround (worker
 proxy or per-docket RSS) → M6. HEARTBEAT_URL secret still unset (M0).
+
+**M4 DoD fully closed 2026-07-13.** The last open item — "missed-heartbeat
+alert observed once on purpose" — tested live against Watchtower
+(self-hosted Healthchecks): /fail signal → check DOWN → Telegram alert
+received → success ping → UP-again alert. The dead-man switch works
+end-to-end; daily-intake pings it on every green run.
 
 ## M5 — Review loop end-to-end (days 10–12)
 
@@ -220,6 +239,20 @@ documented stubs (undocumented JSON API / JS app); ECHO national NAICS-518210
 discovery mode needs the air-program filter param (279k raw FRS rows without
 it). The "week of daily runs with zero silent failures" clock starts now.
 
+**M6 CLOSED 2026-07-13 (daily-intake #18 green, 10/11 sources live).**
+All stubs resolved, each probed live before coding: FERC eLibrary turned
+out to front a keyless JSON API (POST eLibraryWebAPI/api/Search/
+AdvancedSearch; 12 candidates first sweep incl. Data Center Coalition
+intervention in EL26-72) · MDEQ needed no JS after all — the enSearch
+"EPD Permits at Public Notice" page is server-rendered ASPX (33 candidates
+first sweep; kw-hits: Entergy Traceview Advanced Power Station
+Air-Construction PSD + TVA Magnolia Combined Cycle) · ECHO discovery fixed:
+the working NAICS param is p_ncs (p_naics silently ignored → the 279k
+wall); p_ncs=518210 → 460 CAA facilities nationwide, counter-hash now
+catches any new data-center air permit in the country · OPSB = honest
+limit: DIS's F5 WAF serves browsers but rejects datacenter IPs, no RSS;
+SLO relaxed to 30d, coverage via gdelt + ferc + weekly manual glance.
+
 ## Island Watch — promoted to core differentiator (was: verification add-on)
 
 Permits say what's allowed; satellites say what's on the ground; gas flows say
@@ -265,6 +298,16 @@ documented, parser probe = remaining work. Abilene has NO public pulse
 (private lateral + planned private 42" Permian line, intrastate candidates
 carry no FERC EBB obligation) — published as an honest limit; pulse stays
 satellite-first. Scene-purchase list unchanged (2 × ~$15–30, 2026-Q3).
+
+**Gas pulse LIVE 2026-07-13.** GasQuest turned out to be a clean JSON API
+(list: POST infopost/infopostdetails; download: GET infopost/postings?
+postingsDocumentId → base64 NAESB CSV). `gas_ebb` adapter live: newest
+Operational Capacity posting → rows for watched locations → one candidate
+per (location, gas day); ZERO scheduled flow sets kw_hit — silence at a
+watched island surfaces in the review PR. First live capture: Loc 26096
+"MZX Southaven", gas day 20260713, 177,000 MMBtu scheduled (~7.4k MMBtu/h
+≈ several hundred MW of simple-cycle equivalent — the island is running
+hard). IW-v1 fully closed: permits + satellites + gas flows all ticking.
 
 ## M8 — Hot lane + digest + site rewire (days 16–18)
 
