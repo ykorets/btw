@@ -1,0 +1,32 @@
+# Self-hosted Healthchecks — dead-man switch for all cron/pipeline services.
+# Deploy target: Coolify (New Resource -> Docker Compose). Coolify's proxy
+# terminates TLS and routes the domain -> no reverse proxy here.
+#
+# In Coolify: set the domain on the service to https://hc.<domain>:8000
+# and fill the environment variables (see .env.example for the list).
+
+services:
+  healthchecks:
+    image: healthchecks/healthchecks:latest
+    restart: unless-stopped
+    environment:
+      - DB=sqlite
+      - DB_NAME=/data/hc.sqlite
+      - SITE_ROOT=${SITE_ROOT}
+      - SITE_NAME=${SITE_NAME:-Watchtower}
+      - SECRET_KEY=${SECRET_KEY}
+      - ALLOWED_HOSTS=${ALLOWED_HOSTS}
+      - DEBUG=False
+      - REGISTRATION_OPEN=False
+      # NB: the app reads TELEGRAM_TOKEN (not TELEGRAM_BOT_TOKEN)
+      - TELEGRAM_TOKEN=${TELEGRAM_TOKEN}
+      - TELEGRAM_BOT_NAME=${TELEGRAM_BOT_NAME}
+    volumes:
+      - hc-data:/data
+    expose:
+      - "8000"
+    # SQLite on the hc-data volume is fine at this scale; move to Postgres
+    # (DB_* env vars) only if checks grow into the hundreds.
+
+volumes:
+  hc-data:
