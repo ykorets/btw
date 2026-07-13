@@ -12,6 +12,7 @@
       ],
       "state": "TX",
       "county": "Taylor",
+      "geo": "(-99.7752,32.5049)",
       "developer": "Crusoe / Lancium",
       "offtaker": "OpenAI via Oracle",
       "status": "operating",
@@ -69,7 +70,8 @@
           "url": "https://livingatlas.arcgis.com/wayback/#mapCenter=-99.77520%2C32.50490%2C17&mode=explore&active=32246",
           "doc_genre": "satellite_scene",
           "facts": [
-            "facility.status"
+            "facility.status",
+            "facility.geo"
           ]
         }
       ]
@@ -83,6 +85,7 @@
       ],
       "state": "TN",
       "county": "Shelby",
+      "geo": "(-90.15639,35.05759)",
       "developer": "xAI / MZX Tech",
       "offtaker": "xAI",
       "status": "operating",
@@ -116,7 +119,8 @@
           "url": "https://livingatlas.arcgis.com/wayback/#mapCenter=-90.15639%2C35.05759%2C19&mode=explore&active=32246",
           "doc_genre": "satellite_scene",
           "facts": [
-            "facility.status"
+            "facility.status",
+            "facility.geo"
           ]
         },
         {
@@ -141,6 +145,7 @@
       ],
       "state": "MS",
       "county": "DeSoto",
+      "geo": "(-90.03811,34.98208)",
       "developer": "xAI",
       "offtaker": "xAI",
       "status": "operating",
@@ -174,7 +179,8 @@
           "url": "https://livingatlas.arcgis.com/wayback/#mapCenter=-90.03811%2C34.98208%2C19&mode=explore&active=32246",
           "doc_genre": "satellite_scene",
           "facts": [
-            "facility.status"
+            "facility.status",
+            "facility.geo"
           ]
         },
         {
