@@ -1,20 +1,20 @@
+# Gas pulse for Southaven C2 — the continuous "is it running" signal between
+# satellite snapshots (IW-v1; recon: docs/island-watch/gas-recon-2026-07.md).
+# Probe 2026-07-13: GasQuest backend is a clean JSON API —
+#   list:     POST {url}/infopostdetails {infoPostID:1, tspId:100000, ...}
+#   download: GET  {url}/postings?postingsDocumentId=<infoPostTrackerID>
+#             (CSV served base64-encoded)
+# Live check at probe time: Loc 26096 "MZX Southaven" (zone 1, DPQ delivery),
+# gas day 20260713 TD2: Total Scheduled Quantity 177,000 MMBtu.
+# One candidate per (location, gas day); zero scheduled flow -> kw_hit (the
+# anomaly worth surfacing). ABILENE has no public EBB — honest limit, see recon.
 id: gas-nominations
 kind: api
-url: "https://www.gasquest.com/informational-posting"  # Boardwalk GasQuest (ex-infopost.bwpipelines.com)
-query: "TGT (TSP 100000) operationally-available / scheduled quantities, location ~ 'MZX'"
+adapter: gas_ebb
+url: "https://reporting.prod.bwpmlp.org/infopost"
 schedule: daily
-slo_interval_days: 14
-parser: gas-ebb_v1
-status: recon_done  # IW-v1 recon 2026-07-12 (docs/island-watch/gas-recon-2026-07.md):
-                    # SOUTHAVEN C2 — capturable: Texas Gas Transmission (Boardwalk,
-                    # FERC TSP 100000), delivery meter "MZX Southaven" (MZX Tech,
-                    # DeSoto Co MS) confirmed present in daily postings via a
-                    # third-party flow tracker (Feb 2026). Capture: daily OA/
-                    # scheduled-quantities per NAESB cycle -> filter location name
-                    # contains 'MZX' -> flow value = operation pulse. Parser TODO:
-                    # probe GasQuest (JS app) for the CSV/JSON endpoint behind the
-                    # UI before considering headless.
-                    # ABILENE — no public pulse (honest limit): private lateral
-                    # (Primoris/Longhorn) + planned private 42" Permian line;
-                    # intrastate candidates (Atmos Pipeline-Texas, ONEOK WesTex)
-                    # have no FERC EBB obligation. Pulse stays satellite-first.
+slo_interval_days: 7
+params:
+  tsp_id: 100000        # Texas Gas Transmission (Boardwalk internal tspId)
+  info_post_id: 1       # Operational Capacity report
+  locations: ["MZX"]    # substring match on Loc Name
