@@ -37,7 +37,14 @@ def _rest(method: str, path: str, **kw) -> httpx.Response:
     headers = {"apikey": key, "Authorization": f"Bearer {key}"}
     headers.update(kw.pop("headers", {}))
     response = httpx.request(method, base, headers=headers, timeout=60, **kw)
-    response.raise_for_status()
+    try:
+        response.raise_for_status()
+    except httpx.HTTPStatusError as exc:
+        detail = (response.text or "").strip().replace("\n", " ")[:1000]
+        raise RuntimeError(
+            f"Supabase {method} {path} failed "
+            f"({response.status_code}): {detail}"
+        ) from exc
     return response
 
 
