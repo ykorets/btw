@@ -22,6 +22,7 @@ jobs:
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+          BTW_ARCHIVE_BASE_URL: ${{ vars.BTW_ARCHIVE_BASE_URL }}
           PUBLISH_SCOPE: ${{ inputs.scope || 'all' }}
         run: |
           if [ "$PUBLISH_SCOPE" = "announcements" ]; then

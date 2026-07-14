@@ -22,16 +22,21 @@ def _facility():
     }
 
 
-def test_attach_sources_folds_and_dedupes():
+def test_attach_sources_folds_and_dedupes(monkeypatch):
     fac = _facility()
     url = "https://records.tceq.texas.gov/doc"
+    sha = "13bd44e0d6070bd8d1c616d4832c162dd7ee13fbe2e509e32e853248b3957176"
+    monkeypatch.setenv("BTW_ARCHIVE_BASE_URL", "https://evidence.behindthewatt.com")
+    document = {"url": url, "doc_genre": "tceq_standard_permit_review",
+                "sha256": sha, "r2_key": f"docs/{sha}.pdf",
+                "fetched_at": "2026-07-13T00:00:00Z"}
     prov = [
         {"fact_table": "unit", "fact_id": "unit-1", "fact_field": "mw_each",
          "note": "staged", "claim": {"quote": "38 MW per turbine", "page": 3,
-                                     "document": {"url": url, "doc_genre": "tceq_standard_permit_review"}}},
+                                     "document": document}},
         {"fact_table": "unit", "fact_id": "unit-1", "fact_field": "unit_count",
          "note": "corroborated", "claim": {"quote": "six turbines", "page": 3,
-                                           "document": {"url": url, "doc_genre": "tceq_standard_permit_review"}}},
+                                           "document": document}},
         # different facility id -> ignored
         {"fact_table": "facility", "fact_id": "other", "fact_field": "status",
          "note": "", "claim": {"quote": None, "page": 1,
@@ -48,6 +53,9 @@ def test_attach_sources_folds_and_dedupes():
     assert sorted(src["facts"]) == ["unit.mw_each", "unit.unit_count"]
     assert src["quote"] == "38 MW per turbine"
     assert src["page"] == 3
+    assert src["archive_url"] == f"https://evidence.behindthewatt.com/docs/{sha}.pdf"
+    assert src["sha256"] == sha
+    assert src["archive_status"] == "public"
     # internal ids stripped: mirror schema stays stable
     assert "id" not in fac
     assert "id" not in fac["unit"][0]

@@ -165,6 +165,12 @@ export function buildFacilityView(
       ...source,
       label: genreLabels[source.doc_genre] || human(source.doc_genre || "Document"),
       factsLabel: (source.facts || []).map((fact: string) => human(fact.replaceAll(".", " "))).join(", "),
+      checksumLabel: source.sha256 ? `SHA-256 ${source.sha256}` : null,
+      archiveStatusLabel: source.archive_url
+        ? "Immutable BTW copy"
+        : source.archive_status === "approved_pending_endpoint"
+          ? "Immutable copy approved; public endpoint pending"
+        : "Preserved privately; redistribution review pending",
     })),
     satellite: {
       date: displayDate(satelliteEvent?.date),
