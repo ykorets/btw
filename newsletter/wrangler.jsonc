@@ -8,6 +8,12 @@
     "SITE_ORIGIN": "https://behindthewatt.com",
     "RESEND_FROM": "Behind the Watt <weekly@updates.behindthewatt.com>"
   },
+  "kv_namespaces": [
+    {
+      "binding": "DIGEST_STATE",
+      "id": "41d6a29a950c4c9287a710e75219328b"
+    }
+  ],
   "ratelimits": [
     {
       "name": "SUBSCRIBE_RATE_LIMITER",

@@ -1,24 +1,115 @@
 name: btw-weekly-digest
 on:
-  schedule: [{cron: "0 13 * * 2"}]   # Tuesdays 08:00 CT
-  workflow_dispatch: {}
+  schedule:
+    - cron: "0 13 * * 2" # Tuesdays, 08:00 Central during daylight time
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: "Dry-run renders only; send uses the production segment"
+        type: choice
+        options: [dry-run, validate, send]
+        default: dry-run
+      issue_date:
+        description: "Optional YYYY-MM-DD edition date (UTC)"
+        type: string
+        required: false
+
 permissions:
   contents: write
-  pull-requests: write
+
+concurrency:
+  group: btw-weekly-digest
+  cancel-in-progress: false
+
 jobs:
   digest:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - uses: actions/setup-python@v5
-        with: {python-version: "3.12"}
-      - run: pip install httpx pyyaml litellm
-      - name: Draft BTW Weekly
+        with:
+          python-version: "3.12"
+      - uses: astral-sh/setup-uv@08807647e7069bb48b6ef5acd8ec9567f424441b # v8.1.0
+        with:
+          version: "0.11.28"
+          enable-cache: true
+          cache-dependency-glob: "engine/uv.lock"
+      - run: uv sync --locked
+        working-directory: engine
+
+      - name: Resolve immutable edition inputs
+        id: edition
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          INPUT_MODE: ${{ inputs.mode }}
+          INPUT_DATE: ${{ inputs.issue_date }}
+        run: |
+          if [ "$EVENT_NAME" = "schedule" ]; then
+            mode=send
+          else
+            mode="${INPUT_MODE:-dry-run}"
+          fi
+          issue_date="${INPUT_DATE:-$(date -u +%F)}"
+          echo "mode=$mode" >> "$GITHUB_OUTPUT"
+          echo "issue_date=$issue_date" >> "$GITHUB_OUTPUT"
+
+      - name: Validate Resend, segment and idempotency store
+        env:
+          DIGEST_TRIGGER_SECRET: ${{ secrets.DIGEST_TRIGGER_SECRET }}
+        run: >-
+          uv run python -m btw_engine.digest --validate-delivery
+        working-directory: engine
+
+      - name: Build edition from the published record
+        if: steps.edition.outputs.mode != 'validate'
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
-          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
-          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
-          BTW_MODELS_YAML: engine/models.yaml
-          GITHUB_TOKEN: ${{ github.token }}
-        run: PYTHONPATH=engine/src python -m btw_engine.digest
+          DIGEST_TRIGGER_SECRET: ${{ secrets.DIGEST_TRIGGER_SECRET }}
+          MODE: ${{ steps.edition.outputs.mode }}
+          ISSUE_DATE: ${{ steps.edition.outputs.issue_date }}
+        run: |
+          send_flag=""
+          if [ "$MODE" = "send" ]; then send_flag="--send"; fi
+          uv run python -m btw_engine.digest \
+            --issue-date "$ISSUE_DATE" \
+            --archive ../digest \
+            $send_flag
+        working-directory: engine
+
+      - name: Upload dry-run preview
+        if: steps.edition.outputs.mode == 'dry-run'
+        uses: actions/upload-artifact@v4
+        with:
+          name: btw-weekly-${{ steps.edition.outputs.issue_date }}
+          path: |
+            digest/${{ steps.edition.outputs.issue_date }}.md
+            digest/${{ steps.edition.outputs.issue_date }}.json
+          if-no-files-found: error
+
+      - name: Archive the sent edition
+        if: steps.edition.outputs.mode == 'send'
+        env:
+          ISSUE_DATE: ${{ steps.edition.outputs.issue_date }}
+        run: |
+          git config user.name "btw-bot"
+          git config user.email "bot@behindthewatt.com"
+          git add "digest/$ISSUE_DATE.md" "digest/$ISSUE_DATE.json"
+          if git diff --cached --quiet; then
+            echo "edition already archived"
+            exit 0
+          fi
+          git commit -m "digest: archive $ISSUE_DATE"
+          git fetch origin main
+          git rebase origin/main
+          git push origin HEAD:main
+
+      - name: Record failure in the workflow summary
+        if: failure()
+        env:
+          RUN_URL: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          echo "## BTW Weekly delivery failed" >> "$GITHUB_STEP_SUMMARY"
+          echo "No retry should create a duplicate broadcast; inspect $RUN_URL and rerun the job." >> "$GITHUB_STEP_SUMMARY"

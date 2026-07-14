@@ -3,9 +3,15 @@
 The newsletter uses two separate systems:
 
 - this Cloudflare Worker owns subscription and double opt-in;
-- Resend owns confirmed contacts, Broadcasts and unsubscribe handling.
+- the engine builds a deterministic Tuesday edition from the published record;
+- this Worker creates/sends the Resend Broadcast exactly once;
+- Resend owns confirmed contacts, delivery and unsubscribe handling.
 
-An address is not created as a Resend contact until its confirmation link is opened. The existing Tuesday digest job still creates a GitHub PR; merging a draft does not send an email.
+An address is not created as a Resend contact until its confirmation link is opened.
+The Tuesday workflow sends automatically. It excludes staging facts and watcher
+candidates; exact unit, permit and event changes come from sealed review
+manifests. Published third-party announcements are shown in a separate,
+explicitly unverified section.
 
 ## One-time production setup
 
@@ -17,6 +23,7 @@ An address is not created as a Resend contact until its confirmation link is ope
    npx wrangler secret put RESEND_API_KEY
    npx wrangler secret put RESEND_SEGMENT_ID
    npx wrangler secret put SIGNING_SECRET
+   npx wrangler secret put DIGEST_TRIGGER_SECRET
    ```
 
    `SIGNING_SECRET` should be a newly generated high-entropy value of at least 32 bytes.
@@ -26,14 +33,36 @@ An address is not created as a Resend contact until its confirmation link is ope
 
 Worker secrets remain attached to the deployed Worker when GitHub Actions publishes a new version.
 
-## Publishing an edition
+Add the same `DIGEST_TRIGGER_SECRET` value as a GitHub Actions secret. The
+Resend API key stays only in the Worker; the digest workflow never receives it.
 
-1. Review and merge the Tuesday `digest/YYYY-MM-DD.md` PR.
-2. Create a Resend Broadcast for the `BTW Weekly` Segment.
-3. Use `Behind the Watt <weekly@updates.behindthewatt.com>` as the sender.
-4. Include Resend's unsubscribe footer, send a test, inspect every evidence link, then schedule or send.
+The `DIGEST_STATE` KV binding stores only edition id, content hash, Resend
+broadcast id and delivery state. It does not contain subscriber addresses.
 
-The human review gate is intentional. The engine drafts; it never sends a Broadcast on its own.
+## Automatic Tuesday delivery
+
+At 13:00 UTC every Tuesday, `.github/workflows/digest.yml`:
+
+1. validates the Resend Segment and KV binding;
+2. finds the end of the last archived edition so a missed run creates no gap;
+3. reads published changes from Supabase;
+4. renders deterministic HTML, text and Markdown without an LLM;
+5. asks the Worker to create a draft, persists its id, then sends it;
+6. commits `digest/YYYY-MM-DD.{md,json}` as the public delivery receipt.
+
+The Worker rejects a repeated issue id with different content. A retry of the
+same content retrieves the existing Resend Broadcast instead of creating a
+second one.
+
+The workflow can also be run manually:
+
+- `dry-run` (default) renders downloadable receipt files and sends nothing;
+- `validate` checks credentials, Segment and delivery state only;
+- `send` uses the production Segment and is protected by the same exactly-once
+  issue id/content hash contract as the schedule.
+
+Every Broadcast includes Resend's per-recipient unsubscribe URL. Resend applies
+the unsubscribe state automatically before future Broadcasts.
 
 ## Local verification
 
