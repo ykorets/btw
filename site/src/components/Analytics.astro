@@ -1,0 +1,18 @@
+---
+// Google Analytics 4 (gtag.js)
+// Property: "Behind the Watt" · Stream: behindthewatt.com
+// Loads only in production builds so local/dev traffic isn't tracked.
+const GA_ID = "G-HNDJ4VRW5G";
+const enabled = import.meta.env.PROD;
+---
+{enabled && (
+  <>
+    <script is:inline async src={`https://www.googletagmanager.com/gtag/js?id=${GA_ID}`}></script>
+    <script is:inline define:vars={{ GA_ID }}>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', GA_ID);
+    </script>
+  </>
+)}
