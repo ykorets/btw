@@ -213,8 +213,8 @@ def test_resolve_permit_and_plan_exact_fields():
 
 def test_plan_permit_changes_stages_one_unique_typed_value():
     permit = {"id": "p", "permit_no": "177263", "facility_id": "f",
-              "authority": "TCEQ", "permit_type": "legacy label",
-              "status": "issued", "filed_at": None, "issued_at": None}
+              "authority": "TCEQ", "permit_type": None,
+              "status": None, "filed_at": None, "issued_at": None}
     claims = [
         _c("no", "permit.no", "177263", None, "Registration 177263"),
         _c("type", "permit.type", "Standard Permit Application", None,
@@ -227,6 +227,27 @@ def test_plan_permit_changes_stages_one_unique_typed_value():
     assert {field for _p, field, _c, _m in links} == {"permit_no"}
     assert changes["permit_type"][0] == "Standard Permit Application"
     assert changes["status"][0] == "currently permitted"
+
+
+def test_plan_permit_changes_never_overwrites_existing_field_from_one_claim():
+    permit = {"id": "p", "permit_no": "177263", "facility_id": "f",
+              "authority": "TCEQ", "permit_type": "EGU Standard Permit",
+              "status": "issued", "filed_at": "2024-08-01",
+              "issued_at": None}
+    claims = [
+        _c("authority", "permit.authority", "Texas", None,
+           "Longhorn Data Center in Taylor County, Texas."),
+        _c("status", "permit.status", "submitted", None,
+           "The modification application was submitted."),
+        _c("date", "permit.filed_at", "January 11, 2025", None,
+           "Project Received Date January 11, 2025"),
+    ]
+
+    _links, changes, conflicts = plan_permit_changes(permit, claims)
+
+    assert changes == {}
+    assert len(conflicts) == 3
+    assert all("was not overwritten" in conflict for conflict in conflicts)
 
 
 def test_permit_date_mismatch_is_not_linked():

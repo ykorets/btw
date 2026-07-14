@@ -151,9 +151,10 @@ def _text_supports(published: str | None, claim: dict) -> bool:
 def plan_permit_changes(permit: dict, doc_claims: list[dict]):
     """Plan direct permit receipts and unambiguous staged corrections.
 
-    Exact claims corroborate the current value.  If no claim supports the
-    current value and one unique typed value remains, the planner stages that
-    source value.  Multiple competing values are held for human review.
+    Exact claims corroborate the current value. A unique typed value may fill
+    a missing field, but never silently replace an existing categorical or
+    date value: a later amendment, a location mistaken for an authority, or
+    a workflow label mistaken for status must remain an explicit conflict.
     """
     links, changes, conflicts = [], {}, []
     candidates: dict[str, list[tuple[object, dict, str]]] = {}
@@ -201,15 +202,20 @@ def plan_permit_changes(permit: dict, doc_claims: list[dict]):
             unique: dict[str, tuple[object, dict, str]] = {}
             for row in rows:
                 unique.setdefault(_norm(row[0]), row)
-            if unique and not exact:
-                values = [row[0] for row in unique.values()]
-                changes[col] = ("; ".join(str(v) for v in values),
-                                [row[1] for row in unique.values()],
-                                "typed status set")
-            elif missing:
+            if current not in (None, ""):
+                candidates = ", ".join(
+                    str(row[0]) for row in unique.values()) or "none"
                 conflicts.append(
-                    f"permit {permit['permit_no']}: status lacks typed "
-                    f"support for {', '.join(missing)}")
+                    f"permit {permit['permit_no']}: status lacks exact typed "
+                    f"support for {', '.join(missing) or current}; candidates "
+                    f"{candidates}; existing value was not overwritten")
+            elif len(unique) == 1:
+                value, claim, _method = next(iter(unique.values()))
+                changes[col] = (value, [claim], "unique typed status")
+            elif len(unique) > 1:
+                conflicts.append(
+                    f"permit {permit['permit_no']}: status has "
+                    f"{len(unique)} competing typed values")
             continue
 
         exact = [row for row in rows if (
@@ -223,7 +229,13 @@ def plan_permit_changes(permit: dict, doc_claims: list[dict]):
         for row in rows:
             key = str(row[0]) if col in {"filed_at", "issued_at"} else _norm(row[0])
             unique.setdefault(key, row)
-        if len(unique) == 1:
+        if current not in (None, "") and unique:
+            candidates = ", ".join(str(row[0]) for row in unique.values())
+            conflicts.append(
+                f"permit {permit['permit_no']}: {col} current value "
+                f"{current!r} has no exact typed support; candidates "
+                f"{candidates}; existing value was not overwritten")
+        elif len(unique) == 1:
             value, claim, method = next(iter(unique.values()))
             changes[col] = (value, [claim], method)
         elif len(unique) > 1:
