@@ -11,6 +11,7 @@ from btw_engine.normalize import (
     plan_permit_links,
     plan_permit_changes,
     plan_unit_changes,
+    prepare_unit_receipts,
     resolve_facility,
     resolve_permit,
     staged_copy,
@@ -402,3 +403,19 @@ def test_reported_basis_cannot_be_derived_from_metadata_only():
         assert "quantitative" in str(exc)
     else:
         raise AssertionError("metadata-only basis receipt was accepted")
+
+
+def test_unit_plan_skips_alternative_count_receipt_instead_of_blocking():
+    permit_count = _c("permit", "unit.count", "5", 5,
+                      "The permit authorizes five units.")
+    observed_count = _c("observed", "observation.unit_count", "5", 5,
+                        "Five units are visible.")
+
+    plan, skipped, error = prepare_unit_receipts(
+        [("unit_count", observed_count), ("unit_count", permit_count)], {})
+
+    assert error is None
+    assert plan["basis"] == "reported"
+    assert plan["unit_links"] == [("unit_count", permit_count)]
+    assert skipped == [("unit_count", observed_count)]
+    assert plan["representative"] == permit_count

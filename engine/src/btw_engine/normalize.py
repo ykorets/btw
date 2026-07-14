@@ -547,6 +547,51 @@ def _basis_claim(claims: list[dict], basis: str) -> dict:
     raise ValueError(f"no compatible claim can derive unit basis {basis!r}")
 
 
+def prepare_unit_receipts(unit_links: list[tuple[str, dict]],
+                          changes: dict) -> tuple[dict | None,
+                                                   list[tuple[str, dict]],
+                                                   str | None]:
+    """Build the exact unit evidence plan used by dry-run and staging."""
+    direct_claims = [claim for _field, claim in unit_links]
+    direct_claims += [item[1] for item in changes.values()
+                      if item[1] is not None]
+    if not direct_claims:
+        return None, [], "no compatible claim remains after truth-gate pruning"
+    basis, basis_derivation = _unit_basis(direct_claims)
+    incompatible_changes = [
+        (field, claim.get("field"))
+        for field, item in changes.items()
+        if (claim := item[1]) is not None
+        if not _unit_receipt_compatible(basis, field, claim)
+    ]
+    if incompatible_changes:
+        detail = ", ".join(
+            f"{field} <- {claim_field}"
+            for field, claim_field in incompatible_changes)
+        return None, [], f"basis {basis} is incompatible with {detail}"
+    compatible_links = [
+        (field, claim) for field, claim in unit_links
+        if _unit_receipt_compatible(basis, field, claim)
+    ]
+    skipped = [item for item in unit_links if item not in compatible_links]
+    direct_claims = [claim for _field, claim in compatible_links]
+    direct_claims += [item[1] for item in changes.values()
+                      if item[1] is not None]
+    verification, verification_derivation = _verification_state(direct_claims)
+    try:
+        representative = _basis_claim(direct_claims, basis)
+    except ValueError as exc:
+        return None, skipped, str(exc)
+    return {
+        "basis": basis,
+        "basis_derivation": basis_derivation,
+        "verification": verification,
+        "verification_derivation": verification_derivation,
+        "representative": representative,
+        "unit_links": compatible_links,
+    }, skipped, None
+
+
 def _verification_state(claims: list[dict]) -> tuple[str, str]:
     documents = {claim.get("document_id") for claim in claims
                  if claim.get("document_id")}
@@ -713,94 +758,71 @@ def main() -> None:
             if not chg:
                 updates.pop(unit["id"], None)
 
-        if args.dry_run:
-            for u, field, c in links:
-                print(f"DRY LINK  {slug}/{u['model']}.{field} <- claim "
-                      f"{c['id'][:8]}")
-            for uid, chg in updates.items():
-                u = next(x for x in units if x["id"] == uid)
+        # Dry-run and staging consume one evidence plan. This prevents a plan
+        # from succeeding read-only and then choosing different receipts when
+        # writes are enabled.
+        touched_units = ({u["id"] for u, _field, _claim in links}
+                         | set(updates))
+        for uid in touched_units:
+            u = next(x for x in units if x["id"] == uid)
+            unit_links = [(field, claim) for linked, field, claim in links
+                          if linked["id"] == uid]
+            chg = updates.get(uid, {})
+            plan, skipped, error = prepare_unit_receipts(unit_links, chg)
+            prefix = "DRY " if args.dry_run else ""
+            for field, claim in skipped:
+                print(f"{prefix}SKIP {slug}/{u.get('model') or uid}.{field}: "
+                      f"{claim.get('field')} is incompatible with "
+                      f"basis {plan['basis'] if plan else 'candidate'}")
+            if error:
+                print(f"{prefix}HOLD {slug}/{u.get('model') or uid}: {error}")
+                continue
+            unit_links = plan["unit_links"]
+            basis = plan["basis"]
+            verification = plan["verification"]
+            if args.dry_run:
+                print(f"DRY CLASS {slug}/{u.get('model') or uid}: "
+                      f"basis={basis}, verification={verification}")
+                for field, c in unit_links:
+                    print(f"DRY LINK  {slug}/{u.get('model') or uid}.{field} "
+                          f"<- claim {c['id'][:8]}")
                 for col, (new, _c, method) in chg.items():
-                    print(f"DRY STAGE {slug}/{u['model']}.{col}: "
+                    print(f"DRY STAGE {slug}/{u.get('model') or uid}.{col}: "
                           f"{u.get(col)} -> {new} [{method}]")
-        else:
+                continue
+
             # Every evidence change creates/updates a staging version.
             # Published rows remain immutable until manifest promotion.
-            touched_units = ({u["id"] for u, _field, _claim in links}
-                             | set(updates))
-            for uid in touched_units:
-                u = next(x for x in units if x["id"] == uid)
-                unit_links = [(field, claim) for linked, field, claim in links
-                              if linked["id"] == uid]
-                chg = updates.get(uid, {})
-                direct_claims = [claim for _field, claim in unit_links]
-                direct_claims += [item[1] for item in chg.values()
-                                  if item[1] is not None]
-                if not direct_claims:
-                    print(f"HOLD {slug}/{u.get('model') or uid}: no compatible "
-                          "claim remains after truth-gate pruning")
-                    continue
-                basis, basis_derivation = _unit_basis(direct_claims)
-                incompatible_changes = [
-                    (field, claim.get("field"))
-                    for field, item in chg.items()
-                    if (claim := item[1]) is not None
-                    if not _unit_receipt_compatible(basis, field, claim)
-                ]
-                if incompatible_changes:
-                    detail = ", ".join(
-                        f"{field} <- {claim_field}"
-                        for field, claim_field in incompatible_changes)
-                    print(f"HOLD {slug}/{u.get('model') or uid}: basis "
-                          f"{basis} is incompatible with {detail}")
-                    continue
-                compatible_links = [
-                    (field, claim) for field, claim in unit_links
-                    if _unit_receipt_compatible(basis, field, claim)
-                ]
-                for field, claim in unit_links:
-                    if (field, claim) not in compatible_links:
-                        print(f"SKIP {slug}/{u.get('model') or uid}.{field}: "
-                              f"{claim.get('field')} is incompatible with "
-                              f"basis {basis}")
-                unit_links = compatible_links
-                direct_claims = [claim for _field, claim in unit_links]
-                direct_claims += [item[1] for item in chg.values()
-                                  if item[1] is not None]
-                verification, verification_derivation = _verification_state(
-                    direct_claims)
-                try:
-                    representative = _basis_claim(direct_claims, basis)
-                except ValueError as exc:
-                    print(f"HOLD {slug}/{u.get('model') or uid}: {exc}")
-                    continue
-                sid = staged_copy(u, chg, basis=basis,
-                                  verification_state=verification)
-                replaced = {field for field, _claim in unit_links} | set(chg)
-                replaced |= {"basis", "verification_state"}
-                copy_provenance("unit", u["id"], sid,
-                                exclude_fields=replaced)
-                for field, c in unit_links:
-                    if ensure_provenance(
-                            "unit", sid, field, c["id"],
-                            f"corroborated by anchored quote "
-                            f"(match {c['match_score']})"):
-                        n_links += 1
-                for col, (new, c, method) in chg.items():
-                    if c is not None:
-                        note = (f"staged update {u.get(col)} -> {new}"
-                                + (" (bound via sentence context)"
-                                   if method == "context" else ""))
-                        ensure_provenance("unit", sid, col, c["id"], note)
-                    n_stage += 1
-                    print(f"STAGE {slug}/{u['model']}.{col}: "
-                          f"{u.get(col)} -> {new} [{method}]")
-                ensure_provenance(
-                    "unit", sid, "basis", representative["id"],
-                    "engine classification", "derived", basis_derivation)
-                ensure_provenance(
-                    "unit", sid, "verification_state", representative["id"],
-                    "engine classification", "derived",
-                    verification_derivation)
+            sid = staged_copy(u, chg, basis=basis,
+                              verification_state=verification)
+            replaced = {field for field, _claim in unit_links} | set(chg)
+            replaced |= {"basis", "verification_state"}
+            copy_provenance("unit", u["id"], sid,
+                            exclude_fields=replaced)
+            for field, c in unit_links:
+                if ensure_provenance(
+                        "unit", sid, field, c["id"],
+                        f"corroborated by anchored quote "
+                        f"(match {c['match_score']})"):
+                    n_links += 1
+            for col, (new, c, method) in chg.items():
+                if c is not None:
+                    note = (f"staged update {u.get(col)} -> {new}"
+                            + (" (bound via sentence context)"
+                               if method == "context" else ""))
+                    ensure_provenance("unit", sid, col, c["id"], note)
+                n_stage += 1
+                print(f"STAGE {slug}/{u.get('model') or uid}.{col}: "
+                      f"{u.get(col)} -> {new} [{method}]")
+            ensure_provenance(
+                "unit", sid, "basis", plan["representative"]["id"],
+                "engine classification", "derived",
+                plan["basis_derivation"])
+            ensure_provenance(
+                "unit", sid, "verification_state",
+                plan["representative"]["id"],
+                "engine classification", "derived",
+                plan["verification_derivation"])
 
         for permit in permits_by_facility.get(fac_id, []):
             permit_claims = permit_claims_by_id.get(permit["id"], [])
