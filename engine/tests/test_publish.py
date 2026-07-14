@@ -196,3 +196,28 @@ def test_observed_total_is_supported_without_manufactured_per_unit_rating():
     ]
     assert provenance_violations([facility], receipts) == []
     assert publish.facility_mw(facility) == 495
+
+
+def test_reported_basis_requires_quantitative_cohort_claim():
+    facility = _facility()
+    facility["permit"] = []
+    facility["unit"] = [{
+        "id": "unit-1", "oem": None, "model": "SMT-130",
+        "unit_count": 15, "mw_each": None, "total_mw": None,
+        "fuel": None, "hours_permitted": None, "basis": "reported",
+        "verification_state": "source_asserted",
+    }]
+    receipts = [
+        _receipt("unit", "unit-1", "model", "unit.model", "SMT-130"),
+        _receipt("unit", "unit-1", "basis", "unit.model", "SMT-130",
+                 support_kind="derived", derivation="reported cohort"),
+        _receipt("unit", "unit-1", "verification_state", "unit.model",
+                 "SMT-130", support_kind="derived",
+                 derivation="one archived source"),
+        _receipt("unit", "unit-1", "unit_count", "unit.count", 15,
+                 value_num=15, numeric=True),
+    ]
+
+    violations = provenance_violations([facility], receipts)
+
+    assert any("basis" in item for item in violations)

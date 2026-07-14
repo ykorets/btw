@@ -121,8 +121,10 @@ def receipt_supports(table: str, field: str, value, fact: dict,
             return ((basis == "permitted" and claim_field.startswith("unit."))
                     or (basis == "observed"
                         and claim_field.startswith("observation."))
-                    or (basis == "reported"
-                        and claim_field.startswith(("unit.", "observation."))))
+                    or (basis == "reported" and claim_field in {
+                        "unit.count", "unit.mw_total",
+                        "observation.unit_count", "observation.mw",
+                    }))
         return False
     if support_kind != "direct":
         return False

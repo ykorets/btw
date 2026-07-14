@@ -482,12 +482,17 @@ def _unit_basis(claims: list[dict]) -> tuple[str, str]:
     dossier; that does not make a permit-authorized count an observation.
     """
     fields = {claim.get("field") or "" for claim in claims}
+    # Count defines the cohort more strongly than a capacity assertion. A
+    # reported total may coexist with an independently observed count without
+    # turning that observed cohort into a reported/permitted one.
+    if ("observation.unit_count" in fields
+            and "unit.count" not in fields):
+        return "observed", "observation.* claim classifies the cohort as observed"
     unit_quantitative = {
         "unit.count", "unit.mw_each", "unit.mw_total",
         "unit.hours_permitted",
     }
-    observation_quantitative = {"observation.unit_count", "observation.mw"}
-    if fields & observation_quantitative and not fields & unit_quantitative:
+    if ("observation.mw" in fields and not fields & unit_quantitative):
         return "observed", "observation.* claim classifies the cohort as observed"
     genres = {
         ((claim.get("document") or {}).get("doc_genre") or "").lower()
@@ -526,16 +531,19 @@ def _unit_receipt_compatible(basis: str, fact_field: str,
 
 def _basis_claim(claims: list[dict], basis: str) -> dict:
     """Choose a receipt that migration 008 accepts for derived ``basis``."""
+    if basis == "reported":
+        # Keep this exactly aligned with migration 008. A manufacturer/model
+        # claim identifies equipment but cannot establish a reported cohort.
+        for field in ("unit.count", "unit.mw_total",
+                      "observation.unit_count", "observation.mw"):
+            for claim in claims:
+                if (claim.get("field") or "") == field:
+                    return claim
+        raise ValueError("no compatible quantitative claim derives reported basis")
     prefix = "observation." if basis == "observed" else "unit."
     for claim in claims:
         if (claim.get("field") or "").startswith(prefix):
             return claim
-    # ``reported`` accepts both unit.* and observation.*. The branch above
-    # already prefers unit.*, but retain a defensive deterministic fallback.
-    if basis == "reported":
-        for claim in claims:
-            if (claim.get("field") or "").startswith("observation."):
-                return claim
     raise ValueError(f"no compatible claim can derive unit basis {basis!r}")
 
 
@@ -732,24 +740,38 @@ def main() -> None:
                           "claim remains after truth-gate pruning")
                     continue
                 basis, basis_derivation = _unit_basis(direct_claims)
-                verification, verification_derivation = _verification_state(
-                    direct_claims)
-                planned_receipts = list(unit_links)
-                planned_receipts += [
-                    (field, item[1]) for field, item in chg.items()
-                    if item[1] is not None
-                ]
-                incompatible = [
+                incompatible_changes = [
                     (field, claim.get("field"))
-                    for field, claim in planned_receipts
+                    for field, item in chg.items()
+                    if (claim := item[1]) is not None
                     if not _unit_receipt_compatible(basis, field, claim)
                 ]
-                if incompatible:
+                if incompatible_changes:
                     detail = ", ".join(
                         f"{field} <- {claim_field}"
-                        for field, claim_field in incompatible)
+                        for field, claim_field in incompatible_changes)
                     print(f"HOLD {slug}/{u.get('model') or uid}: basis "
                           f"{basis} is incompatible with {detail}")
+                    continue
+                compatible_links = [
+                    (field, claim) for field, claim in unit_links
+                    if _unit_receipt_compatible(basis, field, claim)
+                ]
+                for field, claim in unit_links:
+                    if (field, claim) not in compatible_links:
+                        print(f"SKIP {slug}/{u.get('model') or uid}.{field}: "
+                              f"{claim.get('field')} is incompatible with "
+                              f"basis {basis}")
+                unit_links = compatible_links
+                direct_claims = [claim for _field, claim in unit_links]
+                direct_claims += [item[1] for item in chg.values()
+                                  if item[1] is not None]
+                verification, verification_derivation = _verification_state(
+                    direct_claims)
+                try:
+                    representative = _basis_claim(direct_claims, basis)
+                except ValueError as exc:
+                    print(f"HOLD {slug}/{u.get('model') or uid}: {exc}")
                     continue
                 sid = staged_copy(u, chg, basis=basis,
                                   verification_state=verification)
@@ -772,7 +794,6 @@ def main() -> None:
                     n_stage += 1
                     print(f"STAGE {slug}/{u['model']}.{col}: "
                           f"{u.get(col)} -> {new} [{method}]")
-                representative = _basis_claim(direct_claims, basis)
                 ensure_provenance(
                     "unit", sid, "basis", representative["id"],
                     "engine classification", "derived", basis_derivation)

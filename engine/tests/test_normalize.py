@@ -360,6 +360,20 @@ def test_observed_cohort_stays_observed_when_model_metadata_is_present():
         basis, "unit_count", _c("permit", "unit.count", "27", 27, "27"))
 
 
+def test_observed_count_wins_when_same_cohort_has_a_reported_total():
+    observed_count = _c(
+        "observed-count", "observation.unit_count", "27", 27,
+        "Twenty-seven generator enclosures are visible.")
+    reported_total = _c(
+        "reported-total", "unit.mw_total", "495 MW", 495,
+        "The filing reports at least 495 MW in total.")
+
+    basis, _derivation = _unit_basis([reported_total, observed_count])
+
+    assert basis == "observed"
+    assert _basis_claim([reported_total, observed_count], basis) == observed_count
+
+
 def test_reported_quantitative_claim_is_not_reclassified_by_observation():
     reported_count = {
         **_c("reported", "unit.count", "15", 15,
@@ -376,3 +390,15 @@ def test_reported_quantitative_claim_is_not_reclassified_by_observation():
 
     assert basis == "reported"
     assert _basis_claim([observation, reported_count], basis) == reported_count
+
+
+def test_reported_basis_cannot_be_derived_from_metadata_only():
+    model = _c("model", "unit.model", "SMT-130", None,
+               "The filing identifies SMT-130 equipment.")
+
+    try:
+        _basis_claim([model], "reported")
+    except ValueError as exc:
+        assert "quantitative" in str(exc)
+    else:
+        raise AssertionError("metadata-only basis receipt was accepted")
