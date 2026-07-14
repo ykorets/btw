@@ -22,57 +22,90 @@
       "unit": [
         {
           "oem": "GE Vernova",
+          "fuel": null,
+          "basis": "permitted",
           "model": "LM2500",
           "mw_each": 34.1,
+          "total_mw": null,
           "unit_count": 5,
-          "hours_permitted": 8760
+          "hours_permitted": 8760,
+          "verification_state": "source_asserted"
         },
         {
-          "oem": "Solar Turbines",
+          "oem": null,
+          "fuel": null,
+          "basis": "permitted",
           "model": "Titan 350",
           "mw_each": 38,
+          "total_mw": null,
           "unit_count": 5,
-          "hours_permitted": 8760
+          "hours_permitted": null,
+          "verification_state": "source_asserted"
         }
       ],
       "permit": [
         {
           "status": "issued",
-          "filed_at": "2024-08-01",
+          "filed_at": "2025-01-11",
           "authority": "TCEQ",
           "issued_at": null,
           "permit_no": "177263",
-          "permit_type": "EGU Standard Permit registration"
-        },
-        {
-          "status": "issued",
-          "filed_at": null,
-          "authority": "TCEQ",
-          "issued_at": null,
-          "permit_no": "O4721",
-          "permit_type": "Title V"
+          "permit_type": "EGU Standard Permit registration",
+          "verification_state": "corroborated"
         }
       ],
       "sources": [
         {
           "url": "https://records.tceq.texas.gov/cs/idcplg?IdcService=TCEQ_EXTERNAL_SEARCH_GET_FILE&dID=8600163&Rendition=Web",
+          "archive_url": "https://evidence.behindthewatt.com/docs/13bd44e0d6070bd8d1c616d4832c162dd7ee13fbe2e509e32e853248b3957176.pdf",
+          "sha256": "13bd44e0d6070bd8d1c616d4832c162dd7ee13fbe2e509e32e853248b3957176",
+          "archived_at": "2026-07-11T17:30:33.909129+00:00",
+          "archive_status": "public",
           "doc_genre": "tceq_standard_permit_review",
           "facts": [
+            "facility.status",
+            "unit.oem",
             "unit.model",
             "unit.unit_count",
-            "facility.status",
-            "unit.mw_each"
+            "unit.mw_each",
+            "unit.basis",
+            "unit.verification_state",
+            "unit.hours_permitted",
+            "permit.permit_no",
+            "permit.permit_type",
+            "permit.status",
+            "permit.filed_at"
           ],
-          "quote": "Reduce the count of GE LM2500 simple-cycle turbines from six to five, reduce the site-rated power to 34.1 MW  \"per turbine, and increase the annual hours of operation from 5,880 hours to 8,760 hours per turbine.",
+          "quote": "Registration Number177263",
           "page": 1
         },
         {
           "url": "https://livingatlas.arcgis.com/wayback/#mapCenter=-99.77520%2C32.50490%2C17&mode=explore&active=32246",
+          "archive_url": null,
+          "sha256": "scene:wayback-2026-06-30-abilene-block",
+          "archived_at": "2026-07-11T23:51:34.159803+00:00",
+          "archive_status": "preserved_private",
           "doc_genre": "satellite_scene",
           "facts": [
             "facility.status",
             "facility.geo"
           ]
+        },
+        {
+          "url": "https://records.tceq.texas.gov/cs/idcplg?IdcService=TCEQ_EXTERNAL_SEARCH_GET_FILE&Rendition=Web&dID=8114425",
+          "archive_url": "https://evidence.behindthewatt.com/docs/0c801ce20883f0048985505a27021c4ccbdab2bd6476ddd610c44561c94e3ba1.pdf",
+          "sha256": "0c801ce20883f0048985505a27021c4ccbdab2bd6476ddd610c44561c94e3ba1",
+          "archived_at": "2026-07-14T16:54:11.062056+00:00",
+          "archive_status": "public",
+          "doc_genre": "tceq_standard_permit_final_action",
+          "facts": [
+            "permit.permit_no",
+            "permit.authority",
+            "permit.permit_type",
+            "permit.verification_state"
+          ],
+          "quote": "Standard Permit Registration Number:  177263",
+          "page": 1
         }
       ]
     },
@@ -98,25 +131,34 @@
       "unit": [
         {
           "oem": "Solar Turbines",
+          "fuel": null,
+          "basis": "reported",
           "model": "SMT-130",
           "mw_each": 16.5,
+          "total_mw": null,
           "unit_count": 15,
-          "hours_permitted": 8760
+          "hours_permitted": null,
+          "verification_state": "corroborated"
         }
       ],
       "permit": [
         {
-          "status": "issued; under appeal; CAA litigation",
-          "filed_at": "2025-01-31",
+          "status": "issued; under appeal",
+          "filed_at": null,
           "authority": "Shelby County Health Department",
           "issued_at": "2025-07-02",
           "permit_no": "01156-01PC",
-          "permit_type": "Air construction permit"
+          "permit_type": "Air construction permit",
+          "verification_state": "corroborated"
         }
       ],
       "sources": [
         {
           "url": "https://livingatlas.arcgis.com/wayback/#mapCenter=-90.15639%2C35.05759%2C19&mode=explore&active=32246",
+          "archive_url": null,
+          "sha256": "scene:vantor-lg01-2025-12-29-memphis",
+          "archived_at": "2026-07-11T02:03:59.543132+00:00",
+          "archive_status": "preserved_private",
           "doc_genre": "satellite_scene",
           "facts": [
             "facility.status",
@@ -125,14 +167,43 @@
         },
         {
           "url": "https://cdn.arstechnica.net/wp-content/uploads/2025/07/NAACP-and-YGGs-xAI-Air-Permit-Appeal-7-15-2025.pdf",
+          "archive_url": "https://evidence.behindthewatt.com/docs/ab75444eb75f82d1d14a18db75bf689df091ca2c8f4ca34782f6120f617fef40.pdf",
+          "sha256": "ab75444eb75f82d1d14a18db75bf689df091ca2c8f4ca34782f6120f617fef40",
+          "archived_at": "2026-07-11T17:30:35.364622+00:00",
+          "archive_status": "public",
           "doc_genre": "appeal_filing",
           "facts": [
             "facility.status",
+            "unit.model",
             "unit.unit_count",
-            "unit.model"
+            "permit.permit_no",
+            "permit.status",
+            "permit.authority",
+            "permit.permit_type",
+            "permit.issued_at",
+            "permit.verification_state"
           ],
           "quote": "Air Permit No. 01156-01PC",
           "page": 1
+        },
+        {
+          "url": "https://cleanenergy.org/wp-content/uploads/2025-04-09-Letter-from-SELC-et-al.-to-SCHD-re-xAIs-New-Turbines.pdf",
+          "archive_url": null,
+          "sha256": "68a2b4d3f5c34b0504b896f0cb52cdc34c83ab241013caed56b4e29d9ddf9da5",
+          "archived_at": "2026-07-11T17:30:36.758812+00:00",
+          "archive_status": "preserved_private",
+          "doc_genre": "advocacy_letter",
+          "facts": [
+            "unit.oem",
+            "unit.model",
+            "unit.unit_count",
+            "unit.mw_each",
+            "unit.basis",
+            "unit.verification_state",
+            "permit.authority"
+          ],
+          "quote": "posting of a draft permit on March 31, 2025 for 15 Solar SMT-130 gas turbines at the xAI site",
+          "page": 4
         }
       ]
     },
@@ -157,26 +228,35 @@
       "first_power": null,
       "unit": [
         {
-          "oem": "mixed mobile",
-          "model": "unverified",
-          "mw_each": 15.6,
+          "oem": null,
+          "fuel": null,
+          "basis": "observed",
+          "model": null,
+          "mw_each": null,
+          "total_mw": 495.0,
           "unit_count": 27,
-          "hours_permitted": null
+          "hours_permitted": null,
+          "verification_state": "source_asserted"
         }
       ],
       "permit": [
         {
-          "status": "approved; appealed",
+          "status": "issued",
           "filed_at": null,
           "authority": "MDEQ",
-          "issued_at": "2026-01-15",
+          "issued_at": "2026-03-11",
           "permit_no": "0680-00119",
-          "permit_type": "Air permit (41 turbines)"
+          "permit_type": "PSD Air Construction Permit",
+          "verification_state": "corroborated"
         }
       ],
       "sources": [
         {
           "url": "https://livingatlas.arcgis.com/wayback/#mapCenter=-90.03811%2C34.98208%2C19&mode=explore&active=32246",
+          "archive_url": null,
+          "sha256": "scene:vantor-wv02-2025-11-27-southaven",
+          "archived_at": "2026-07-11T02:03:59.543132+00:00",
+          "archive_status": "preserved_private",
           "doc_genre": "satellite_scene",
           "facts": [
             "facility.status",
@@ -185,11 +265,52 @@
         },
         {
           "url": "https://opcgis.deq.state.ms.us/ensearchonline/get_doc.aspx?dt=dpermit&id=1825411",
+          "archive_url": "https://evidence.behindthewatt.com/docs/e96ef09159edf43aa35d2d48b8f457958c928c1a222afb65515dee62b70a320f.pdf",
+          "sha256": "e96ef09159edf43aa35d2d48b8f457958c928c1a222afb65515dee62b70a320f",
+          "archived_at": "2026-07-11T23:18:03.159445+00:00",
+          "archive_status": "public",
           "doc_genre": "permit",
           "facts": [
-            "facility.status"
+            "facility.status",
+            "permit.permit_no",
+            "permit.permit_type",
+            "permit.verification_state"
           ],
           "quote": "Permit No.: 0680-00119",
+          "page": 1
+        },
+        {
+          "url": "https://storage.courtlistener.com/recap/gov.uscourts.msnd.52261/gov.uscourts.msnd.52261.52.0_2.pdf",
+          "archive_url": "https://evidence.behindthewatt.com/docs/b6692335ccef7ffa855246a6ac2fdba0adc086f37ae17b7a3c32b1563236c757.pdf",
+          "sha256": "b6692335ccef7ffa855246a6ac2fdba0adc086f37ae17b7a3c32b1563236c757",
+          "archived_at": "2026-07-12T20:45:46.728723+00:00",
+          "archive_status": "public",
+          "doc_genre": "court_filing",
+          "facts": [
+            "unit.total_mw",
+            "unit.unit_count",
+            "unit.basis",
+            "unit.verification_state",
+            "permit.authority",
+            "permit.status",
+            "permit.issued_at"
+          ],
+          "quote": "These 27 turbines have a combined generating capacity of at least 495 MW\u2014enough to power 400,000 homes.",
+          "page": 7
+        },
+        {
+          "url": "https://opcgis.deq.state.ms.us/enOnline/ai_info.aspx?ai=12592",
+          "archive_url": null,
+          "sha256": "0804e41f4793622c4791fa3a974ff3c7ed3ebb07321326b92da43bdeac3da4f9",
+          "archived_at": "2026-07-14T16:54:20.863879+00:00",
+          "archive_status": "preserved_private",
+          "doc_genre": "mdeq_permit_registry",
+          "facts": [
+            "permit.permit_no",
+            "permit.status",
+            "permit.issued_at"
+          ],
+          "quote": "Air - Air-Construction PSD 0680-00119 03/11/2026",
           "page": 1
         }
       ]
