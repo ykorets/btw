@@ -56,6 +56,13 @@ def sync(*, dry_run: bool = False,
             raise RuntimeError(
                 f"expected one private archive object for {sha}, got {len(matches)}")
         key = matches[0]["Key"]
+        if dry_run:
+            # Planning must work before the public bucket and its scoped R2
+            # credentials exist. The private lookup above still proves that
+            # the exact content-addressed source is available to copy.
+            print(f"WOULD ENSURE {key} [{metadata['rights_basis']}]")
+            copied += 1
+            continue
         try:
             exists = client.list_objects_v2(
                 Bucket=PUBLIC_BUCKET, Prefix=key).get("KeyCount", 0)
@@ -63,30 +70,26 @@ def sync(*, dry_run: bool = False,
             code = exc.response.get("Error", {}).get("Code")
             if code not in {"NoSuchBucket", "404"}:
                 raise
-            if not dry_run:
-                raise RuntimeError(
-                    f"public archive bucket {PUBLIC_BUCKET!r} does not exist") \
-                    from exc
-            exists = 0
+            raise RuntimeError(
+                f"public archive bucket {PUBLIC_BUCKET!r} does not exist") \
+                from exc
         if exists:
             print(f"KEEP {key}")
             continue
-        print(f"{'WOULD COPY' if dry_run else 'COPY'} {key} "
-              f"[{metadata['rights_basis']}]")
-        if not dry_run:
-            source = client.get_object(Bucket=BUCKET, Key=key)
-            client.put_object(
-                Bucket=PUBLIC_BUCKET,
-                Key=key,
-                Body=source["Body"],
-                ContentType=source.get("ContentType") or "application/octet-stream",
-                CacheControl="public, max-age=31536000, immutable",
-                Metadata={
-                    "sha256": sha,
-                    "rights-basis": metadata["rights_basis"],
-                    "source-bucket": BUCKET,
-                },
-            )
+        print(f"COPY {key} [{metadata['rights_basis']}]")
+        source = client.get_object(Bucket=BUCKET, Key=key)
+        client.put_object(
+            Bucket=PUBLIC_BUCKET,
+            Key=key,
+            Body=source["Body"],
+            ContentType=source.get("ContentType") or "application/octet-stream",
+            CacheControl="public, max-age=31536000, immutable",
+            Metadata={
+                "sha256": sha,
+                "rights-basis": metadata["rights_basis"],
+                "source-bucket": BUCKET,
+            },
+        )
         copied += 1
     return copied
 
