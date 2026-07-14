@@ -14,6 +14,14 @@ async function load(name: string): Promise<Json> {
   return JSON.parse(await readFile(path.join(dataRoot(), name), "utf8"));
 }
 
+export async function loadMirrorJson(name: string): Promise<Json> {
+  return load(name);
+}
+
+export async function loadMirrorText(name: string): Promise<string> {
+  return readFile(path.join(dataRoot(), name), "utf8");
+}
+
 async function loadOptional(name: string, fallback: Json): Promise<Json> {
   try { return await load(name); }
   catch (error: any) {

@@ -7,6 +7,7 @@ export const GET: APIRoute = async () => {
   const mirror = await loadMirror();
   const urls = [
     "https://behindthewatt.com/",
+    "https://behindthewatt.com/data/",
     ...mirror.facilities.facilities.map(
       (facility: Record<string, any>) =>
         `https://behindthewatt.com/facility/${facility.slug}/`,

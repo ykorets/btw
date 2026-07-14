@@ -1,0 +1,21 @@
+{
+  "name": "behind-the-watt-mcp",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy",
+    "type-check": "tsc --noEmit"
+  },
+  "dependencies": {
+    "agents": "^0.17.1",
+    "zod": "^4.4.3"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^5.20260714.1",
+    "@types/node": "^24.0.0",
+    "typescript": "6.0.3",
+    "wrangler": "^4.105.0"
+  }
+}
