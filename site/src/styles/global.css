@@ -1,18 +1,12 @@
-:root{
-  --ink:#14140f; --ink-2:#57564e; --ink-3:#8a897f;
-  --bg:#fbfaf7; --card:#ffffff; --line:#e6e4dc; --line-2:#d4d2c7;
-  --green:#157a54; --green-bg:#e4f3ec; --red:#b3362c; --red-bg:#faeae8;
-  --amber:#9a6b10; --amber-bg:#f8efdb; --blue:#1f5fa8; --blue-bg:#e8f0fa;
-  --sans:'Inter',system-ui,sans-serif; --serif:'Source Serif 4',Georgia,serif; --mono:'IBM Plex Mono',ui-monospace,monospace;
-}
+@import "./tokens.css";
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:var(--sans);color:var(--ink);background:var(--bg);font-size:16px;line-height:1.6;-webkit-font-smoothing:antialiased}
-.wrap{max-width:1060px;margin:0 auto;padding:0 24px}
+.wrap{max-width:var(--content-width);margin:0 auto;padding:0 24px}
 a{color:inherit}
 h2{font-size:26px;font-weight:600;letter-spacing:-.01em;margin-bottom:6px}
 .kicker{font-family:var(--mono);font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3);margin-bottom:10px}
 .sub{color:var(--ink-2);max-width:620px}
-section{padding:64px 0;border-top:1px solid var(--line)}
+section{padding:var(--section-y) 0;border-top:1px solid var(--line)}
 .btn{display:inline-block;padding:10px 20px;border-radius:8px;border:1px solid var(--line-2);font-size:14px;font-weight:500;text-decoration:none;background:var(--card);cursor:pointer;transition:background .15s}
 .btn:hover{background:var(--bg)}
 .btn-primary{background:var(--ink);color:#fff;border-color:var(--ink)}
