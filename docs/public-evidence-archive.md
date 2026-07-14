@@ -20,8 +20,10 @@ Deployment:
    then run it with writes enabled.
 5. Run `publish-mirror` with scope `all` and rebuild Pages.
 
-A dry run is safe before the public bucket exists: it lists every planned copy.
-The write run fails closed until the separate public bucket has been created.
+A dry run is safe before the public bucket exists: it verifies each immutable
+source in the private archive and lists every object the write run will ensure.
+It deliberately does not access the public bucket. The write run fails closed
+until the separate public bucket and scoped credentials have been configured.
 
 The public mirror exports both URLs, capture time, archive status and SHA-256.
 Because object keys are content-addressed and responses use an immutable cache

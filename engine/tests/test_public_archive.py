@@ -31,9 +31,12 @@ def test_archive_url_is_fail_closed_without_approval_or_base():
 
 
 class MissingPublicBucketClient:
+    public_lookups = 0
+
     def list_objects_v2(self, *, Bucket, Prefix):
         if Bucket == public_archive.BUCKET:
             return {"Contents": [{"Key": f"docs/{SHA}.pdf"}]}
+        self.public_lookups += 1
         raise ClientError(
             {"Error": {"Code": "NoSuchBucket", "Message": "missing"}},
             "ListObjectsV2")
@@ -43,8 +46,10 @@ def test_dry_run_can_plan_before_public_bucket_exists(tmp_path, monkeypatch):
     path = tmp_path / "manifest.json"
     path.write_text(json.dumps({"version": 1, "documents": {
         SHA: {"rights_basis": "public_record"}}}))
-    monkeypatch.setattr(public_archive, "s3", lambda: MissingPublicBucketClient())
+    client = MissingPublicBucketClient()
+    monkeypatch.setattr(public_archive, "s3", lambda: client)
     assert public_archive.sync(dry_run=True, manifest_path=path) == 1
+    assert client.public_lookups == 0
 
 
 def test_write_fails_closed_when_public_bucket_is_missing(tmp_path, monkeypatch):
