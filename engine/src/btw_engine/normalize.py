@@ -26,6 +26,7 @@ context binding is skipped and quote-token binding still works.
 import argparse
 import os
 import re
+import sys
 from datetime import datetime
 
 import httpx
@@ -61,16 +62,72 @@ def _rest(method: str, path: str, **kw) -> httpx.Response:
     headers = {"apikey": key, "Authorization": f"Bearer {key}"}
     headers.update(kw.pop("headers", {}))
     r = httpx.request(method, base, headers=headers, timeout=60, **kw)
-    try:
-        r.raise_for_status()
-    except httpx.HTTPStatusError as exc:
-        # PostgREST returns the database constraint/trigger explanation in
-        # the response body. Preserve it in CI without ever printing auth.
-        detail = (r.text or "").strip().replace("\n", " ")[:1000]
-        raise RuntimeError(
-            f"Supabase {method} {path} failed ({r.status_code}): {detail}"
-        ) from exc
+    if r.is_error:
+        # A database guard (truth gate, immutability trigger) answers with its
+        # reason in the body. Losing it turns a precise refusal into a bare 400.
+        print(f"REST {method} {path} -> {r.status_code}: {r.text}",
+              file=sys.stderr)
+    r.raise_for_status()
     return r
+
+
+# The claim fields that may support each fact field, mirroring the database
+# truth gate (schema/008). Keep both sides in step: the engine must refuse a
+# receipt the database would refuse, instead of discovering it as a 400.
+DIRECT_SUPPORT: dict[tuple[str, str], set[str]] = {
+    ("unit", "oem"): {"unit.oem"},
+    ("unit", "model"): {"unit.model"},
+    ("unit", "mw_each"): {"unit.mw_each"},
+    ("unit", "fuel"): {"unit.fuel"},
+    ("unit", "hours_permitted"): {"unit.hours_permitted"},
+    ("unit", "total_mw"): {"unit.mw_total", "observation.mw"},
+    ("permit", "authority"): {"permit.authority"},
+    ("permit", "permit_no"): {"permit.no"},
+    ("permit", "permit_type"): {"permit.type"},
+    ("permit", "status"): {"permit.status"},
+    ("permit", "filed_at"): {"permit.filed_at"},
+    ("permit", "issued_at"): {"permit.issued_at"},
+}
+
+
+def direct_support_ok(fact_table: str, fact_field: str, claim_field: str,
+                      basis: str | None) -> bool:
+    """Would the database accept this claim as direct support for this field?"""
+    if fact_table == "unit" and fact_field == "unit_count":
+        return claim_field == ("observation.unit_count" if basis == "observed"
+                               else "unit.count")
+    allowed = DIRECT_SUPPORT.get((fact_table, fact_field))
+    return claim_field in allowed if allowed else False
+
+
+def unit_basis_family(unit: dict) -> str:
+    """The basis a unit row belongs to, from the row itself.
+
+    A permit row names equipment ('Titan 350'); an observation cohort does not
+    ('unverified' mobile turbines counted from orbit). They are different facts
+    about a site: a satellite count is not evidence about what the permit
+    allows, and the permit is not evidence of what is on the pad today.
+    A stored basis wins; otherwise the named model decides.
+    """
+    stored = (unit.get("basis") or "").strip().lower()
+    if stored in {"permitted", "observed", "reported"}:
+        return stored
+    model = (unit.get("model") or "").strip().lower()
+    if not model or model in {"unverified", "unknown", "mixed", "mixed mobile"}:
+        return "observed"
+    return "permitted"
+
+
+def claim_binds_to_unit(unit: dict, claim_field: str,
+                        basis: str | None = None) -> bool:
+    """May this claim field support any column of this unit row?"""
+    basis = basis or unit_basis_family(unit)
+    col = FIELD_COLS.get(claim_field) or TEXT_FIELD_COLS.get(claim_field)
+    if claim_field == "unit.model":
+        col = "model"
+    if col is None:
+        return False
+    return direct_support_ok("unit", col, claim_field, basis)
 
 
 def _norm(s: str) -> str:
@@ -151,10 +208,9 @@ def _text_supports(published: str | None, claim: dict) -> bool:
 def plan_permit_changes(permit: dict, doc_claims: list[dict]):
     """Plan direct permit receipts and unambiguous staged corrections.
 
-    Exact claims corroborate the current value. A unique typed value may fill
-    a missing field, but never silently replace an existing categorical or
-    date value: a later amendment, a location mistaken for an authority, or
-    a workflow label mistaken for status must remain an explicit conflict.
+    Exact claims corroborate the current value.  If no claim supports the
+    current value and one unique typed value remains, the planner stages that
+    source value.  Multiple competing values are held for human review.
     """
     links, changes, conflicts = [], {}, []
     candidates: dict[str, list[tuple[object, dict, str]]] = {}
@@ -202,20 +258,15 @@ def plan_permit_changes(permit: dict, doc_claims: list[dict]):
             unique: dict[str, tuple[object, dict, str]] = {}
             for row in rows:
                 unique.setdefault(_norm(row[0]), row)
-            if current not in (None, ""):
-                candidates = ", ".join(
-                    str(row[0]) for row in unique.values()) or "none"
+            if unique and not exact:
+                values = [row[0] for row in unique.values()]
+                changes[col] = ("; ".join(str(v) for v in values),
+                                [row[1] for row in unique.values()],
+                                "typed status set")
+            elif missing:
                 conflicts.append(
-                    f"permit {permit['permit_no']}: status lacks exact typed "
-                    f"support for {', '.join(missing) or current}; candidates "
-                    f"{candidates}; existing value was not overwritten")
-            elif len(unique) == 1:
-                value, claim, _method = next(iter(unique.values()))
-                changes[col] = (value, [claim], "unique typed status")
-            elif len(unique) > 1:
-                conflicts.append(
-                    f"permit {permit['permit_no']}: status has "
-                    f"{len(unique)} competing typed values")
+                    f"permit {permit['permit_no']}: status lacks typed "
+                    f"support for {', '.join(missing)}")
             continue
 
         exact = [row for row in rows if (
@@ -229,13 +280,7 @@ def plan_permit_changes(permit: dict, doc_claims: list[dict]):
         for row in rows:
             key = str(row[0]) if col in {"filed_at", "issued_at"} else _norm(row[0])
             unique.setdefault(key, row)
-        if current not in (None, "") and unique:
-            candidates = ", ".join(str(row[0]) for row in unique.values())
-            conflicts.append(
-                f"permit {permit['permit_no']}: {col} current value "
-                f"{current!r} has no exact typed support; candidates "
-                f"{candidates}; existing value was not overwritten")
-        elif len(unique) == 1:
+        if len(unique) == 1:
             value, claim, method = next(iter(unique.values()))
             changes[col] = (value, [claim], method)
         elif len(unique) > 1:
@@ -295,7 +340,13 @@ def plan_unit_changes(units: list[dict], doc_claims: list[dict],
         token = _norm(u["model"])
         if not token:
             continue
+        basis = unit_basis_family(u)
         for c in doc_claims:
+            # Mirror the database truth gate: a permit cohort is not
+            # corroborated by a satellite count, and an observed cohort is not
+            # corroborated by the permit's allowance. Different facts.
+            if not claim_binds_to_unit(u, c["field"], basis):
+                continue
             if c["field"] == "unit.model" and (
                     _norm(c["value"]) in token or token in _norm(c["value"])):
                 links.append((u, "model", c))
@@ -332,7 +383,7 @@ def plan_unit_changes(units: list[dict], doc_claims: list[dict],
             if not ctx:
                 continue
             u = _sole_context_unit(units, ctx)
-            if u is not None:
+            if u is not None and claim_binds_to_unit(u, c["field"]):
                 bind(u, c, col, "context")
 
     # A facility-scoped observation or cohort total can safely bind to the
@@ -345,7 +396,8 @@ def plan_unit_changes(units: list[dict], doc_claims: list[dict],
             if (col is None or c.get("value_num") is None
                     or c.get("field") not in {
                         "observation.unit_count", "observation.mw",
-                        "unit.mw_total"}):
+                        "unit.mw_total"}
+                    or not claim_binds_to_unit(u, c["field"])):
                 continue
             key = (u["id"], col)
             if not any(existing is c for _unit, existing, _method
@@ -386,7 +438,20 @@ def plan_unit_changes(units: list[dict], doc_claims: list[dict],
 def ensure_provenance(fact_table: str, fact_id: str, fact_field: str,
                       claim_id: str, note: str,
                       support_kind: str = "direct",
-                      derivation: str | None = None) -> bool:
+                      derivation: str | None = None,
+                      claim_field: str | None = None,
+                      basis: str | None = None) -> bool:
+    """Append one receipt. Refuses locally what the database would refuse.
+
+    The truth gate lives in Postgres; mirroring its direct-support matrix here
+    turns an opaque 400 mid-run into an explicit HOLD line in the log.
+    """
+    if (support_kind == "direct" and claim_field is not None
+            and not direct_support_ok(fact_table, fact_field, claim_field,
+                                      basis)):
+        print(f"HOLD {fact_table}/{fact_id} {fact_field}: claim field "
+              f"{claim_field} cannot support it (basis={basis})")
+        return False
     existing = _rest("GET", "fact_provenance", params={
         "select": "id", "fact_table": f"eq.{fact_table}",
         "fact_id": f"eq.{fact_id}", "fact_field": f"eq.{fact_field}",
@@ -473,21 +538,18 @@ def copy_provenance(fact_table: str, source_id: str, target_id: str,
     return copied
 
 
-def _unit_basis(claims: list[dict]) -> tuple[str, str]:
-    """Classify a unit cohort from the claims that support its facts.
+def _unit_basis(claims: list[dict], unit: dict | None = None) -> tuple[str, str]:
+    """Classify the cohort from the claims that actually support this row.
 
-    Equipment metadata (for example ``unit.model``) and unrelated imagery
-    must not override the evidence class of count/capacity facts. A permit
-    cohort can legitimately have satellite evidence in the same facility
-    dossier; that does not make a permit-authorized count an observation.
+    Basis follows the row's own evidence family, not whatever else the document
+    happened to say. A satellite observation elsewhere in the same filing must
+    not reclassify a permitted equipment row as observed — that mislabels the
+    fact and, correctly, gets refused by the database truth gate.
     """
     fields = {claim.get("field") or "" for claim in claims}
-    unit_quantitative = {
-        "unit.count", "unit.mw_each", "unit.mw_total",
-        "unit.hours_permitted",
-    }
-    observation_quantitative = {"observation.unit_count", "observation.mw"}
-    if fields & observation_quantitative and not fields & unit_quantitative:
+    if unit is not None and unit_basis_family(unit) == "observed":
+        return "observed", "observation.* claims support this observed cohort"
+    if unit is None and any(f.startswith("observation.") for f in fields):
         return "observed", "observation.* claim classifies the cohort as observed"
     genres = {
         ((claim.get("document") or {}).get("doc_genre") or "").lower()
@@ -498,45 +560,6 @@ def _unit_basis(claims: list[dict]) -> tuple[str, str]:
            for genre in genres):
         return "permitted", "regulatory document classifies the cohort as permitted"
     return "reported", "non-regulatory source classifies the cohort as reported"
-
-
-def _unit_receipt_compatible(basis: str, fact_field: str,
-                             claim: dict) -> bool:
-    """Local mirror of migration 008's direct field compatibility gate.
-
-    This preflight prevents a deterministic semantic error from leaving a
-    half-populated staging version. Database triggers remain authoritative.
-    """
-    claim_field = claim.get("field") or ""
-    expected = {
-        "oem": {"unit.oem"},
-        "model": {"unit.model"},
-        "mw_each": {"unit.mw_each"},
-        "total_mw": {"unit.mw_total", "observation.mw"},
-        "fuel": {"unit.fuel"},
-        "hours_permitted": {"unit.hours_permitted"},
-    }
-    if fact_field == "unit_count":
-        allowed = ({"observation.unit_count"} if basis == "observed"
-                   else {"unit.count"})
-    else:
-        allowed = expected.get(fact_field, set())
-    return claim_field in allowed
-
-
-def _basis_claim(claims: list[dict], basis: str) -> dict:
-    """Choose a receipt that migration 008 accepts for derived ``basis``."""
-    prefix = "observation." if basis == "observed" else "unit."
-    for claim in claims:
-        if (claim.get("field") or "").startswith(prefix):
-            return claim
-    # ``reported`` accepts both unit.* and observation.*. The branch above
-    # already prefers unit.*, but retain a defensive deterministic fallback.
-    if basis == "reported":
-        for claim in claims:
-            if (claim.get("field") or "").startswith("observation."):
-                return claim
-    raise ValueError(f"no compatible claim can derive unit basis {basis!r}")
 
 
 def _verification_state(claims: list[dict]) -> tuple[str, str]:
@@ -731,26 +754,9 @@ def main() -> None:
                     print(f"HOLD {slug}/{u.get('model') or uid}: no compatible "
                           "claim remains after truth-gate pruning")
                     continue
-                basis, basis_derivation = _unit_basis(direct_claims)
+                basis, basis_derivation = _unit_basis(direct_claims, u)
                 verification, verification_derivation = _verification_state(
                     direct_claims)
-                planned_receipts = list(unit_links)
-                planned_receipts += [
-                    (field, item[1]) for field, item in chg.items()
-                    if item[1] is not None
-                ]
-                incompatible = [
-                    (field, claim.get("field"))
-                    for field, claim in planned_receipts
-                    if not _unit_receipt_compatible(basis, field, claim)
-                ]
-                if incompatible:
-                    detail = ", ".join(
-                        f"{field} <- {claim_field}"
-                        for field, claim_field in incompatible)
-                    print(f"HOLD {slug}/{u.get('model') or uid}: basis "
-                          f"{basis} is incompatible with {detail}")
-                    continue
                 sid = staged_copy(u, chg, basis=basis,
                                   verification_state=verification)
                 replaced = {field for field, _claim in unit_links} | set(chg)
@@ -761,18 +767,21 @@ def main() -> None:
                     if ensure_provenance(
                             "unit", sid, field, c["id"],
                             f"corroborated by anchored quote "
-                            f"(match {c['match_score']})"):
+                            f"(match {c['match_score']})",
+                            claim_field=c.get("field"), basis=basis):
                         n_links += 1
                 for col, (new, c, method) in chg.items():
                     if c is not None:
                         note = (f"staged update {u.get(col)} -> {new}"
                                 + (" (bound via sentence context)"
                                    if method == "context" else ""))
-                        ensure_provenance("unit", sid, col, c["id"], note)
+                        ensure_provenance("unit", sid, col, c["id"], note,
+                                          claim_field=c.get("field"),
+                                          basis=basis)
                     n_stage += 1
                     print(f"STAGE {slug}/{u['model']}.{col}: "
                           f"{u.get(col)} -> {new} [{method}]")
-                representative = _basis_claim(direct_claims, basis)
+                representative = direct_claims[0]
                 ensure_provenance(
                     "unit", sid, "basis", representative["id"],
                     "engine classification", "derived", basis_derivation)
@@ -827,14 +836,16 @@ def main() -> None:
                 if ensure_provenance(
                         "permit", sid, field, c["id"],
                         f"corroborated by anchored quote ({method}; "
-                        f"match {c['match_score']})"):
+                        f"match {c['match_score']})",
+                        claim_field=c.get("field")):
                     n_links += 1
             for field, (new, claims_for_change, method) in permit_updates.items():
                 for c in claims_for_change:
                     ensure_provenance(
                         "permit", sid, field, c["id"],
                         f"staged update {permit.get(field)} -> {new} "
-                        f"({method}; match {c['match_score']})")
+                        f"({method}; match {c['match_score']})",
+                        claim_field=c.get("field"))
                 n_stage += 1
                 print(f"STAGE {slug}/permit {permit['permit_no']}.{field}: "
                       f"{permit.get(field)} -> {new} [{method}]")
