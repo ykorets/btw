@@ -16,7 +16,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with: {python-version: "3.12"}
-      - run: pip install httpx rapidfuzz pypdf boto3
+      - run: pip install httpx rapidfuzz pypdf boto3 pyyaml
       - name: Plan or stage reconciled fact versions
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
