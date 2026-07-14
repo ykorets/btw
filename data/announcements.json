@@ -1,0 +1,1159 @@
+{
+  "license": "CC BY 4.0",
+  "cite_as": "Behind the Watt, behindthewatt.com, CC BY 4.0",
+  "classification": "third_party_reported_not_btw_verified",
+  "note": "Reported project pipeline from a cited third-party inventory. Do not add to BTW verified operating capacity.",
+  "summary": {
+    "projects": 74,
+    "projects_with_capacity": 70,
+    "reported_gw": 143.3,
+    "statuses": {
+      "Proposed": {
+        "projects": 70,
+        "reported_mw": 137691.0
+      },
+      "Under Construction": {
+        "projects": 4,
+        "reported_mw": 5628.0
+      }
+    },
+    "top_states": [
+      {
+        "state": "TX",
+        "reported_gw": 63.2
+      },
+      {
+        "state": "WV",
+        "reported_gw": 15.5
+      },
+      {
+        "state": "OH",
+        "reported_gw": 14.0
+      },
+      {
+        "state": "PA",
+        "reported_gw": 13.7
+      },
+      {
+        "state": "UT",
+        "reported_gw": 13.0
+      },
+      {
+        "state": "WY",
+        "reported_gw": 7.0
+      }
+    ]
+  },
+  "announcements": [
+    {
+      "name": "Fermi America Project Matador",
+      "state": "TX",
+      "county": "Carson County",
+      "project_type": "New",
+      "operating_status": "Proposed",
+      "expected_operating_year": "Q2 2027",
+      "generating_technology": "Combined Cycle",
+      "reported_capacity_mw": 11280,
+      "source_as_of": "2026-04-30",
+      "source": {
+        "url": "https://environmentalintegrity.org/wp-content/uploads/2026/06/2026.05.14_BTM-Gas-Power-Plants.xlsx",
+        "doc_genre": "third_party_inventory"
+      }
+    },
+    {
+      "name": "Portsmouth Powered Land Project",
+      "state": "OH",
+      "county": "Pike County",
+      "project_type": "New",
+      "operating_status": "Proposed",
+      "expected_operating_year": "Unknown",
+      "generating_technology": "Unknown",
+      "reported_capacity_mw": 9200,
+      "source_as_of": "2026-04-30",
+      "source": {
+        "url": "https://environmentalintegrity.org/wp-content/uploads/2026/06/2026.05.14_BTM-Gas-Power-Plants.xlsx",
+        "doc_genre": "third_party_inventory"
+      }
+    },
+    {
+      "name": "Stratos Project/Wonder Valley",
+      "state": "UT",
+      "county": "Box Elder County",
+      "project_type": "New",
+      "operating_status": "Proposed",
+      "expected_operating_year": "2036",
+      "generating_technology": "Unknown",
+      "reported_capacity_mw": 9000,
+      "source_as_of": "2026-04-30",
+      "source": {
+        "url": "https://environmentalintegrity.org/wp-content/uploads/2026/06/2026.05.14_BTM-Gas-Power-Plants.xlsx",
+        "doc_genre": "third_party_inventory"
+      }
+    },
+    {
+      "name": "Monarch Compute Campus Power Plant",
+      "state": "WV",
+      "county": "Mason County",
+      "project_type": "New",
+      "operating_status": "Proposed",
+      "expected_operating_year": "2031",
+      "generating_technology": "Internal Combustion Engine; Unknown",
+      "reported_capacity_mw": 8160,
+      "source_as_of": "2026-04-30",
+      "source": {
+        "url": "https://environmentalintegrity.org/wp-content/uploads/2026/06/2026.05.14_BTM-Gas-Power-Plants.xlsx",
+        "doc_genre": "third_party_inventory"
+      }
+    },
+    {
+      "name": "GW Ranch Energy Center",
+      "state": "TX",
+      "county": "Pecos County",
+      "project_type": "New",
+      "operating_status": "Proposed",
+      "expected_operating_year": "Q2 2027",
+      "generating_technology": "Simple Cycle",
+      "reported_capacity_mw": 7650,
+      "source_as_of": "2026-04-30",
+      "source": {
+        "url": "https://environmentalintegrity.org/wp-content/uploads/2026/06/2026.05.14_BTM-Gas-Power-Plants.xlsx",
+        "doc_genre": "third_party_inventory"
+      }
+    },
+    {
+      "name": "Nexus Data Center Hubbard Power Plant",
+      "state": "TX",
+      "county": "Hill County",
+      "project_type": "New",
+      "operating_status": "Proposed",
+      "expected_operating_year": "2027",
+      "generating_technology": "Internal Combustion Engine, Simple Cycle, Combined Cycle",
+      "reported_capacity_mw": 7227,
+      "source_as_of": "2026-04-30",
+      "source": {
+        "url": "https://environmentalintegrity.org/wp-content/uploads/2026/06/2026.05.14_BTM-Gas-Power-Plants.xlsx",
+        "doc_genre": "third_party_inventory"
+      }
+    },
+    {
+      "name": "Texas Power Generation Hub (Nextera-Comstock Power Station)",
+      "state": "TX",
+      "county": "Anderson County",
+      "project_type": "New",
+      "operating_status": "Proposed",
+      "expected_operating_year": "2028/2029/2031/2032",
+      "generating_technology": "Combined Cycle, Simple Cycle",
+      "reported_capacity_mw": 5200,
+      "source_as_of": "2026-04-30",
+      "source": {
+        "url": "https://environmentalintegrity.org/wp-content/uploads/2026/06/2026.05.14_BTM-Gas-Power-Plants.xlsx",
+        "doc_genre": "third_party_inventory"
+      }
+    },
+    {
+      "name": "Chevron AI Data Center Project",
+      "state": "TX",
+      "county": null,
+      "project_type": "New",
+      "operating_status": "Proposed",
+      "expected_operating_year": "2027",
+      "generating_technology": "Unknown",
+      "reported_capacity_mw": 5000,
+      "source_as_of": "2026-04-30",
+      "source": {
+        "url": "https://environmentalintegrity.org/wp-content/uploads/2026/06/2026.05.14_BTM-Gas-Power-Plants.xlsx",
+        "doc_genre": "third_party_inventory"
+      }
+    },
+    {
+      "name": "FO Permian Partners Data Center Complex",
+      "state": "TX",
+      "county": "Midland County",
+      "project_type": "New",
+      "operating_status": "Proposed",
+      "expected_operating_year": "2026",
+      "generating_technology": "Unknown",
+      "reported_capacity_mw": 5000,
+      "source_as_of": "2026-04-30",
+      "source": {
+        "url": "https://environmentalintegrity.org/wp-content/uploads/2026/06/2026.05.14_BTM-Gas-Power-Plants.xlsx",
+        "doc_genre": "third_party_inventory"
+      }
+    },
+    {
+      "name": "Homer City Generating Station",
+      "state": "PA",
+      "county": "Indiana County",
+      "project_type": "New",
+      "operating_status": "Under Construction",
+      "expected_operating_year": "2029",
+      "generating_technology": "Simple Cycle, Combined Cycle",
+      "reported_capacity_mw": 4678,
+      "source_as_of": "2026-04-30",
+      "source": {
+        "url": "https://environmentalintegrity.org/wp-content/uploads/2026/06/2026.05.14_BTM-Gas-Power-Plants.xlsx",
+        "doc_genre": "third_party_inventory"
+      }
+    },
+    {
+      "name": "Shippingport Power Station (Formerly Bruce Mansfield Power Plant)",
+      "state": "PA",
+      "county": "Beaver County",
+      "project_type": "New (coal to gas conversion)",
+      "operating_status": "Proposed",
+      "expected_operating_year": "2028",
+      "generating_technology": "Simple Cycle, Steam Turbine",
+      "reported_capacity_mw": 3641,
+      "source_as_of": "2026-04-30",
+      "source": {
+        "url": "https://environmentalintegrity.org/wp-content/uploads/2026/06/2026.05.14_BTM-Gas-Power-Plants.xlsx",
+        "doc_genre": "third_party_inventory"
+      }
+    },
+    {
+      "name": "Tenaska Gas Power Plant",
+      "state": "NE",
+      "county": null,
+      "project_type": "New",
+      "operating_status": "Proposed",
+      "expected_operating_year": "2029",
+      "generating_technology": "Combined Cycle",
+      "reported_capacity_mw": 3000,
+      "source_as_of": "2026-04-30",
+      "source": {
+        "url": "https://environmentalintegrity.org/wp-content/uploads/2026/06/2026.05.14_BTM-Gas-Power-Plants.xlsx",
+        "doc_genre": "third_party_inventory"
+      }
+    },
+    {
+      "name": "Kilby Power Plant",
+      "state": "TX",
+      "county": "Reeves County",
+      "project_type": "New",
+      "operating_status": "Proposed",
+      "expected_operating_year": "Unknown",
+      "generating_technology": "Combined Cycle, Simple Cycle",
+      "reported_capacity_mw": 2869,
+      "source_as_of": "2026-04-30",
+      "source": {
+        "url": "https://environmentalintegrity.org/wp-content/uploads/2026/06/2026.05.14_BTM-Gas-Power-Plants.xlsx",
+        "doc_genre": "third_party_inventory"
+      }
+    },
+    {
+      "name": "Adams Fork Data Center Energy Campus",
+      "state": "WV",
+      "county": "Mingo County",
+      "project_type": "New",
+      "operating_status": "Proposed",
+      "expected_operating_year": "2027",
+      "generating_technology": "Internal Combustion Engine",
+      "reported_capacity_mw": 2850,
+      "source_as_of": "2026-04-30",
+      "source": {
+        "url": "https://environmentalintegrity.org/wp-content/uploads/2026/06/2026.05.14_BTM-Gas-Power-Plants.xlsx",
+        "doc_genre": "third_party_inventory"
+      }
+    },
+    {
+      "name": "Adams Fork Harless Data Center Energy Campus",
+      "state": "WV",
+      "county": "Mingo County",
+      "project_type": "New",
+      "operating_status": "Proposed",
+      "expected_operating_year": "2027",
+      "generating_technology": "Internal Combustion Engine",
+      "reported_capacity_mw": 2850,
+      "source_as_of": "2026-04-30",
+      "source": {
+        "url": "https://environmentalintegrity.org/wp-content/uploads/2026/06/2026.05.14_BTM-Gas-Power-Plants.xlsx",
+        "doc_genre": "third_party_inventory"
+      }
+    },
+    {
+      "name": "TECfusions Keystone Connect Power Plant",
+      "state": "PA",
+      "county": "Westmoreland County",
+      "project_type": "New",
+      "operating_status": "Proposed",
+      "expected_operating_year": "2031/Unknown",
+      "generating_technology": "Unknown",
+      "reported_capacity_mw": 2700,
+      "source_as_of": "2026-04-30",
+      "source": {
+        "url": "https://environmentalintegrity.org/wp-content/uploads/2026/06/2026.05.14_BTM-Gas-Power-Plants.xlsx",
+        "doc_genre": "third_party_inventory"
+      }
+    },
+    {
+      "name": "VoltaGrid ABI-1 Electric Generating Station",
+      "state": "TX",
+      "county": "Shackleford County",
+      "project_type": "New",
+      "operating_status": "Proposed",
+      "expected_operating_year": "Q2 2026",
+      "generating_technology": "Internal Combustion Engine",
+      "reported_capacity_mw": 2582,
+      "source_as_of": "2026-04-30",
+      "source": {
+        "url": "https://environmentalintegrity.org/wp-content/uploads/2026/06/2026.05.14_BTM-Gas-Power-Plants.xlsx",
+        "doc_genre": "third_party_inventory"
+      }
+    },
+    {
+      "name": "Project Jupiter East Microgrid",
+      "state": "NM",
+      "county": "Dona Ana County",
+      "project_type": "New",
+      "operating_status": "Proposed",
+      "expected_operating_year": "Q4 2026",
+      "generating_technology": "Simple Cycle",
+      "reported_capacity_mw": 2393,
+      "source_as_of": "2026-04-30",
+      "source": {
+        "url": "https://environmentalintegrity.org/wp-content/uploads/2026/06/2026.05.14_BTM-Gas-Power-Plants.xlsx",
+        "doc_genre": "third_party_inventory"
+      }
+    },
+    {
+      "name": "Schahfer Generating Station",
+      "state": "IN",
+      "county": "Jasper County",
+      "project_type": "Expansion",
+      "operating_status": "Proposed",
+      "expected_operating_year": "Unknown",
+      "generating_technology": "Combined Cycle",
+      "reported_capacity_mw": 2300,
+      "source_as_of": "2026-04-30",
+      "source": {
+        "url": "https://environmentalintegrity.org/wp-content/uploads/2026/06/2026.05.14_BTM-Gas-Power-Plants.xlsx",
+        "doc_genre": "third_party_inventory"
+      }
+    },
+    {
+      "name": "BFC Power and Cheyenne Power Hub",
+      "state": "WY",
+      "county": "Laramie County",
+      "project_type": "New",
+      "operating_status": "Proposed",
+      "expected_operating_year": "2027",
+      "generating_technology": "Combined Cycle, Simple Cycle",
+      "reported_capacity_mw": 2200,
+      "source_as_of": "2026-04-30",
+      "source": {
+        "url": "https://environmentalintegrity.org/wp-content/uploads/2026/06/2026.05.14_BTM-Gas-Power-Plants.xlsx",
+        "doc_genre": "third_party_inventory"
+      }
+    },
+    {
+      "name": "Miller Generating Station",
+      "state": "WY",
+      "county": "Carbon County",
+      "project_type": "New",
+      "operating_status": "Proposed",
+      "expected_operating_year": "2028",
+      "generating_technology": "Combined Cycle, Simple Cycle",
+      "reported_capacity_mw": 2089,
+      "source_as_of": "2026-04-30",
+      "source": {
+        "url": "https://environmentalintegrity.org/wp-content/uploads/2026/06/2026.05.14_BTM-Gas-Power-Plants.xlsx",
+        "doc_genre": "third_party_inventory"
+      }
+    },
+    {
+      "name": "NRG Tolar Power Center",
+      "state": "TX",
+      "county": "Hood County",
+      "project_type": "New",
+      "operating_status": "Proposed",
+      "expected_operating_year": "Unknown",
+      "generating_technology": "Combined Cycle",
+      "reported_capacity_mw": 2014,
+      "source_as_of": "2026-04-30",
+      "source": {
+        "url": "https://environmentalintegrity.org/wp-content/uploads/2026/06/2026.05.14_BTM-Gas-Power-Plants.xlsx",
+        "doc_genre": "third_party_inventory"
+      }
+    },
+    {
+      "name": "Alpha Digital Campus Power Plant",
+      "state": "TX",
+      "county": "Reeves County",
+      "project_type": "New",
+      "operating_status": "Proposed",
+      "expected_operating_year": "2027/2028",
+      "generating_technology": "Unknown",
+      "reported_capacity_mw": 2000,
+      "source_as_of": "2026-04-30",
+      "source": {
+        "url": "https://environmentalintegrity.org/wp-content/uploads/2026/06/2026.05.14_BTM-Gas-Power-Plants.xlsx",
+        "doc_genre": "third_party_inventory"
+      }
+    },
+    {
+      "name": "Creekstone Delta Gigasite Data Center",
+      "state": "UT",
+      "county": "Millard County",
+      "project_type": "New",
+      "operating_status": "Proposed",
+      "expected_operating_year": "2030/2035",
+      "generating_technology": "Internal Combustion Engine; Unknown",
+      "reported_capacity_mw": 2000,
+      "source_as_of": "2026-04-30",
+      "source": {
+        "url": "https://environmentalintegrity.org/wp-content/uploads/2026/06/2026.05.14_BTM-Gas-Power-Plants.xlsx",
+        "doc_genre": "third_party_inventory"
+      }
+    },
+    {
+      "name": "New Era Lea County Power Station",
+      "state": "NM",
+      "county": "Lea County",
+      "project_type": "New",
+      "operating_status": "Proposed",
+      "expected_operating_year": "2028",
+      "generating_technology": "Unknown",
+      "reported_capacity_mw": 2000,
+      "source_as_of": "2026-04-30",
+      "source": {
+        "url": "https://environmentalintegrity.org/wp-content/uploads/2026/06/2026.05.14_BTM-Gas-Power-Plants.xlsx",
+        "doc_genre": "third_party_inventory"
+      }
+    },
+    {
+      "name": "Kingsboro NetZero Data Center and Power Station",
+      "state": "NC",
+      "county": "Edgecombe County",
+      "project_type": "New",
+      "operating_status": "Proposed",
+      "expected_operating_year": "2029",
+      "generating_technology": "Unknown",
+      "reported_capacity_mw": 1800,
+      "source_as_of": "2026-04-30",
+      "source": {
+        "url": "https://environmentalintegrity.org/wp-content/uploads/2026/06/2026.05.14_BTM-Gas-Power-Plants.xlsx",
+        "doc_genre": "third_party_inventory"
+      }
+    },
+    {
+      "name": "Project Jupiter West Microgrid",
+      "state": "NM",
+      "county": "Dona Ana County",
+      "project_type": "New",
+      "operating_status": "Proposed",
+      "expected_operating_year": "Q2 2026",
+      "generating_technology": "Simple Cycle",
+      "reported_capacity_mw": 1676,
+      "source_as_of": "2026-04-30",
+      "source": {
+        "url": "https://environmentalintegrity.org/wp-content/uploads/2026/06/2026.05.14_BTM-Gas-Power-Plants.xlsx",
+        "doc_genre": "third_party_inventory"
+      }
+    },
+    {
+      "name": "Ridgeline Power Plant",
+      "state": "WV",
+      "county": "Tucker County",
+      "project_type": "New",
+      "operating_status": "Proposed",
+      "expected_operating_year": "2027",
+      "generating_technology": "Combined Cycle",
+      "reported_capacity_mw": 1656,
+      "source_as_of": "2026-04-30",
+      "source": {
+        "url": "https://environmentalintegrity.org/wp-content/uploads/2026/06/2026.05.14_BTM-Gas-Power-Plants.xlsx",
+        "doc_genre": "third_party_inventory"
+      }
+    },
+    {
+      "name": "Casper Campus Power Station",
+      "state": "WY",
+      "county": "Natrona County",
+      "project_type": "New",
+      "operating_status": "Proposed",
+      "expected_operating_year": "Unknown",
+      "generating_technology": "Unknown",
+      "reported_capacity_mw": 1500,
+      "source_as_of": "2026-04-30",
+      "source": {
+        "url": "https://environmentalintegrity.org/wp-content/uploads/2026/06/2026.05.14_BTM-Gas-Power-Plants.xlsx",
+        "doc_genre": "third_party_inventory"
+      }
+    },
+    {
+      "name": "Crusoe-Blue Energy Data Center Power Station",
+      "state": "TX",
+      "county": "Victoria County",
+      "project_type": "New",
+      "operating_status": "Proposed",
+      "expected_operating_year": "2028",
+      "generating_technology": "Unknown",
+      "reported_capacity_mw": 1500,
+      "source_as_of": "2026-04-30",
+      "source": {
+        "url": "https://environmentalintegrity.org/wp-content/uploads/2026/06/2026.05.14_BTM-Gas-Power-Plants.xlsx",
+        "doc_genre": "third_party_inventory"
+      }
+    },
+    {
+      "name": "Joule Capital Data Center and Power Station",
+      "state": "UT",
+      "county": "Millard County",
+      "project_type": "New",
+      "operating_status": "Proposed",
+      "expected_operating_year": "2027/2028",
+      "generating_technology": "Internal Combustion Engine",
+      "reported_capacity_mw": 1500,
+      "source_as_of": "2026-04-30",
+      "source": {
+        "url": "https://environmentalintegrity.org/wp-content/uploads/2026/06/2026.05.14_BTM-Gas-Power-Plants.xlsx",
+        "doc_genre": "third_party_inventory"
+      }
+    },
+    {
+      "name": "Longhorn Data Center Power Plant",
+      "state": "TX",
+      "county": "Taylor County",
+      "project_type": "Expansion",
+      "operating_status": "Proposed",
+      "expected_operating_year": "Q1 2027",
+      "generating_technology": "Simple Cycle",
+      "reported_capacity_mw": 1398,
+      "source_as_of": "2026-04-30",
+      "source": {
+        "url": "https://environmentalintegrity.org/wp-content/uploads/2026/06/2026.05.14_BTM-Gas-Power-Plants.xlsx",
+        "doc_genre": "third_party_inventory"
+      }
+    },
+    {
+      "name": "xAI Southaven Power Plant",
+      "state": "MS",
+      "county": "DeSoto County",
+      "project_type": "New",
+      "operating_status": "Proposed",
+      "expected_operating_year": "2026",
+      "generating_technology": "Simple Cycle",
+      "reported_capacity_mw": 1240,
+      "source_as_of": "2026-04-30",
+      "source": {
+        "url": "https://environmentalintegrity.org/wp-content/uploads/2026/06/2026.05.14_BTM-Gas-Power-Plants.xlsx",
+        "doc_genre": "third_party_inventory"
+      }
+    },
+    {
+      "name": "CloudBurst Data Center Power Plant",
+      "state": "TX",
+      "county": "Comal County",
+      "project_type": "New",
+      "operating_status": "Proposed",
+      "expected_operating_year": "Q4 2026",
+      "generating_technology": "Unknown",
+      "reported_capacity_mw": 1200,
+      "source_as_of": "2026-04-30",
+      "source": {
+        "url": "https://environmentalintegrity.org/wp-content/uploads/2026/06/2026.05.14_BTM-Gas-Power-Plants.xlsx",
+        "doc_genre": "third_party_inventory"
+      }
+    },
+    {
+      "name": "Evanston Power Station",
+      "state": "WY",
+      "county": "Uinta County",
+      "project_type": "New",
+      "operating_status": "Proposed",
+      "expected_operating_year": "2026",
+      "generating_technology": "Unknown",
+      "reported_capacity_mw": 1200,
+      "source_as_of": "2026-04-30",
+      "source": {
+        "url": "https://environmentalintegrity.org/wp-content/uploads/2026/06/2026.05.14_BTM-Gas-Power-Plants.xlsx",
+        "doc_genre": "third_party_inventory"
+      }
+    },
+    {
+      "name": "NextEra Exxon Southeast Power Plant",
+      "state": null,
+      "county": null,
+      "project_type": "New",
+      "operating_status": "Proposed",
+      "expected_operating_year": "Unknown",
+      "generating_technology": "Combined Cycle",
+      "reported_capacity_mw": 1200,
+      "source_as_of": "2026-04-30",
+      "source": {
+        "url": "https://environmentalintegrity.org/wp-content/uploads/2026/06/2026.05.14_BTM-Gas-Power-Plants.xlsx",
+        "doc_genre": "third_party_inventory"
+      }
+    },
+    {
+      "name": "Bluegrass Power Generation Facility",
+      "state": "OH",
+      "county": "Fayette County",
+      "project_type": "New",
+      "operating_status": "Proposed",
+      "expected_operating_year": "2028/2030",
+      "generating_technology": "Simple Cycle",
+      "reported_capacity_mw": 1184,
+      "source_as_of": "2026-04-30",
+      "source": {
+        "url": "https://environmentalintegrity.org/wp-content/uploads/2026/06/2026.05.14_BTM-Gas-Power-Plants.xlsx",
+        "doc_genre": "third_party_inventory"
+      }
+    },
+    {
+      "name": "Fort Cherry Power Station",
+      "state": "PA",
+      "county": "Washington County",
+      "project_type": "New",
+      "operating_status": "Proposed",
+      "expected_operating_year": "Unknown",
+      "generating_technology": "Simple Cycle",
+      "reported_capacity_mw": 1000,
+      "source_as_of": "2026-04-30",
+      "source": {
+        "url": "https://environmentalintegrity.org/wp-content/uploads/2026/06/2026.05.14_BTM-Gas-Power-Plants.xlsx",
+        "doc_genre": "third_party_inventory"
+      }
+    },
+    {
+      "name": "Texas Critical Data Centers Power Plant",
+      "state": "TX",
+      "county": "Ector County",
+      "project_type": "New",
+      "operating_status": "Proposed",
+      "expected_operating_year": "2026/2027",
+      "generating_technology": "Simple Cycle, Internal Combustion Engine",
+      "reported_capacity_mw": 1000,
+      "source_as_of": "2026-04-30",
+      "source": {
+        "url": "https://environmentalintegrity.org/wp-content/uploads/2026/06/2026.05.14_BTM-Gas-Power-Plants.xlsx",
+        "doc_genre": "third_party_inventory"
+      }
+    },
+    {
+      "name": "Pecos Power Generation",
+      "state": "TX",
+      "county": "Reeves County",
+      "project_type": "New",
+      "operating_status": "Proposed",
+      "expected_operating_year": "2027",
+      "generating_technology": "Combined Cycle",
+      "reported_capacity_mw": 956,
+      "source_as_of": "2026-04-30",
+      "source": {
+        "url": "https://environmentalintegrity.org/wp-content/uploads/2026/06/2026.05.14_BTM-Gas-Power-Plants.xlsx",
+        "doc_genre": "third_party_inventory"
+      }
+    },
+    {
+      "name": "Project Hummingbird Power Plant",
+      "state": "PA",
+      "county": "Greene County",
+      "project_type": "New",
+      "operating_status": "Proposed",
+      "expected_operating_year": "2029",
+      "generating_technology": "Combined Cycle",
+      "reported_capacity_mw": 944,
+      "source_as_of": "2026-04-30",
+      "source": {
+        "url": "https://environmentalintegrity.org/wp-content/uploads/2026/06/2026.05.14_BTM-Gas-Power-Plants.xlsx",
+        "doc_genre": "third_party_inventory"
+      }
+    },
+    {
+      "name": "Goodnight Data Center Power Plant",
+      "state": "TX",
+      "county": "Armstrong County",
+      "project_type": "New",
+      "operating_status": "Proposed",
+      "expected_operating_year": "Q2 2027",
+      "generating_technology": "Simple Cycle",
+      "reported_capacity_mw": 933,
+      "source_as_of": "2026-04-30",
+      "source": {
+        "url": "https://environmentalintegrity.org/wp-content/uploads/2026/06/2026.05.14_BTM-Gas-Power-Plants.xlsx",
+        "doc_genre": "third_party_inventory"
+      }
+    },
+    {
+      "name": "Featherwood Energies Pecos Power Plant",
+      "state": "TX",
+      "county": "Reeves County",
+      "project_type": "New",
+      "operating_status": "Proposed",
+      "expected_operating_year": "Q2 2027",
+      "generating_technology": "Simple Cycle",
+      "reported_capacity_mw": 931,
+      "source_as_of": "2026-04-30",
+      "source": {
+        "url": "https://environmentalintegrity.org/wp-content/uploads/2026/06/2026.05.14_BTM-Gas-Power-Plants.xlsx",
+        "doc_genre": "third_party_inventory"
+      }
+    },
+    {
+      "name": "Ashville Energy Center",
+      "state": "OH",
+      "county": "Pickaway County",
+      "project_type": "New",
+      "operating_status": "Proposed",
+      "expected_operating_year": "2027",
+      "generating_technology": "Unknown",
+      "reported_capacity_mw": 800,
+      "source_as_of": "2026-04-30",
+      "source": {
+        "url": "https://environmentalintegrity.org/wp-content/uploads/2026/06/2026.05.14_BTM-Gas-Power-Plants.xlsx",
+        "doc_genre": "third_party_inventory"
+      }
+    },
+    {
+      "name": "MMEX Pecos Power Plant",
+      "state": "TX",
+      "county": "Pecos County",
+      "project_type": "New",
+      "operating_status": "Proposed",
+      "expected_operating_year": "Unknown",
+      "generating_technology": "Combined Cycle",
+      "reported_capacity_mw": 640,
+      "source_as_of": "2026-04-30",
+      "source": {
+        "url": "https://environmentalintegrity.org/wp-content/uploads/2026/06/2026.05.14_BTM-Gas-Power-Plants.xlsx",
+        "doc_genre": "third_party_inventory"
+      }
+    },
+    {
+      "name": "Verdant Power Plant",
+      "state": "TX",
+      "county": "Angelina County",
+      "project_type": "New",
+      "operating_status": "Proposed",
+      "expected_operating_year": "2026",
+      "generating_technology": "Simple Cycle",
+      "reported_capacity_mw": 600,
+      "source_as_of": "2026-04-30",
+      "source": {
+        "url": "https://environmentalintegrity.org/wp-content/uploads/2026/06/2026.05.14_BTM-Gas-Power-Plants.xlsx",
+        "doc_genre": "third_party_inventory"
+      }
+    },
+    {
+      "name": "EdgeConneX New Albany North Power Plant",
+      "state": "OH",
+      "county": "Licking County",
+      "project_type": "New",
+      "operating_status": "Proposed",
+      "expected_operating_year": "Unknown",
+      "generating_technology": "Internal Combustion Engine",
+      "reported_capacity_mw": 577,
+      "source_as_of": "2026-04-30",
+      "source": {
+        "url": "https://environmentalintegrity.org/wp-content/uploads/2026/06/2026.05.14_BTM-Gas-Power-Plants.xlsx",
+        "doc_genre": "third_party_inventory"
+      }
+    },
+    {
+      "name": "Rock House Draw Generating Station",
+      "state": "TX",
+      "county": "Pecos County",
+      "project_type": "New",
+      "operating_status": "Proposed",
+      "expected_operating_year": "Q4 2025",
+      "generating_technology": "Internal Combustion Engine",
+      "reported_capacity_mw": 576,
+      "source_as_of": "2026-04-30",
+      "source": {
+        "url": "https://environmentalintegrity.org/wp-content/uploads/2026/06/2026.05.14_BTM-Gas-Power-Plants.xlsx",
+        "doc_genre": "third_party_inventory"
+      }
+    },
+    {
+      "name": "Eagle Mountain Power Plant (Aquila Project)",
+      "state": "UT",
+      "county": "Utah County",
+      "project_type": "New",
+      "operating_status": "Proposed",
+      "expected_operating_year": "2027/2028",
+      "generating_technology": "Simple Cycle",
+      "reported_capacity_mw": 521,
+      "source_as_of": "2026-04-30",
+      "source": {
+        "url": "https://environmentalintegrity.org/wp-content/uploads/2026/06/2026.05.14_BTM-Gas-Power-Plants.xlsx",
+        "doc_genre": "third_party_inventory"
+      }
+    },
+    {
+      "name": "Misae Wilson Power Plant",
+      "state": "TX",
+      "county": "Wilson County",
+      "project_type": "New",
+      "operating_status": "Proposed",
+      "expected_operating_year": "Q2 2028",
+      "generating_technology": "Internal Combustion Engine",
+      "reported_capacity_mw": 519,
+      "source_as_of": "2026-04-30",
+      "source": {
+        "url": "https://environmentalintegrity.org/wp-content/uploads/2026/06/2026.05.14_BTM-Gas-Power-Plants.xlsx",
+        "doc_genre": "third_party_inventory"
+      }
+    },
+    {
+      "name": "Apollo Generating Station",
+      "state": "OH",
+      "county": "Wood County",
+      "project_type": "New",
+      "operating_status": "Proposed",
+      "expected_operating_year": "Q3 2027",
+      "generating_technology": "Simple Cycle, Internal Combustion Engine",
+      "reported_capacity_mw": 514,
+      "source_as_of": "2026-04-30",
+      "source": {
+        "url": "https://environmentalintegrity.org/wp-content/uploads/2026/06/2026.05.14_BTM-Gas-Power-Plants.xlsx",
+        "doc_genre": "third_party_inventory"
+      }
+    },
+    {
+      "name": "Aliquippa Data Center Power Plant",
+      "state": "PA",
+      "county": "Beaver County",
+      "project_type": "New",
+      "operating_status": "Proposed",
+      "expected_operating_year": "2028",
+      "generating_technology": "Unknown",
+      "reported_capacity_mw": 500,
+      "source_as_of": "2026-04-30",
+      "source": {
+        "url": "https://environmentalintegrity.org/wp-content/uploads/2026/06/2026.05.14_BTM-Gas-Power-Plants.xlsx",
+        "doc_genre": "third_party_inventory"
+      }
+    },
+    {
+      "name": "Chickasha Industrial Park Power Station",
+      "state": "OK",
+      "county": "Grady County",
+      "project_type": "New",
+      "operating_status": "Proposed",
+      "expected_operating_year": "2028/2029",
+      "generating_technology": "Unknown",
+      "reported_capacity_mw": 500,
+      "source_as_of": "2026-04-30",
+      "source": {
+        "url": "https://environmentalintegrity.org/wp-content/uploads/2026/06/2026.05.14_BTM-Gas-Power-Plants.xlsx",
+        "doc_genre": "third_party_inventory"
+      }
+    },
+    {
+      "name": "Pacifico Ft. Spunky Power Plant",
+      "state": "TX",
+      "county": "Hood County",
+      "project_type": "New",
+      "operating_status": "Proposed",
+      "expected_operating_year": "2028",
+      "generating_technology": "Simple Cycle",
+      "reported_capacity_mw": 473,
+      "source_as_of": "2026-04-30",
+      "source": {
+        "url": "https://environmentalintegrity.org/wp-content/uploads/2026/06/2026.05.14_BTM-Gas-Power-Plants.xlsx",
+        "doc_genre": "third_party_inventory"
+      }
+    },
+    {
+      "name": "PowerConneX New Albany 3 Energy Center",
+      "state": "OH",
+      "county": "Licking County",
+      "project_type": "New",
+      "operating_status": "Proposed",
+      "expected_operating_year": "2027",
+      "generating_technology": "Unknown",
+      "reported_capacity_mw": 430,
+      "source_as_of": "2026-04-30",
+      "source": {
+        "url": "https://environmentalintegrity.org/wp-content/uploads/2026/06/2026.05.14_BTM-Gas-Power-Plants.xlsx",
+        "doc_genre": "third_party_inventory"
+      }
+    },
+    {
+      "name": "Pampa Data Center Power Plant",
+      "state": "TX",
+      "county": "Gray County",
+      "project_type": "New",
+      "operating_status": "Proposed",
+      "expected_operating_year": "2026",
+      "generating_technology": "Simple Cycle",
+      "reported_capacity_mw": 400,
+      "source_as_of": "2026-04-30",
+      "source": {
+        "url": "https://environmentalintegrity.org/wp-content/uploads/2026/06/2026.05.14_BTM-Gas-Power-Plants.xlsx",
+        "doc_genre": "third_party_inventory"
+      }
+    },
+    {
+      "name": "McCloud Generation Facility",
+      "state": "TX",
+      "county": "El Paso County",
+      "project_type": "New",
+      "operating_status": "Proposed",
+      "expected_operating_year": "Q2 2027",
+      "generating_technology": "Internal Combustion Engine",
+      "reported_capacity_mw": 366,
+      "source_as_of": "2026-04-30",
+      "source": {
+        "url": "https://environmentalintegrity.org/wp-content/uploads/2026/06/2026.05.14_BTM-Gas-Power-Plants.xlsx",
+        "doc_genre": "third_party_inventory"
+      }
+    },
+    {
+      "name": "Socrates the Younger Generating Station",
+      "state": "OH",
+      "county": "Licking County",
+      "project_type": "New",
+      "operating_status": "Proposed",
+      "expected_operating_year": "2H 2028",
+      "generating_technology": "Internal Combustion Engine, Simple Cycle",
+      "reported_capacity_mw": 350,
+      "source_as_of": "2026-04-30",
+      "source": {
+        "url": "https://environmentalintegrity.org/wp-content/uploads/2026/06/2026.05.14_BTM-Gas-Power-Plants.xlsx",
+        "doc_genre": "third_party_inventory"
+      }
+    },
+    {
+      "name": "PowerConneX I and II New Albany Energy Center",
+      "state": "OH",
+      "county": "Licking County",
+      "project_type": "New",
+      "operating_status": "Under Construction",
+      "expected_operating_year": "2026",
+      "generating_technology": "Internal Combustion Engine",
+      "reported_capacity_mw": 336,
+      "source_as_of": "2026-04-30",
+      "source": {
+        "url": "https://environmentalintegrity.org/wp-content/uploads/2026/06/2026.05.14_BTM-Gas-Power-Plants.xlsx",
+        "doc_genre": "third_party_inventory"
+      }
+    },
+    {
+      "name": "Poolside Generating Station",
+      "state": "TX",
+      "county": "Pecos County",
+      "project_type": "New",
+      "operating_status": "Proposed",
+      "expected_operating_year": "2027/2028",
+      "generating_technology": "Simple Cycle",
+      "reported_capacity_mw": 332,
+      "source_as_of": "2026-04-30",
+      "source": {
+        "url": "https://environmentalintegrity.org/wp-content/uploads/2026/06/2026.05.14_BTM-Gas-Power-Plants.xlsx",
+        "doc_genre": "third_party_inventory"
+      }
+    },
+    {
+      "name": "Socrates North Power Generation Facility",
+      "state": "OH",
+      "county": "Licking County",
+      "project_type": "New",
+      "operating_status": "Under Construction",
+      "expected_operating_year": "2026",
+      "generating_technology": "Simple Cycle",
+      "reported_capacity_mw": 307,
+      "source_as_of": "2026-04-30",
+      "source": {
+        "url": "https://environmentalintegrity.org/wp-content/uploads/2026/06/2026.05.14_BTM-Gas-Power-Plants.xlsx",
+        "doc_genre": "third_party_inventory"
+      }
+    },
+    {
+      "name": "Socrates South Power Generation Facility",
+      "state": "OH",
+      "county": "Licking County",
+      "project_type": "New",
+      "operating_status": "Under Construction",
+      "expected_operating_year": "2026",
+      "generating_technology": "Simple Cycle",
+      "reported_capacity_mw": 307,
+      "source_as_of": "2026-04-30",
+      "source": {
+        "url": "https://environmentalintegrity.org/wp-content/uploads/2026/06/2026.05.14_BTM-Gas-Power-Plants.xlsx",
+        "doc_genre": "third_party_inventory"
+      }
+    },
+    {
+      "name": "Fayetteville NetZero Data Center and Power Station",
+      "state": "NC",
+      "county": "Cumberland County",
+      "project_type": "New",
+      "operating_status": "Proposed",
+      "expected_operating_year": "Unknown",
+      "generating_technology": "Unknown",
+      "reported_capacity_mw": 300,
+      "source_as_of": "2026-04-30",
+      "source": {
+        "url": "https://environmentalintegrity.org/wp-content/uploads/2026/06/2026.05.14_BTM-Gas-Power-Plants.xlsx",
+        "doc_genre": "third_party_inventory"
+      }
+    },
+    {
+      "name": "Tarboro NetZero Data Center and Power Station",
+      "state": "NC",
+      "county": "Edgecombe County",
+      "project_type": "New",
+      "operating_status": "Proposed",
+      "expected_operating_year": "Unknown",
+      "generating_technology": "Unknown",
+      "reported_capacity_mw": 300,
+      "source_as_of": "2026-04-30",
+      "source": {
+        "url": "https://environmentalintegrity.org/wp-content/uploads/2026/06/2026.05.14_BTM-Gas-Power-Plants.xlsx",
+        "doc_genre": "third_party_inventory"
+      }
+    },
+    {
+      "name": "Wyalusing Energy Center",
+      "state": "PA",
+      "county": "Bradford County",
+      "project_type": "New",
+      "operating_status": "Proposed",
+      "expected_operating_year": "Q1 2026",
+      "generating_technology": "Simple Cycle",
+      "reported_capacity_mw": 248,
+      "source_as_of": "2026-04-30",
+      "source": {
+        "url": "https://environmentalintegrity.org/wp-content/uploads/2026/06/2026.05.14_BTM-Gas-Power-Plants.xlsx",
+        "doc_genre": "third_party_inventory"
+      }
+    },
+    {
+      "name": "Remington Technology Park",
+      "state": "VA",
+      "county": "Fauquier County",
+      "project_type": "New",
+      "operating_status": "Proposed",
+      "expected_operating_year": "2027",
+      "generating_technology": "Simple Cycle",
+      "reported_capacity_mw": 215,
+      "source_as_of": "2026-04-30",
+      "source": {
+        "url": "https://environmentalintegrity.org/wp-content/uploads/2026/06/2026.05.14_BTM-Gas-Power-Plants.xlsx",
+        "doc_genre": "third_party_inventory"
+      }
+    },
+    {
+      "name": "Circe Energy Data Centers E. Monahans Campus",
+      "state": "TX",
+      "county": "Ward County",
+      "project_type": "New",
+      "operating_status": "Proposed",
+      "expected_operating_year": "2027",
+      "generating_technology": "Internal Combustion Engine",
+      "reported_capacity_mw": 160,
+      "source_as_of": "2026-04-30",
+      "source": {
+        "url": "https://environmentalintegrity.org/wp-content/uploads/2026/06/2026.05.14_BTM-Gas-Power-Plants.xlsx",
+        "doc_genre": "third_party_inventory"
+      }
+    },
+    {
+      "name": "VoltaGrid SAT-2 Power Plant",
+      "state": "TX",
+      "county": "Bexar County",
+      "project_type": "New",
+      "operating_status": "Proposed",
+      "expected_operating_year": "Q4 2025",
+      "generating_technology": "Internal Combustion Engine",
+      "reported_capacity_mw": 149,
+      "source_as_of": "2026-04-30",
+      "source": {
+        "url": "https://environmentalintegrity.org/wp-content/uploads/2026/06/2026.05.14_BTM-Gas-Power-Plants.xlsx",
+        "doc_genre": "third_party_inventory"
+      }
+    },
+    {
+      "name": "Lone Star Project",
+      "state": "TX",
+      "county": "Glasscock County",
+      "project_type": "New",
+      "operating_status": "Proposed",
+      "expected_operating_year": "Unknown",
+      "generating_technology": "Unknown",
+      "reported_capacity_mw": 100,
+      "source_as_of": "2026-04-30",
+      "source": {
+        "url": "https://environmentalintegrity.org/wp-content/uploads/2026/06/2026.05.14_BTM-Gas-Power-Plants.xlsx",
+        "doc_genre": "third_party_inventory"
+      }
+    },
+    {
+      "name": "Xenergy Monahans Power Plant",
+      "state": "TX",
+      "county": "Ward County",
+      "project_type": "Expansion",
+      "operating_status": "Proposed",
+      "expected_operating_year": "Unknown",
+      "generating_technology": "Internal Combustion Engine",
+      "reported_capacity_mw": 98,
+      "source_as_of": "2026-04-30",
+      "source": {
+        "url": "https://environmentalintegrity.org/wp-content/uploads/2026/06/2026.05.14_BTM-Gas-Power-Plants.xlsx",
+        "doc_genre": "third_party_inventory"
+      }
+    },
+    {
+      "name": "Data City Energy Center",
+      "state": "TX",
+      "county": "Webb County",
+      "project_type": "New",
+      "operating_status": "Proposed",
+      "expected_operating_year": "2026",
+      "generating_technology": "Unknown",
+      "reported_capacity_mw": null,
+      "source_as_of": "2026-04-30",
+      "source": {
+        "url": "https://environmentalintegrity.org/wp-content/uploads/2026/06/2026.05.14_BTM-Gas-Power-Plants.xlsx",
+        "doc_genre": "third_party_inventory"
+      }
+    },
+    {
+      "name": "Mesones Data Center Campus",
+      "state": "TX",
+      "county": "Williamson County",
+      "project_type": "New",
+      "operating_status": "Proposed",
+      "expected_operating_year": "Unknown",
+      "generating_technology": "Unknown",
+      "reported_capacity_mw": null,
+      "source_as_of": "2026-04-30",
+      "source": {
+        "url": "https://environmentalintegrity.org/wp-content/uploads/2026/06/2026.05.14_BTM-Gas-Power-Plants.xlsx",
+        "doc_genre": "third_party_inventory"
+      }
+    },
+    {
+      "name": "Tract Austin Power Plant",
+      "state": "TX",
+      "county": "Caldwell County",
+      "project_type": "New",
+      "operating_status": "Proposed",
+      "expected_operating_year": "2028",
+      "generating_technology": "Combined Cycle",
+      "reported_capacity_mw": null,
+      "source_as_of": "2026-04-30",
+      "source": {
+        "url": "https://environmentalintegrity.org/wp-content/uploads/2026/06/2026.05.14_BTM-Gas-Power-Plants.xlsx",
+        "doc_genre": "third_party_inventory"
+      }
+    },
+    {
+      "name": "Vermaland La Osa Data Center Campus Power Plant",
+      "state": "AZ",
+      "county": "Pinal County",
+      "project_type": "New",
+      "operating_status": "Proposed",
+      "expected_operating_year": "Unknown",
+      "generating_technology": "Unknown",
+      "reported_capacity_mw": null,
+      "source_as_of": "2026-04-30",
+      "source": {
+        "url": "https://environmentalintegrity.org/wp-content/uploads/2026/06/2026.05.14_BTM-Gas-Power-Plants.xlsx",
+        "doc_genre": "third_party_inventory"
+      }
+    }
+  ]
+}
