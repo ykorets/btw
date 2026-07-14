@@ -24,6 +24,17 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+          cache: npm
+          cache-dependency-path: mcp/package-lock.json
+
+      - name: Install pinned dependencies
+        run: npm ci
+        working-directory: mcp
+
       - name: Deploy Worker
         uses: cloudflare/wrangler-action@v3
         with:
