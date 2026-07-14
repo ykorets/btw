@@ -5,6 +5,8 @@ It never queries staging facts or the production database directly.
 
 Endpoint: `https://mcp.behindthewatt.com/mcp`
 
+Registry name: `io.github.ykorets/behind-the-watt`
+
 Tools:
 
 - `search_facilities` — filter BTW-verified facilities.
@@ -24,3 +26,8 @@ npm install
 npm run type-check
 npm run dev
 ```
+
+Production deployment is handled by GitHub Actions whenever files under
+`mcp/` reach `main`. The official MCP Registry entry is published manually or
+by pushing a matching release tag such as `mcp-v1.0.0`; the tag must match the
+version in `server.json`.
