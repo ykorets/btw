@@ -4,6 +4,8 @@ from btw_engine.extract import (
     MATCH_THRESHOLD,
     _values_match,
     canonical_claims,
+    deterministic_claims,
+    html_text,
     quorum_verdicts,
     validate_claim,
 )
@@ -131,3 +133,69 @@ def test_canonical_claims_extracts_explicit_gas_fuel_once():
     fuels = [c for c in got if c["field"] == "unit.fuel"]
     assert len(fuels) == 1
     assert fuels[0]["value"] == "natural gas"
+
+
+def test_deterministic_tceq_claims_are_explicit_and_permit_scoped():
+    page = """
+    Electric Generating Unit Standard Permit Technical Review
+    Registration Number 177263
+    The Texas Commission on Environmental Quality (TCEQ) has determined
+    that the emissions are authorized.
+    The units are currently permitted under Standard Permit Registration 177263.
+    """
+
+    got = deterministic_claims([page])
+    fields = {(c["field"], c["value"]) for c in got}
+
+    assert ("permit.authority", "TCEQ") in fields
+    assert ("permit.type", "EGU Standard Permit registration") in fields
+    assert ("permit.status", "issued") in fields
+    assert all(c["entity_hint"] == "permit 177263" for c in got)
+
+
+def test_deterministic_schd_claims_cover_every_status_component():
+    page = """
+    RE: Appeal of Air Permit No. 01156-01PC
+    Shelby County Health Department’s (“SCHD” or “Health Department”)
+    issuance of Air Permit No. 01156-01PC.
+    Response to Public Comments on Draft Construction Air Permit No. 01156-01PC.
+    """
+    second = "when the Health Department issued the CTC Permit on July 2, 2025"
+
+    got = deterministic_claims([page, second])
+    fields = {(c["field"], c["value"]) for c in got}
+
+    assert ("permit.authority", "Shelby County Health Department") in fields
+    assert ("permit.type", "Air construction permit") in fields
+    assert ("permit.status", "issued") in fields
+    assert ("permit.status", "under appeal") in fields
+    assert ("permit.issued_at", "July 2, 2025") in fields
+
+
+def test_deterministic_mdeq_pdf_claims_type_and_issue_date():
+    pages = [
+        "Permit No.: 0680-00119",
+        "PSD Air Construction Permit No.: 0680-00119",
+        "MDEQ issued MZX a permit on March 11, 2026.",
+    ]
+
+    got = deterministic_claims(pages)
+    fields = {(c["field"], c["value"]) for c in got}
+
+    assert ("permit.type", "PSD Air Construction Permit") in fields
+    assert ("permit.status", "issued") in fields
+    assert ("permit.issued_at", "March 11, 2026") in fields
+
+
+def test_deterministic_mdeq_registry_html_uses_archived_visible_text():
+    body = b"""<html><script>ignore()</script><body>
+      <table><tr><td>Air - Air-Construction PSD</td>
+      <td>0680-00119</td><td>03/11/2026</td><td>Permit Issued</td></tr></table>
+      </body></html>"""
+
+    got = deterministic_claims([html_text(body)])
+    fields = {(c["field"], c["value"]) for c in got}
+
+    assert ("permit.type", "PSD Air Construction Permit") in fields
+    assert ("permit.issued_at", "03/11/2026") in fields
+    assert ("permit.status", "issued") in fields

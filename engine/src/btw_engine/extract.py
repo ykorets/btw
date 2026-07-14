@@ -26,6 +26,7 @@ used; optional BTW_EXTRACTOR_ROLE overrides the primary role. Usage:
 """
 
 import argparse
+import html
 import io
 import json
 import os
@@ -37,12 +38,12 @@ from pypdf import PdfReader
 from rapidfuzz import fuzz
 
 from btw_engine.fetch import s3, BUCKET
-from btw_engine import llm
 
 EXTRACT_BASE_VERSION = "extract-v2"
 MATCH_THRESHOLD = 0.92
 QUOTE_IDENTITY_THRESHOLD = 0.85  # two quotes anchor the same passage
 MAX_CHARS_TO_LLM = 60_000
+DETERMINISTIC_VERSION = "deterministic-regulatory-v1"
 
 PROMPT = """You are extracting structured facts from a US government or legal \
 document about power generation equipment serving data centers.
@@ -119,6 +120,176 @@ def numeric_inventory(text: str) -> set[float]:
 def page_texts(pdf_bytes: bytes) -> list[str]:
     reader = PdfReader(io.BytesIO(pdf_bytes))
     return [(p.extract_text() or "") for p in reader.pages]
+
+
+def html_text(body: bytes) -> str:
+    """Visible text from an archived registry page, without live HTTP.
+
+    The archive remains the only downstream read path.  Whitespace is
+    collapsed after scripts, styles, comments, and tags are removed so the
+    resulting text can use the same fuzzy quote validator as PDF pages.
+    """
+    source = body.decode("utf-8", errors="replace")
+    source = re.sub(r"<(script|style)\b.*?</\1>", " ", source,
+                    flags=re.S | re.I)
+    source = re.sub(r"<!--.*?-->", " ", source, flags=re.S)
+    source = re.sub(r"<[^>]+>", " ", source)
+    return re.sub(r"\s+", " ", html.unescape(source)).strip()
+
+
+def document_pages(body: bytes, r2_key: str) -> list[str]:
+    if r2_key.lower().endswith(".pdf"):
+        return page_texts(body)
+    if r2_key.lower().endswith((".html", ".htm")):
+        return [html_text(body)]
+    return []
+
+
+def deterministic_claims(pages: list[str]) -> list[dict]:
+    """Exact regulatory phrases -> controlled permit claims.
+
+    These rules classify explicit agency language; they do not infer from a
+    hostname, document genre, or project name.  Every emitted value retains
+    the exact matched quote and still passes ``validate_claim`` before it can
+    become validated evidence.
+    """
+    out: list[dict] = []
+    seen: set[tuple] = set()
+
+    def emit(*, page: int, quote: str, field: str, value: str,
+             permit_no: str | None = None) -> None:
+        quote = quote.strip()
+        # Repeated permit headers appear on every PDF page. One anchored
+        # claim per exact phrase is sufficient and keeps review receipts
+        # compact; retain the first page where the phrase occurs.
+        key = (field, _norm(value), _norm(quote))
+        if not quote or key in seen:
+            return
+        seen.add(key)
+        out.append({
+            "entity_hint": (f"permit {permit_no}" if permit_no else "permit"),
+            "field": field,
+            "value": value,
+            "value_num": None,
+            "unit": None,
+            "quote": quote,
+            "page": page,
+        })
+
+    permit_no_patterns = (
+        r"(?:Standard Permit Registration (?:Number|No\.)|"
+        r"Registration (?:Number|No\.))\s*:?\s*"
+        r"([0-9]{4,})",
+        r"(?:PSD Air Construction |Construction |Air )?Permit No\.?\s*:?\s*"
+        r"([0-9A-Z][0-9A-Z-]{4,})",
+    )
+
+    for page_no, text in enumerate(pages, start=1):
+        page_numbers: list[str] = []
+        for pattern in permit_no_patterns:
+            for match in re.finditer(pattern, text, flags=re.I):
+                permit_no = match.group(1)
+                page_numbers.append(permit_no)
+                emit(page=page_no, quote=match.group(0), field="permit.no",
+                     value=permit_no, permit_no=permit_no)
+        unique_numbers = list(dict.fromkeys(page_numbers))
+        sole_no = unique_numbers[0] if len(unique_numbers) == 1 else None
+
+        for match in re.finditer(
+                r"Texas\s+Commission\s+on\s+Environmental\s+Quality\s*"
+                r"\(TCEQ\)",
+                text, flags=re.I):
+            emit(page=page_no, quote=match.group(0),
+                 field="permit.authority", value="TCEQ", permit_no=sole_no)
+
+        for match in re.finditer(
+                r"Shelby\s+County\s+Health\s+Department(?:[’']s)?\s*"
+                r"\([“\"]SCHD[”\"]\s+or\s+[“\"]Health Department[”\"]\)",
+                text, flags=re.I):
+            emit(page=page_no, quote=match.group(0),
+                 field="permit.authority",
+                 value="Shelby County Health Department", permit_no=sole_no)
+
+        for match in re.finditer(
+                r"Electric Generating Unit(?:s)?(?: Air Quality)? Standard Permit",
+                text, flags=re.I):
+            emit(page=page_no, quote=match.group(0), field="permit.type",
+                 value="EGU Standard Permit registration", permit_no=sole_no)
+
+        for match in re.finditer(
+                r"(?:Draft\s+)?Construction Air Permit No\.?\s*:?\s*"
+                r"([0-9A-Z][0-9A-Z-]{4,})", text, flags=re.I):
+            permit_no = match.group(1)
+            emit(page=page_no, quote=match.group(0), field="permit.type",
+                 value="Air construction permit", permit_no=permit_no)
+
+        for match in re.finditer(
+                r"PSD Air Construction Permit No\.?\s*:?\s*"
+                r"([0-9A-Z][0-9A-Z-]{4,})", text, flags=re.I):
+            permit_no = match.group(1)
+            emit(page=page_no, quote=match.group(0), field="permit.type",
+                 value="PSD Air Construction Permit", permit_no=permit_no)
+
+        # MDEQ's HTML registry uses the inverse controlled label.
+        for match in re.finditer(
+                r"Air\s*-\s*Air-Construction PSD\s+"
+                r"([0-9A-Z][0-9A-Z-]{4,})\s+"
+                r"(\d{1,2}/\d{1,2}/\d{4})", text, flags=re.I):
+            permit_no, issued_at = match.groups()
+            emit(page=page_no, quote=match.group(0), field="permit.type",
+                 value="PSD Air Construction Permit", permit_no=permit_no)
+            emit(page=page_no, quote=match.group(0), field="permit.issued_at",
+                 value=issued_at, permit_no=permit_no)
+
+        for match in re.finditer(
+                r"currently permitted under Standard Permit Registration\s+"
+                r"([0-9]{4,})", text, flags=re.I):
+            permit_no = match.group(1)
+            emit(page=page_no, quote=match.group(0), field="permit.status",
+                 value="issued", permit_no=permit_no)
+
+        for match in re.finditer(
+                r"Appeal of Air Permit No\.?\s*([0-9A-Z][0-9A-Z-]{4,})",
+                text, flags=re.I):
+            permit_no = match.group(1)
+            emit(page=page_no, quote=match.group(0), field="permit.status",
+                 value="under appeal", permit_no=permit_no)
+
+        for match in re.finditer(
+                r"issuance of Air Permit No\.?\s*([0-9A-Z][0-9A-Z-]{4,})",
+                text, flags=re.I):
+            permit_no = match.group(1)
+            emit(page=page_no, quote=match.group(0), field="permit.status",
+                 value="issued", permit_no=permit_no)
+
+        for match in re.finditer(
+                r"issued\s+the\s+CTC\s+Permit\s+on\s+"
+                r"([A-Z][a-z]+\s+\d{1,2},\s+\d{4})", text):
+            emit(page=page_no, quote=match.group(0),
+                 field="permit.issued_at", value=match.group(1),
+                 permit_no=sole_no)
+
+        for match in re.finditer(
+                r"MDEQ\s+issued\s+MZX\s+a\s+permit\s+on\s+"
+                r"([A-Z][a-z]+\s+\d{1,2},\s+\d{4})", text):
+            issued_at = match.group(1)
+            emit(page=page_no, quote=match.group(0), field="permit.status",
+                 value="issued", permit_no=sole_no)
+            emit(page=page_no, quote=match.group(0),
+                 field="permit.issued_at", value=issued_at,
+                 permit_no=sole_no)
+
+        for match in re.finditer(
+                r"([0-9A-Z][0-9A-Z-]{4,})\s+"
+                r"(\d{1,2}/\d{1,2}/\d{4})\s+Permit Issued",
+                text, flags=re.I):
+            permit_no, issued_at = match.groups()
+            emit(page=page_no, quote=match.group(0), field="permit.status",
+                 value="issued", permit_no=permit_no)
+            emit(page=page_no, quote=match.group(0),
+                 field="permit.issued_at", value=issued_at,
+                 permit_no=permit_no)
+    return out
 
 
 def _candidate_texts(pages: list[str], page_no: int) -> list[tuple[int, str]]:
@@ -270,6 +441,8 @@ def quorum_verdicts(primary: list[dict], checker: list[dict]) -> list[str]:
 
 def _llm_claims(role: str, marked: str, doc_id: str) -> list[dict]:
     """One extraction pass for a role; retry once on unparseable output."""
+    from btw_engine import llm
+
     for attempt in (1, 2):
         raw = llm.complete(
             role,
@@ -298,15 +471,77 @@ def _anchored(claims: list[dict], pages: list[str]) -> list[dict]:
 
 
 def extractor_version(role: str, quorum: bool) -> str:
+    from btw_engine import llm
+
     model = llm.load_roles()[role]["model"]
     return (f"{EXTRACT_BASE_VERSION}"
             f"{'+quorum' if quorum else ''}@{model}")
 
 
+def extract_deterministic_document(doc: dict, *, body: bytes | None = None,
+                                   pages: list[str] | None = None) -> dict:
+    """Persist idempotent, anchor-validated regulatory claims."""
+    if body is None:
+        body = s3().get_object(Bucket=BUCKET, Key=doc["r2_key"])["Body"].read()
+    if pages is None:
+        pages = document_pages(body, doc["r2_key"])
+    if not pages:
+        return {"claims": 0, "validated": 0, "held": 0, "pages": 0}
+
+    existing = _rest("GET", "claim", params={
+        "select": "field,value,quote,page,extractor_version,status",
+        "document_id": f"eq.{doc['id']}",
+        "extractor_version": f"eq.{DETERMINISTIC_VERSION}",
+    }).json()
+    signatures = {(
+        row.get("field"), _norm(str(row.get("value") or "")),
+        _norm(str(row.get("quote") or "")), row.get("page"),
+    ) for row in existing}
+
+    rows = []
+    for claim in deterministic_claims(pages):
+        signature = (
+            claim["field"], _norm(str(claim["value"])),
+            _norm(str(claim["quote"])), claim["page"],
+        )
+        if signature in signatures:
+            continue
+        score, num_ok, offset = validate_claim(claim, pages)
+        if score < MATCH_THRESHOLD or num_ok is False:
+            continue
+        entity_hint = claim.get("entity_hint")
+        if offset:
+            entity_hint = ((entity_hint or "")
+                           + f" [quote spans page break {offset:+d}]").strip()
+        rows.append({
+            "document_id": doc["id"],
+            "entity_hint": entity_hint,
+            "field": claim["field"],
+            "value": claim["value"],
+            "value_num": claim.get("value_num"),
+            "unit": claim.get("unit"),
+            "anchor": "quote",
+            "quote": claim["quote"],
+            "page": claim["page"],
+            "match_score": round(score, 3),
+            "numeric_check": num_ok,
+            "confidence": round(score, 3),
+            "extractor_version": DETERMINISTIC_VERSION,
+            "status": "validated",
+        })
+        signatures.add(signature)
+    if rows:
+        _rest("POST", "claim", json=rows)
+    return {"claims": len(rows), "validated": len(rows), "held": 0,
+            "pages": len(pages)}
+
+
 def extract_document(doc: dict, role: str = "default_extractor",
                      quorum: bool = False) -> dict:
     body = s3().get_object(Bucket=BUCKET, Key=doc["r2_key"])["Body"].read()
-    pages = page_texts(body)
+    pages = document_pages(body, doc["r2_key"])
+    deterministic = extract_deterministic_document(
+        doc, body=body, pages=pages)
     marked = "\n\n".join(f"[PAGE {i+1}]\n{t}" for i, t in enumerate(pages))
     if len(marked) > MAX_CHARS_TO_LLM:
         marked = marked[:MAX_CHARS_TO_LLM]
@@ -376,7 +611,8 @@ def extract_document(doc: dict, role: str = "default_extractor",
     if rows:
         _rest("POST", "claim", json=rows)
     return {"claims": len(rows), "validated": validated, "held": held,
-            "pages": len(pages)}
+            "pages": len(pages),
+            "deterministic": deterministic["validated"]}
 
 
 def main() -> None:
@@ -392,6 +628,8 @@ def main() -> None:
     ap.add_argument("--quorum", action="store_true",
                     default=os.environ.get("BTW_QUORUM") == "1",
                     help="cross-check with a second family per D9")
+    ap.add_argument("--deterministic-only", action="store_true",
+                    help="run exact regulatory parsers without an LLM call")
     args = ap.parse_args()
 
     params = {"select": "id,sha256,r2_key,doc_genre,url"}
@@ -408,16 +646,24 @@ def main() -> None:
 
     failures = 0
     for doc in docs:
-        if not doc["r2_key"].endswith(".pdf"):
-            print(f"SKIP {doc['sha256'][:12]}: not a pdf ({doc['r2_key']})")
+        supported = doc["r2_key"].lower().endswith((".pdf", ".html", ".htm"))
+        if not supported:
+            print(f"SKIP {doc['sha256'][:12]}: unsupported archive object "
+                  f"({doc['r2_key']})")
             continue
         try:
-            stats = extract_document(doc, role=args.role, quorum=args.quorum)
+            if args.deterministic_only or not doc["r2_key"].endswith(".pdf"):
+                stats = extract_deterministic_document(doc)
+            else:
+                stats = extract_document(
+                    doc, role=args.role, quorum=args.quorum)
             extra = (f", {stats['held']} held for review"
                      if stats["held"] else "")
+            deterministic = stats.get("deterministic", stats["validated"])
             print(f"OK   {doc['sha256'][:12]} [{doc['doc_genre']}]: "
                   f"{stats['validated']}/{stats['claims']} claims validated"
-                  f"{extra} ({stats['pages']} pages)")
+                  f"{extra}; {deterministic} deterministic "
+                  f"({stats['pages']} pages)")
         except Exception as e:  # noqa: BLE001 — batch continues
             failures += 1
             print(f"FAIL {doc['sha256'][:12]}: {e}")

@@ -8,6 +8,7 @@ from btw_engine.normalize import (
     _unit_receipt_compatible,
     copy_provenance,
     locate_context,
+    permit_coverage_gaps,
     plan_permit_links,
     plan_permit_changes,
     plan_unit_changes,
@@ -249,6 +250,121 @@ def test_plan_permit_changes_never_overwrites_existing_field_from_one_claim():
     assert changes == {}
     assert len(conflicts) == 3
     assert all("was not overwritten" in conflict for conflict in conflicts)
+
+
+def test_only_deterministic_claim_can_repair_unsupported_existing_field():
+    permit = {"id": "p", "permit_no": "0680-00119", "facility_id": "f",
+              "authority": "MDEQ", "permit_type": "Air permit (41 turbines)",
+              "status": "issued", "filed_at": None,
+              "issued_at": "2026-03-11"}
+    candidate = _c(
+        "type", "permit.type", "PSD Air Construction Permit", None,
+        "PSD Air Construction Permit No.: 0680-00119")
+
+    _links, changes, conflicts = plan_permit_changes(
+        permit, [candidate], repairable_fields={"permit_type"})
+    assert changes == {}
+    assert conflicts
+
+    candidate["extractor_version"] = "deterministic-regulatory-v1"
+    _links, changes, conflicts = plan_permit_changes(
+        permit, [candidate], repairable_fields={"permit_type"})
+    assert not conflicts
+    assert changes["permit_type"][0] == "PSD Air Construction Permit"
+    assert changes["permit_type"][2] == "deterministic truth-gate repair"
+
+
+def test_compound_permit_status_requires_each_component():
+    permit = {"id": "p", "permit_no": "01156-01PC", "facility_id": "f",
+              "authority": "Shelby County Health Department",
+              "permit_type": "Air construction permit",
+              "status": "issued; under appeal", "filed_at": None,
+              "issued_at": "2025-07-02"}
+    issued = _c("issued", "permit.status", "issued", None,
+                "issuance of Air Permit No. 01156-01PC")
+    appeal = _c("appeal", "permit.status", "under appeal", None,
+                "Appeal of Air Permit No. 01156-01PC")
+    links = [(permit, "status", issued, "status component")]
+
+    assert permit_coverage_gaps(
+        permit, links, {}, lambda _field, _value: False) == [
+            "authority", "permit_no", "permit_type",
+            "status component 'under appeal'", "issued_at"]
+
+    links.append((permit, "status", appeal, "status component"))
+    supported = {"authority", "permit_no", "permit_type", "issued_at"}
+    assert permit_coverage_gaps(
+        permit, links, {}, lambda field, _value: field in supported) == []
+
+
+def test_three_m1_permits_form_complete_reviewable_plans():
+    def det(cid, field, value, quote):
+        claim = _c(cid, field, value, None, quote)
+        claim["extractor_version"] = "deterministic-regulatory-v1"
+        return claim
+
+    tceq = {"id": "t", "permit_no": "177263", "facility_id": "abilene",
+            "authority": "TCEQ",
+            "permit_type": "EGU Standard Permit registration",
+            "status": "issued", "filed_at": None, "issued_at": None}
+    tceq_claims = [
+        det("tn", "permit.no", "177263", "Registration Number 177263"),
+        det("ta", "permit.authority", "TCEQ",
+            "Texas Commission on Environmental Quality (TCEQ)"),
+        det("tt", "permit.type", "EGU Standard Permit registration",
+            "Electric Generating Unit Standard Permit"),
+        det("ts", "permit.status", "issued",
+            "currently permitted under Standard Permit Registration 177263"),
+    ]
+    links, changes, conflicts = plan_permit_changes(tceq, tceq_claims)
+    assert not changes and not conflicts
+    assert {field for _p, field, _c, _m in links} == {
+        "authority", "permit_no", "permit_type", "status"}
+
+    schd = {"id": "s", "permit_no": "01156-01PC", "facility_id": "memphis",
+            "authority": "Shelby County Health Department",
+            "permit_type": "Air construction permit",
+            "status": "issued; under appeal", "filed_at": None,
+            "issued_at": "2025-07-02"}
+    schd_claims = [
+        det("sn", "permit.no", "01156-01PC", "Air Permit No. 01156-01PC"),
+        det("sa", "permit.authority", "Shelby County Health Department",
+            "Shelby County Health Department issued the permit"),
+        det("st", "permit.type", "Air construction permit",
+            "Draft Construction Air Permit No. 01156-01PC"),
+        det("si", "permit.status", "issued",
+            "issuance of Air Permit No. 01156-01PC"),
+        det("sp", "permit.status", "under appeal",
+            "Appeal of Air Permit No. 01156-01PC"),
+        det("sd", "permit.issued_at", "July 2, 2025",
+            "issued the CTC Permit on July 2, 2025"),
+    ]
+    links, changes, conflicts = plan_permit_changes(schd, schd_claims)
+    assert not changes and not conflicts
+    assert permit_coverage_gaps(
+        schd, links, {}, lambda _field, _value: False) == []
+
+    mdeq = {"id": "m", "permit_no": "0680-00119", "facility_id": "southaven",
+            "authority": "MDEQ", "permit_type": "Air permit (41 turbines)",
+            "status": "issued", "filed_at": None,
+            "issued_at": "2026-03-11"}
+    mdeq_claims = [
+        det("mn", "permit.no", "0680-00119", "Permit No.: 0680-00119"),
+        det("ma", "permit.authority", "MDEQ",
+            "Mississippi Department of Environmental Quality (MDEQ)"),
+        det("mt", "permit.type", "PSD Air Construction Permit",
+            "PSD Air Construction Permit No.: 0680-00119"),
+        det("ms", "permit.status", "issued",
+            "MDEQ issued MZX a permit on March 11, 2026"),
+        det("md", "permit.issued_at", "March 11, 2026",
+            "MDEQ issued MZX a permit on March 11, 2026"),
+    ]
+    links, changes, conflicts = plan_permit_changes(
+        mdeq, mdeq_claims, repairable_fields={"permit_type"})
+    assert not conflicts
+    assert changes["permit_type"][0] == "PSD Air Construction Permit"
+    assert permit_coverage_gaps(
+        mdeq, links, changes, lambda _field, _value: False) == []
 
 
 def test_permit_date_mismatch_is_not_linked():
