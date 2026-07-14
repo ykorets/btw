@@ -8,6 +8,7 @@ const proposed = summary.statuses?.Proposed || { projects: 0, reported_mw: 0 };
 const construction = summary.statuses?.["Under Construction"] || { projects: 0, reported_mw: 0 };
 const source = rows[0]?.source;
 const asOf = rows[0]?.source_as_of;
+const undisclosed = Math.max(0, summary.projects - summary.projects_with_capacity);
 const maxState = Math.max(...(summary.top_states || []).map((row: any) => row.reported_gw), 1);
 ---
 <section id="announcements" class="announced-layer">
@@ -15,7 +16,7 @@ const maxState = Math.max(...(summary.top_states || []).map((row: any) => row.re
     <div class="kicker">The announcement pipeline · separate evidence class</div>
     <div class="announced-head">
       <div>
-        <h2>What the 143 GW of announcements actually contains</h2>
+        <h2>What the {summary.reported_gw} GW of announcements actually contains</h2>
         <p class="sub">A third-party inventory of proposed behind-the-meter gas plants—not BTW-verified operating capacity. We publish it as a comparison layer so the gap is inspectable rather than rhetorical.</p>
       </div>
       <span class="tag tag-amber">Third-party reported</span>
@@ -38,7 +39,7 @@ const maxState = Math.max(...(summary.top_states || []).map((row: any) => row.re
       <div class="evidence-note">
         <div class="kicker">How to read this</div>
         <p><b>Reported</b> means a source lists a project and capacity. It does not mean financed, permitted, built, or operating.</p>
-        <p>Capacity bases differ by disclosure, and four projects have no published capacity. The total must not be added to the verified fleet.</p>
+        <p>Capacity bases differ by disclosure, and {undisclosed} projects have no published capacity. The total must not be added to the verified fleet.</p>
         {source?.url && <a class="btn" href={source.url} target="_blank" rel="noopener">Open EIP source inventory ↗</a>}
         <div class="src">Inventory as of {asOf} · imported into BTW with row-level source linkage</div>
       </div>

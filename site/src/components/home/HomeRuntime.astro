@@ -101,7 +101,8 @@ function countUp(el,target,decimals,dur){
   }
   requestAnimationFrame(step);
 }
-countUp($("n-ann"),Number($("n-ann").dataset.target||0),1,600);
+const announcedEl=$("n-ann");
+if(announcedEl) countUp(announcedEl,Number(announcedEl.dataset.target),1,600);
 fetch(MIRROR+"/summary.json").then(r=>r.json()).then(s=>{
   countUp($("n-op"),s.operating_gw,1,600);
   $("asof").textContent="Data as of "+s.as_of+" · engine-generated";

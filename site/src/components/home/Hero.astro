@@ -1,11 +1,14 @@
 ---
-interface Props { announcedGw: number }
-const { announcedGw } = Astro.props;
+interface Props {
+  announcedGw: number | null;
+  announcedProjects: number;
+}
+const { announcedGw, announcedProjects } = Astro.props;
 ---
 <section class="hero wrap">
   <div class="kicker">The open database of behind-the-meter data center power</div>
   <div class="hero-nums">
-    <div class="hero-num ghost" style="text-align:right"><div class="lbl">Third-party reported</div><div class="val">~<span id="n-ann" data-target={announcedGw}>0</span> GW</div><div class="lbl" style="margin-top:4px"><a href="#announcements" style="text-decoration:none;color:inherit;border-bottom:1px dotted var(--line-2)">74-project EIP inventory · inspect</a></div></div>
+    <div class="hero-num ghost" style="text-align:right"><div class="lbl">Third-party reported</div><div class="val">{announcedGw == null ? <span>—</span> : <>~<span id="n-ann" data-target={announcedGw}>0</span> GW</>}</div><div class="lbl" style="margin-top:4px"><a href="#announcements" style="text-decoration:none;color:inherit;border-bottom:1px dotted var(--line-2)">{announcedProjects > 0 ? `${announcedProjects}-project EIP inventory · inspect` : "EIP inventory temporarily unavailable"}</a></div></div>
     <div style="width:2.5px;background:var(--ink);border-radius:1px;align-self:stretch"></div>
     <div class="hero-num live" style="text-align:left"><div class="lbl">Actually operating</div><div class="val"><span id="n-op">0</span> GW</div><div class="lbl" style="margin-top:4px;color:var(--ink-3)"><a href="#tracker" style="text-decoration:none;color:inherit;border-bottom:1px dotted var(--line-2)">air permits · verified — sources</a></div></div>
   </div>

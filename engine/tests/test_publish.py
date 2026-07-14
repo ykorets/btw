@@ -92,6 +92,23 @@ def test_announcements_are_separate_and_explicitly_unverified(tmp_path):
     assert data["summary"]["reported_gw"] == 2.0
     assert data["summary"]["projects"] == 2
     assert data["announcements"][0]["source"]["doc_genre"] == "third_party_inventory"
+    assert "source_document" in announcements[0]
+
+
+def test_announcements_only_writes_no_verified_fleet_files(tmp_path):
+    announcements = [{
+        "name": "Project A", "state": "TX",
+        "operating_status": "Proposed", "reported_capacity_mw": 1500,
+        "source_as_of": "2026-04-30",
+        "source_document": {"url": "https://example.test/inventory.xlsx",
+                            "doc_genre": "third_party_inventory"},
+    }]
+
+    publish.write_announcements(str(tmp_path), announcements)
+
+    assert (tmp_path / "announcements.json").exists()
+    assert not (tmp_path / "facilities.json").exists()
+    assert not (tmp_path / "summary.json").exists()
 
 
 def _receipt(table, fact_id, fact_field, claim_field, value,
