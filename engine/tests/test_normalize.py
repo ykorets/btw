@@ -13,9 +13,11 @@ from btw_engine.normalize import (
     plan_permit_changes,
     plan_unit_changes,
     prepare_unit_receipts,
+    receipt_keys,
     resolve_facility,
     resolve_permit,
     staged_copy,
+    unseen_receipts,
 )
 
 TITAN = {"id": "u-titan", "facility_id": "f1", "oem": "Solar Turbines",
@@ -29,6 +31,25 @@ LM = {"id": "u-lm", "facility_id": "f1", "oem": "GE Vernova",
 def _c(cid, field, value, value_num, quote):
     return {"id": cid, "field": field, "value": value, "value_num": value_num,
             "quote": quote, "entity_hint": None, "match_score": 1.0}
+
+
+def test_reviewed_receipt_index_makes_exact_reconcile_evidence_a_noop():
+    provenance = [
+        {"fact_table": "unit", "fact_id": "u1", "fact_field": "unit_count",
+         "claim_id": "reviewed", "claim": {"document_id": "d1"}},
+        {"fact_table": "permit", "fact_id": "p1", "fact_field": "status",
+         "claim_id": "permit-reviewed", "claim": {"document_id": "d2"}},
+    ]
+    indexed = receipt_keys(provenance)
+    planned = [
+        ("unit_count", _c("reviewed", "unit.count", "5", 5, "five")),
+        ("unit_count", _c("new", "unit.count", "5", 5, "five")),
+    ]
+
+    assert indexed[("unit", "u1")] == {("unit_count", "reviewed")}
+    assert unseen_receipts(indexed[("unit", "u1")], planned) == [planned[1]]
+    assert unseen_receipts(
+        indexed[("unit", "u1")], [planned[0]]) == []
 
 
 def test_quote_token_binding_stages_updates():

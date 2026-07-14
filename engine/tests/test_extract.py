@@ -196,6 +196,7 @@ def test_deterministic_mdeq_registry_html_uses_archived_visible_text():
     got = deterministic_claims([html_text(body)])
     fields = {(c["field"], c["value"]) for c in got}
 
+    assert ("permit.no", "0680-00119") in fields
     assert ("permit.type", "PSD Air Construction Permit") in fields
     assert ("permit.issued_at", "03/11/2026") in fields
     assert ("permit.status", "issued") in fields
