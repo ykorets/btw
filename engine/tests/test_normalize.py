@@ -3,6 +3,9 @@
 from btw_engine import normalize
 
 from btw_engine.normalize import (
+    _basis_claim,
+    _unit_basis,
+    _unit_receipt_compatible,
     copy_provenance,
     locate_context,
     plan_permit_links,
@@ -210,8 +213,8 @@ def test_resolve_permit_and_plan_exact_fields():
 
 def test_plan_permit_changes_stages_one_unique_typed_value():
     permit = {"id": "p", "permit_no": "177263", "facility_id": "f",
-              "authority": "TCEQ", "permit_type": "legacy label",
-              "status": "issued", "filed_at": None, "issued_at": None}
+              "authority": "TCEQ", "permit_type": None,
+              "status": None, "filed_at": None, "issued_at": None}
     claims = [
         _c("no", "permit.no", "177263", None, "Registration 177263"),
         _c("type", "permit.type", "Standard Permit Application", None,
@@ -224,6 +227,27 @@ def test_plan_permit_changes_stages_one_unique_typed_value():
     assert {field for _p, field, _c, _m in links} == {"permit_no"}
     assert changes["permit_type"][0] == "Standard Permit Application"
     assert changes["status"][0] == "currently permitted"
+
+
+def test_plan_permit_changes_never_overwrites_existing_field_from_one_claim():
+    permit = {"id": "p", "permit_no": "177263", "facility_id": "f",
+              "authority": "TCEQ", "permit_type": "EGU Standard Permit",
+              "status": "issued", "filed_at": "2024-08-01",
+              "issued_at": None}
+    claims = [
+        _c("authority", "permit.authority", "Texas", None,
+           "Longhorn Data Center in Taylor County, Texas."),
+        _c("status", "permit.status", "submitted", None,
+           "The modification application was submitted."),
+        _c("date", "permit.filed_at", "January 11, 2025", None,
+           "Project Received Date January 11, 2025"),
+    ]
+
+    _links, changes, conflicts = plan_permit_changes(permit, claims)
+
+    assert changes == {}
+    assert len(conflicts) == 3
+    assert all("was not overwritten" in conflict for conflict in conflicts)
 
 
 def test_permit_date_mismatch_is_not_linked():
@@ -297,3 +321,58 @@ def test_staged_copy_reuses_logical_identity_and_never_publishes(monkeypatch):
     assert posted["fact_state"] == "staging"
     assert posted["basis"] == "permitted"
     assert posted["verification_state"] == "source_asserted"
+
+
+def test_permit_quantities_win_over_unrelated_observation_for_basis():
+    permit_count = {
+        **_c("permit-count", "unit.count", "5", 5,
+             "The permit authorizes five Titan 350 turbines."),
+        "document": {"doc_genre": "permit"},
+    }
+    satellite_total = {
+        **_c("satellite-mw", "observation.mw", "190 MW", 190,
+             "Estimated visible generation capacity is 190 MW."),
+        "document": {"doc_genre": "satellite_scene"},
+    }
+
+    basis, derivation = _unit_basis([satellite_total, permit_count])
+
+    assert basis == "permitted"
+    assert "regulatory" in derivation
+    assert _basis_claim([satellite_total, permit_count], basis) == permit_count
+    assert _unit_receipt_compatible(basis, "unit_count", permit_count)
+
+
+def test_observed_cohort_stays_observed_when_model_metadata_is_present():
+    observed_count = _c(
+        "observed-count", "observation.unit_count", "27", 27,
+        "Twenty-seven generator enclosures are visible.")
+    model = _c(
+        "model", "unit.model", "FlexTitan", None,
+        "The equipment resembles FlexTitan packages.")
+
+    basis, _derivation = _unit_basis([model, observed_count])
+
+    assert basis == "observed"
+    assert _basis_claim([model, observed_count], basis) == observed_count
+    assert _unit_receipt_compatible(basis, "unit_count", observed_count)
+    assert not _unit_receipt_compatible(
+        basis, "unit_count", _c("permit", "unit.count", "27", 27, "27"))
+
+
+def test_reported_quantitative_claim_is_not_reclassified_by_observation():
+    reported_count = {
+        **_c("reported", "unit.count", "15", 15,
+             "The filing reports fifteen generator units."),
+        "document": {"doc_genre": "court_filing"},
+    }
+    observation = {
+        **_c("observation", "observation.mw", "250 MW", 250,
+             "The scene is consistent with roughly 250 MW."),
+        "document": {"doc_genre": "satellite_scene"},
+    }
+
+    basis, _derivation = _unit_basis([observation, reported_count])
+
+    assert basis == "reported"
+    assert _basis_claim([observation, reported_count], basis) == reported_count

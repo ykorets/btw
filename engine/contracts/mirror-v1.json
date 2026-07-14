@@ -1,0 +1,39 @@
+{
+  "version": "1.0",
+  "files": {
+    "facilities.json": {
+      "top": ["cite_as", "facilities", "license"],
+      "collections": {
+        "facilities": ["aliases", "county", "developer", "first_permit_filed", "first_power", "flags", "geo", "name", "offtaker", "permit", "slug", "sources", "state", "status", "unit"],
+        "facilities[].unit": ["hours_permitted", "model", "mw_each", "oem", "unit_count"],
+        "facilities[].permit": ["authority", "filed_at", "issued_at", "permit_no", "permit_type", "status"],
+        "facilities[].sources": ["doc_genre", "facts", "url"]
+      }
+    },
+    "events.json": {
+      "top": ["cite_as", "events", "license"],
+      "collections": {
+        "events": ["date", "facility", "headline", "source_url", "type"]
+      }
+    },
+    "summary.json": {
+      "top": ["as_of", "cite_as", "facilities_tracked", "license", "method", "operating_facilities", "operating_gw"],
+      "collections": {}
+    },
+    "coverage.json": {
+      "top": ["cite_as", "generated", "license", "note", "sources"],
+      "collections": {
+        "sources": ["adapter", "candidates", "created_at", "id", "kind", "last_hit_at", "schedule", "slo_interval", "url"]
+      }
+    },
+    "announcements.json": {
+      "top": ["announcements", "cite_as", "classification", "license", "note", "summary"],
+      "collections": {
+        "announcements": ["county", "expected_operating_year", "generating_technology", "name", "operating_status", "project_type", "reported_capacity_mw", "source", "source_as_of", "state"]
+      }
+    }
+  },
+  "csv": {
+    "fleet.csv": ["slug", "name", "state", "status", "flags", "mw", "units", "permits", "first_permit_filed", "first_power"]
+  }
+}

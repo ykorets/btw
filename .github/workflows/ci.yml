@@ -65,6 +65,8 @@ jobs:
           node-version: "24"
           cache: npm
           cache-dependency-path: site/package-lock.json
+      - name: Verify public mirror v1 compatibility
+        run: PYTHONPATH=engine/src python -m btw_engine.compat --data _mirror/data
       - run: npm ci
         working-directory: site
       - run: npm run check
