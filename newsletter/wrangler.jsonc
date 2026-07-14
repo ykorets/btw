@@ -6,7 +6,8 @@
   "routes": [{ "pattern": "newsletter.behindthewatt.com", "custom_domain": true }],
   "vars": {
     "SITE_ORIGIN": "https://behindthewatt.com",
-    "RESEND_FROM": "Behind the Watt <weekly@updates.behindthewatt.com>"
+    "RESEND_FROM": "Behind the Watt <weekly@updates.behindthewatt.com>",
+    "EDITOR_EMAIL": "yaroslav.korets@gmail.com"
   },
   "kv_namespaces": [
     {

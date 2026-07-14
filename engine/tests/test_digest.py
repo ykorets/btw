@@ -63,6 +63,9 @@ def test_edition_is_deterministic_and_keeps_reported_pipeline_separate():
     second = digest.build_edition("2026-07-21", start, end, data)
 
     assert first == second
+    assert first["mode"] == "review"
+    assert first["window_start"] == "2026-07-14T13:00:00Z"
+    assert first["window_end"] == "2026-07-21T13:00:00Z"
     assert first["content_sha256"] == digest.content_hash(
         first["subject"], first["html"], first["text"])
     assert "5× Solar Titan 350" in first["text"]
@@ -124,3 +127,34 @@ def test_receipt_contains_window_manifest_and_delivery_audit(tmp_path):
     assert receipt["review_manifests"][0]["manifest_hash"] == "a" * 64
     assert receipt["delivery"]["broadcast_id"] == "broadcast-1"
     assert (tmp_path / "2026-07-21.md").exists()
+    assert (tmp_path / "2026-07-21.html").exists()
+
+
+def test_tuesday_edition_freezes_for_review_on_monday():
+    assert digest.review_window_end(dt.date(2026, 7, 21)) == dt.datetime(
+        2026, 7, 20, 13, tzinfo=UTC
+    )
+
+
+def test_delivery_cursor_uses_only_worker_approved_window(monkeypatch):
+    class Response:
+        def raise_for_status(self):
+            return None
+
+        def json(self):
+            return {"window_end": "2026-07-20T13:00:00Z"}
+
+    captured = {}
+
+    def post(endpoint, **kwargs):
+        captured["endpoint"] = endpoint
+        captured.update(kwargs)
+        return Response()
+
+    monkeypatch.setenv("DIGEST_TRIGGER_SECRET", "test-secret")
+    monkeypatch.setattr(digest.httpx, "post", post)
+
+    cursor = digest.delivery_cursor("https://newsletter.example/broadcast")
+
+    assert cursor == dt.datetime(2026, 7, 20, 13, tzinfo=UTC)
+    assert captured["json"] == {"mode": "cursor"}
