@@ -122,6 +122,12 @@ header.site{position:sticky;top:0;background:rgba(251,250,247,.92);backdrop-filt
 .sub-form{display:flex;gap:10px;justify-content:center;margin-top:24px;flex-wrap:wrap}
 .sub-form input{height:46px;width:300px;max-width:100%;border:1px solid var(--line-2);border-radius:8px;padding:0 16px;font-size:15px;font-family:var(--sans);background:var(--card)}
 .sub-form button{height:46px}
+.sub-form button:disabled{cursor:wait;opacity:.65}
+.newsletter-status{margin-top:10px;min-height:20px}
+.newsletter-hp{position:absolute!important;width:1px!important;height:1px!important;overflow:hidden!important;clip:rect(0 0 0 0)!important;white-space:nowrap!important}
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
+.newsletter-result{min-height:calc(100vh - 260px);display:grid;place-items:center;text-align:center;padding:96px 24px}
+.newsletter-result>div{max-width:620px}.newsletter-result h1{font:600 clamp(42px,7vw,68px)/1 var(--serif);letter-spacing:-.03em}.newsletter-result p{color:var(--ink-2);font-size:17px;margin:18px auto 28px;max-width:540px}
 footer{border-top:1px solid var(--line);padding:36px 0 48px;font-size:13px;color:var(--ink-3)}
 .foot{display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap}
 footer a{color:var(--ink-2)}
