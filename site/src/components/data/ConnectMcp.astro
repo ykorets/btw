@@ -1,0 +1,109 @@
+---
+const endpoint = "https://mcp.behindthewatt.com/mcp";
+const registryName = "io.github.ykorets/behind-the-watt";
+const codexCommand = `codex mcp add behind-the-watt --url ${endpoint}`;
+const claudeCommand = `claude mcp add --transport http --scope user behind-the-watt ${endpoint}`;
+---
+<section class="mcp-connect" id="connect-mcp">
+  <div class="wrap">
+    <div class="mcp-connect-head">
+      <div>
+        <div class="kicker">Live agent interface</div>
+        <h2>Connect MCP</h2>
+        <p class="sub">Give an AI agent direct, read-only access to verified facilities, dossiers, announcements and dataset totals. No API key or signup.</p>
+      </div>
+      <div class="mcp-status" aria-label="MCP server status">
+        <span><i></i> Live</span>
+        <span>Streamable HTTP</span>
+        <span>Read-only</span>
+      </div>
+    </div>
+
+    <div class="mcp-endpoint">
+      <div>
+        <span>Endpoint</span>
+        <code>{endpoint}</code>
+      </div>
+      <button type="button" data-mcp-copy={endpoint} aria-label="Copy MCP endpoint">Copy endpoint</button>
+    </div>
+
+    <div class="mcp-client-grid">
+      <article class="mcp-client">
+        <div class="mcp-client-title"><span>01</span><h3>Codex</h3></div>
+        <p>Add it once from the terminal. Codex CLI, the IDE extension and the desktop app share the same MCP configuration.</p>
+        <div class="mcp-command">
+          <pre><code>{codexCommand}</code></pre>
+          <button type="button" data-mcp-copy={codexCommand} aria-label="Copy Codex command">Copy</button>
+        </div>
+        <small>Then open <code>/mcp</code> to confirm the four tools.</small>
+      </article>
+
+      <article class="mcp-client">
+        <div class="mcp-client-title"><span>02</span><h3>Claude Code</h3></div>
+        <p>Install the remote server at user scope so it is available across your projects.</p>
+        <div class="mcp-command">
+          <pre><code>{claudeCommand}</code></pre>
+          <button type="button" data-mcp-copy={claudeCommand} aria-label="Copy Claude Code command">Copy</button>
+        </div>
+        <small>Run <code>claude mcp list</code> or use <code>/mcp</code> to verify.</small>
+      </article>
+
+      <article class="mcp-client">
+        <div class="mcp-client-title"><span>03</span><h3>Claude · Cowork</h3></div>
+        <p>Open <b>Customize → Connectors</b>, choose <b>Add custom connector</b>, and paste the endpoint above. The same remote connector works in Claude, Cowork and Claude Desktop.</p>
+        <a class="text-link" href="https://support.claude.com/en/articles/11175166-get-started-with-custom-connectors-using-remote-mcp" target="_blank" rel="noopener">Claude setup guide ↗</a>
+      </article>
+    </div>
+
+    <div class="mcp-details">
+      <div><span>Other MCP clients</span><b>Use these connection details</b></div>
+      <dl>
+        <div><dt>Transport</dt><dd><code>streamable-http</code></dd></div>
+        <div><dt>URL</dt><dd><code>{endpoint}</code></dd></div>
+        <div><dt>Authentication</dt><dd>None</dd></div>
+        <div><dt>Registry</dt><dd><a href={`https://registry.modelcontextprotocol.io/?q=${encodeURIComponent(registryName)}`} target="_blank" rel="noopener">{registryName} ↗</a></dd></div>
+      </dl>
+    </div>
+
+    <p class="mcp-copy-status" aria-live="polite"></p>
+  </div>
+</section>
+
+<script>
+  const status = document.querySelector<HTMLElement>(".mcp-copy-status");
+  async function copyText(value: string) {
+    try {
+      await navigator.clipboard.writeText(value);
+      return;
+    } catch {
+      const field = document.createElement("textarea");
+      field.value = value;
+      field.setAttribute("readonly", "");
+      field.style.position = "fixed";
+      field.style.opacity = "0";
+      document.body.appendChild(field);
+      field.select();
+      const copied = document.execCommand("copy");
+      field.remove();
+      if (!copied) throw new Error("Clipboard unavailable");
+    }
+  }
+  document.querySelectorAll<HTMLButtonElement>("[data-mcp-copy]").forEach((button) => {
+    button.addEventListener("click", async () => {
+      const value = button.dataset.mcpCopy;
+      if (!value) return;
+      try {
+        await copyText(value);
+        const label = button.textContent;
+        button.textContent = "Copied";
+        if (status) status.textContent = "Copied to clipboard.";
+        window.setTimeout(() => {
+          button.textContent = label;
+          if (status) status.textContent = "";
+        }, 1600);
+      } catch {
+        if (status) status.textContent = "Copy failed. Select the command manually.";
+      }
+    });
+  });
+</script>

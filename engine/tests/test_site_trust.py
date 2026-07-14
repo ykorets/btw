@@ -129,3 +129,15 @@ def test_agent_api_is_versioned_and_mcp_reads_only_public_mirror():
     assert "SUPABASE" not in mcp
     assert "createMcpHandler" in mcp
     assert 'url.pathname !== "/mcp"' in mcp
+
+
+def test_data_portal_has_ready_to_use_mcp_connections():
+    portal = (SITE / "src" / "pages" / "data" / "index.astro").read_text()
+    component = (SITE / "src" / "components" / "data" / "ConnectMcp.astro").read_text()
+    assert "<ConnectMcp />" in portal
+    assert "https://mcp.behindthewatt.com/mcp" in component
+    assert "io.github.ykorets/behind-the-watt" in component
+    assert "codex mcp add behind-the-watt --url" in component
+    assert "claude mcp add --transport http --scope user" in component
+    assert "Streamable HTTP" in component
+    assert "Authentication</dt><dd>None" in component
