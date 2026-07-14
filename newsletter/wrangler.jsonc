@@ -1,0 +1,19 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "behind-the-watt-newsletter",
+  "main": "src/index.ts",
+  "compatibility_date": "2026-07-13",
+  "routes": [{ "pattern": "newsletter.behindthewatt.com", "custom_domain": true }],
+  "vars": {
+    "SITE_ORIGIN": "https://behindthewatt.com",
+    "RESEND_FROM": "Behind the Watt <weekly@updates.behindthewatt.com>"
+  },
+  "ratelimits": [
+    {
+      "name": "SUBSCRIBE_RATE_LIMITER",
+      "namespace_id": "2741",
+      "simple": { "limit": 3, "period": 60 }
+    }
+  ],
+  "observability": { "enabled": true }
+}

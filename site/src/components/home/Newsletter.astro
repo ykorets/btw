@@ -3,9 +3,43 @@
     <div class="kicker">BTW Weekly</div>
     <h2>BTW, here's what actually happened</h2>
     <p class="sub" style="margin:10px auto 0">Every Tuesday: new filings, verified megawatts, and what they mean. The data is free for everyone. The interpretation arrives by email first.</p>
-    <div class="sub-form">
-      <a class="btn btn-primary" href="mailto:hello@behindthewatt.com?subject=BTW%20Weekly%20launch%20list">Join the launch list</a>
-    </div>
-    <p class="src" style="margin-top:10px">The newsletter is in private preview. This opens an email to the editor; no address is collected silently.</p>
+    <form class="sub-form" id="newsletter-form" action="https://newsletter.behindthewatt.com/subscribe" method="post">
+      <label class="sr-only" for="newsletter-email">Email address</label>
+      <input id="newsletter-email" name="email" type="email" autocomplete="email" placeholder="you@example.com" required />
+      <div class="newsletter-hp" aria-hidden="true"><label for="newsletter-company">Company</label><input id="newsletter-company" name="company" type="text" tabindex="-1" autocomplete="off" /></div>
+      <button class="btn btn-primary" type="submit">Subscribe</button>
+    </form>
+    <p class="newsletter-status src" id="newsletter-status" role="status" aria-live="polite">Confirm through the email we send you. Unsubscribe at any time.</p>
   </div>
 </section>
+
+<script>
+  const form = document.querySelector<HTMLFormElement>("#newsletter-form");
+  const status = document.querySelector<HTMLElement>("#newsletter-status");
+  const button = form?.querySelector<HTMLButtonElement>("button[type=submit]");
+  const queryStatus = new URLSearchParams(window.location.search).get("newsletter");
+  if (queryStatus === "pending" && status) status.textContent = "Check your inbox and confirm your subscription.";
+  if (queryStatus === "error" && status) status.textContent = "We could not start the subscription. Please try again.";
+
+  form?.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    if (!form.reportValidity()) return;
+    if (button) { button.disabled = true; button.textContent = "Sending…"; }
+    if (status) status.textContent = "Sending confirmation…";
+    try {
+      const response = await fetch(form.action, {
+        method: "POST",
+        headers: { Accept: "application/json" },
+        body: new FormData(form),
+      });
+      const result = await response.json().catch(() => ({}));
+      if (!response.ok || !result.ok) throw new Error(result.error || "subscription_failed");
+      form.reset();
+      if (status) status.textContent = "Check your inbox and confirm your subscription.";
+    } catch {
+      if (status) status.textContent = "We could not start the subscription. Please try again.";
+    } finally {
+      if (button) { button.disabled = false; button.textContent = "Subscribe"; }
+    }
+  });
+</script>

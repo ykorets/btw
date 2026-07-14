@@ -26,9 +26,17 @@ def test_verified_ui_has_no_known_stale_numbers():
         assert value not in INDEX
 
 
-def test_site_does_not_fake_subscription_success():
-    assert "Check your inbox to confirm" not in INDEX
-    assert "mailto:hello@behindthewatt.com" in INDEX
+def test_newsletter_uses_confirmed_subscription_flow():
+    newsletter = (SITE / "src" / "components" / "home" / "Newsletter.astro").read_text()
+    worker = (ROOT / "newsletter" / "src" / "index.ts").read_text()
+    assert "mailto:hello@behindthewatt.com" not in newsletter
+    assert 'action="https://newsletter.behindthewatt.com/subscribe"' in newsletter
+    assert 'type="email"' in newsletter
+    assert "response.ok" in newsletter
+    assert "verifyToken" in worker
+    assert "RESEND_SEGMENT_ID" in worker
+    assert 'segments: [{ id: env.RESEND_SEGMENT_ID }]' in worker
+    assert (SITE / "src" / "pages" / "newsletter" / "confirmed.astro").exists()
 
 
 def test_map_points_have_keyboard_contract():
