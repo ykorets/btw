@@ -661,6 +661,34 @@ def provenance_facility_map(provenance: list[dict], units: list[dict],
     return out
 
 
+def receipt_keys(provenance: list[dict]) -> dict[tuple[str, str],
+                                                 set[tuple[str, str]]]:
+    """Published fact version -> exact reviewed (field, claim) receipts.
+
+    Reconcile scans the full validated-claim corpus on every run.  Without
+    this index, already-reviewed evidence creates an identical staging twin
+    forever.  A genuinely new claim, field update, or epistemic-state change
+    still creates a new version; an exact reviewed receipt is a no-op.
+    """
+    out: dict[tuple[str, str], set[tuple[str, str]]] = {}
+    for row in provenance:
+        fact_table = row.get("fact_table")
+        fact_id = row.get("fact_id")
+        fact_field = row.get("fact_field")
+        claim_id = row.get("claim_id")
+        if fact_table and fact_id and fact_field and claim_id:
+            out.setdefault((fact_table, fact_id), set()).add(
+                (fact_field, claim_id))
+    return out
+
+
+def unseen_receipts(existing: set[tuple[str, str]],
+                    planned: list[tuple[str, dict]]) -> list[tuple[str, dict]]:
+    """Return only direct receipts not already reviewed on this version."""
+    return [(field, claim) for field, claim in planned
+            if (field, claim["id"]) not in existing]
+
+
 def fact_field_supported(table: str, fact: dict, field: str,
                          value=None) -> bool:
     """Ask migration 008's semantic gate about an existing fact field."""
@@ -750,10 +778,12 @@ def main() -> None:
         by_doc.setdefault(c["document_id"], []).append(c)
 
     prior_receipts = _rest("GET", "fact_provenance", params={
-        "select": "fact_table,fact_id,claim:claim_id(document_id)"
+        "select": "fact_table,fact_id,fact_field,claim_id,"
+                  "claim:claim_id(document_id)"
     }).json()
     doc_facilities = provenance_facility_map(
         prior_receipts, all_units, permits)
+    reviewed_receipts = receipt_keys(prior_receipts)
     units_by_facility: dict[str, list[dict]] = {}
     permits_by_facility: dict[str, list[dict]] = {}
     for row in all_units:
@@ -825,6 +855,15 @@ def main() -> None:
             unit_links = plan["unit_links"]
             basis = plan["basis"]
             verification = plan["verification"]
+            unseen = unseen_receipts(
+                reviewed_receipts.get(("unit", uid), set()), unit_links)
+            class_changed = (u.get("basis") != basis
+                             or u.get("verification_state") != verification)
+            if not chg and not unseen and not class_changed:
+                if args.dry_run:
+                    print(f"DRY NOOP {slug}/{u.get('model') or uid}: "
+                          "all planned receipts already reviewed")
+                continue
             if args.dry_run:
                 print(f"DRY CLASS {slug}/{u.get('model') or uid}: "
                       f"basis={basis}, verification={verification}")
@@ -890,19 +929,9 @@ def main() -> None:
                 permit, permit_links, permit_updates,
                 lambda field, value: fact_field_supported(
                     "permit", permit, field, value))
-            if args.dry_run:
-                for p, field, c, method in permit_links:
-                    print(f"DRY LINK  {slug}/permit {p['permit_no']}.{field} "
-                          f"<- claim {c['id'][:8]} [{method}]")
-                for col, (new, _claims, method) in permit_updates.items():
-                    print(f"DRY STAGE {slug}/permit {permit['permit_no']}."
-                          f"{col}: {permit.get(col)} -> {new} [{method}]")
-                if missing:
-                    print(f"DRY HOLD  {slug}/permit {permit['permit_no']}: "
-                          f"missing compatible claims for {', '.join(missing)}")
-                continue
             if missing:
-                print(f"HOLD {slug}/permit {permit['permit_no']}: missing "
+                prefix = "DRY " if args.dry_run else ""
+                print(f"{prefix}HOLD {slug}/permit {permit['permit_no']}: missing "
                       f"compatible claims for {', '.join(missing)}")
                 continue
             if not permit_links and not permit_updates:
@@ -914,6 +943,24 @@ def main() -> None:
                                      for claim in claims_for_change]
             verification, derivation = _verification_state(
                 permit_direct_claims)
+            unseen = unseen_receipts(
+                reviewed_receipts.get(("permit", permit["id"]), set()),
+                [(field, claim)
+                 for _p, field, claim, _method in permit_links])
+            class_changed = permit.get("verification_state") != verification
+            if not permit_updates and not unseen and not class_changed:
+                if args.dry_run:
+                    print(f"DRY NOOP {slug}/permit {permit['permit_no']}: "
+                          "all planned receipts already reviewed")
+                continue
+            if args.dry_run:
+                for p, field, c, method in permit_links:
+                    print(f"DRY LINK  {slug}/permit {p['permit_no']}.{field} "
+                          f"<- claim {c['id'][:8]} [{method}]")
+                for col, (new, _claims, method) in permit_updates.items():
+                    print(f"DRY STAGE {slug}/permit {permit['permit_no']}."
+                          f"{col}: {permit.get(col)} -> {new} [{method}]")
+                continue
             sid = staged_permit_copy(
                 permit, permit_updates, verification_state=verification)
             replaced = covered | {"verification_state"}

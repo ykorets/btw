@@ -236,6 +236,12 @@ def deterministic_claims(pages: list[str]) -> list[dict]:
                 r"([0-9A-Z][0-9A-Z-]{4,})\s+"
                 r"(\d{1,2}/\d{1,2}/\d{4})", text, flags=re.I):
             permit_no, issued_at = match.groups()
+            # The registry row has no ``Permit No.`` label, so it does not
+            # match the generic number patterns above.  Emit the explicit
+            # row key as a typed claim; without it the document cannot be
+            # deterministically scoped to the known permit.
+            emit(page=page_no, quote=match.group(0), field="permit.no",
+                 value=permit_no, permit_no=permit_no)
             emit(page=page_no, quote=match.group(0), field="permit.type",
                  value="PSD Air Construction Permit", permit_no=permit_no)
             emit(page=page_no, quote=match.group(0), field="permit.issued_at",

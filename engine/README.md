@@ -32,6 +32,13 @@ The parser emits only exact, quote-anchored regulatory classifications. A
 unique deterministic claim may repair a populated permit field only when the
 existing value already fails migration 008's semantic gate. The repair is a
 staging version, not an in-place update, and still requires a sealed review.
+Registry rows must also emit their explicit permit number so every claim is
+scoped by a source key rather than by project name or geography.
+
+Reconciliation is replay-safe across the full validated-claim corpus. An
+exact `(fact version, field, claim)` receipt that has already been reviewed is
+a no-op; only a new receipt, field value, basis, or verification state can
+create another staged version.
 
 ## Truth audit
 

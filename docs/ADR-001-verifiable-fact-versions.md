@@ -60,6 +60,11 @@ the 27 machines are identical or individually rated at 18.333333 MW.
     populated but truth-gate-unsupported permit field. The replacement still
     creates a staged version and requires the same sealed review and atomic
     promotion as every other correction.
+13. Reconciliation may replay the entire validated claim corpus, but an exact
+    field/claim receipt already attached to the current published version is a
+    no-op. A new staged version requires new evidence, a fact-field change, or
+    a basis/verification-state change; repeated runs cannot manufacture
+    identical versions from already reviewed receipts.
 
 ## Options considered
 
