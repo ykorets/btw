@@ -1,16 +1,16 @@
-"""Build and deliver the deterministic BTW Weekly edition.
+"""Build a deterministic BTW Weekly edition and request editor review.
 
 The newsletter is a view of the published record, not a second research
 pipeline.  It reads exact rows promoted through sealed review manifests,
 plus separately labelled published facility and third-party announcement
 updates.  Candidates and staging facts are intentionally excluded.
 
-The Tuesday workflow sends the rendered edition to the newsletter Worker.
-The Worker owns the Resend key and the exactly-once delivery state.  A JSON
-and Markdown receipt are written after delivery so a missed workflow can
-resume from the last successful window without gaps.
+The Monday workflow creates a Resend draft and emails a preview only to the
+editor.  The Worker owns the Resend key, approval gate and delivery cursor.
+Nothing reaches the subscriber segment until the editor confirms with a POST
+action.  JSON, Markdown and HTML preview artifacts are written for audit.
 
-Env: SUPABASE_URL, SUPABASE_SERVICE_KEY; for --send also
+Env: SUPABASE_URL, SUPABASE_SERVICE_KEY; for --request-review also
 DIGEST_TRIGGER_SECRET.  Optional: NEWSLETTER_ENDPOINT.
 """
 
@@ -463,16 +463,18 @@ def render_markdown(issue_id: str, start: dt.datetime, end: dt.datetime,
 
 
 def _html_list(items: list[str]) -> str:
-    return "<ul style=\"margin:12px 0 24px;padding-left:22px\">" + "".join(
-        f"<li style=\"margin:0 0 12px;line-height:1.55\">{item}</li>"
+    return '<table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="margin:14px 0 24px;border-collapse:separate;border-spacing:0 10px">' + "".join(
+        '<tr><td style="padding:16px 18px;border:1px solid #e6e4dc;'
+        'border-radius:9px;background:#ffffff;color:#38372f;font-size:14px;'
+        f'line-height:1.6">{item}</td></tr>'
         for item in items
-    ) + "</ul>"
+    ) + "</table>"
 
 
 def _html_link(label: Any, url: str) -> str:
     return (
         f'<a href="{html.escape(url, quote=True)}" '
-        'style="color:#a64b2a;text-decoration:underline">'
+        'style="color:#157a54;text-decoration:underline;text-decoration-color:#9bcbb4">'
         f"{html.escape(str(label))}</a>"
     )
 
@@ -531,7 +533,7 @@ def render_html(issue_id: str, start: dt.datetime, end: dt.datetime,
         )
     sections.append(
         _html_list(record_items) if record_items
-        else '<p style="color:#66645c;line-height:1.6">No published record changes in this window.</p>'
+        else '<div style="margin:14px 0 26px;padding:18px;border:1px solid #e6e4dc;border-radius:9px;background:#fff;color:#57564e;line-height:1.6">No published record changes in this window.</div>'
     )
 
     announced_items: list[str] = []
@@ -555,39 +557,52 @@ def render_html(issue_id: str, start: dt.datetime, end: dt.datetime,
         )
     sections.append(
         _html_list(announced_items) if announced_items
-        else '<p style="color:#66645c;line-height:1.6">No published third-party inventory updates in this window.</p>'
+        else '<div style="margin:14px 0 8px;padding:18px;border:1px solid #ead9b3;border-radius:9px;background:#fffaf0;color:#6b5730;line-height:1.6">No published third-party inventory updates in this window.</div>'
     )
 
     return f"""<!doctype html>
-<html><body style="margin:0;background:#f4f1e9;color:#181812;font-family:Arial,sans-serif">
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head><body style="margin:0;background:#fbfaf7;color:#14140f;font-family:Arial,sans-serif">
 <div style="display:none;max-height:0;overflow:hidden">{html.escape(_preview(data))}</div>
-<div style="max-width:680px;margin:0 auto;padding:32px 18px">
-  <div style="background:#fbfaf7;border:1px solid #d8d2c5;border-radius:12px;overflow:hidden">
-    <div style="padding:32px 34px 24px;border-bottom:1px solid #d8d2c5">
-      <p style="margin:0 0 14px;font-family:monospace;font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:#8a897f">Behind the Watt · BTW Weekly</p>
-      <h1 style="margin:0;font-family:Georgia,serif;font-size:36px;line-height:1.08;font-weight:500">The record for {html.escape(issue_id)}</h1>
-      <p style="margin:14px 0 0;color:#77756c;font-size:13px">{html.escape(_iso(start))} → {html.escape(_iso(end))}</p>
+<div style="max-width:680px;margin:0 auto;padding:28px 16px 44px">
+  <div style="background:#ffffff;border:1px solid #e6e4dc;border-radius:12px;overflow:hidden">
+    <div style="height:5px;background:#157a54;font-size:0;line-height:0">&nbsp;</div>
+    <div style="padding:27px 34px 30px;border-bottom:1px solid #e6e4dc">
+      <table role="presentation" width="100%" cellspacing="0" cellpadding="0"><tr>
+        <td style="font-family:Georgia,serif;font-size:21px;color:#14140f">behind <span style="color:#157a54">|</span> the watt</td>
+        <td align="right" style="font-family:monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:#8a897f">BTW Weekly</td>
+      </tr></table>
+      <p style="margin:34px 0 10px;font-family:monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:#157a54">Published record · {html.escape(issue_id)}</p>
+      <h1 style="margin:0;max-width:560px;font-family:Georgia,serif;font-size:40px;line-height:1.08;font-weight:500;letter-spacing:-.02em">What changed behind the watt</h1>
+      <p style="margin:16px 0 0;color:#8a897f;font-size:12px;line-height:1.5">Coverage: {html.escape(_iso(start))} to {html.escape(_iso(end))}</p>
     </div>
-    <div style="padding:28px 34px">
-      <p style="margin:0 0 26px;font-family:Georgia,serif;font-size:21px;line-height:1.45">{html.escape(_meaning(data))}</p>
-      <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="margin:0 0 30px;border-collapse:collapse">
+    <div style="padding:30px 34px 34px">
+      <p style="margin:0 0 28px;font-family:Georgia,serif;font-size:22px;line-height:1.45;color:#2a2923">{html.escape(_meaning(data))}</p>
+      <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="margin:0 0 34px;border-collapse:collapse">
         <tr>
-          <td style="padding:16px;border:1px solid #d8d2c5"><div style="font-family:Georgia,serif;font-size:26px">{snapshot['operating_gw']:.2f} GW</div><div style="color:#77756c;font-size:12px">verified operating</div></td>
-          <td style="padding:16px;border:1px solid #d8d2c5"><div style="font-family:Georgia,serif;font-size:26px">{snapshot['published_facilities']}</div><div style="color:#77756c;font-size:12px">published facilities</div></td>
-          <td style="padding:16px;border:1px solid #d8d2c5"><div style="font-family:Georgia,serif;font-size:26px">{snapshot['third_party_reported_gw']:.1f} GW</div><div style="color:#77756c;font-size:12px">third-party reported</div></td>
+          <td width="34%" valign="top" style="padding:17px 15px;border:1px solid #b9dcca;background:#e4f3ec"><div style="font-family:Georgia,serif;font-size:26px;color:#0f5f40">{snapshot['operating_gw']:.2f} GW</div><div style="margin-top:5px;color:#315b49;font-size:10px;font-weight:700;letter-spacing:.07em;text-transform:uppercase">Verified operating</div></td>
+          <td width="27%" valign="top" style="padding:17px 15px;border:1px solid #e6e4dc;background:#fff"><div style="font-family:Georgia,serif;font-size:26px;color:#14140f">{snapshot['published_facilities']}</div><div style="margin-top:5px;color:#8a897f;font-size:10px;font-weight:700;letter-spacing:.07em;text-transform:uppercase">Facilities</div></td>
+          <td width="39%" valign="top" style="padding:17px 15px;border:1px solid #ead9b3;background:#f8efdb"><div style="font-family:Georgia,serif;font-size:26px;color:#76520c">{snapshot['third_party_reported_gw']:.1f} GW</div><div style="margin-top:5px;color:#76520c;font-size:10px;font-weight:700;letter-spacing:.07em;text-transform:uppercase">Third-party reported</div></td>
         </tr>
       </table>
-      <h2 style="margin:0 0 8px;font-family:Georgia,serif;font-size:25px;font-weight:500">The published record</h2>
+      <p style="margin:0 0 7px;font-family:monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:#157a54">Verified layer</p>
+      <h2 style="margin:0;font-family:Georgia,serif;font-size:28px;font-weight:500">The published record</h2>
       {sections[0]}
-      <h2 style="margin:30px 0 8px;font-family:Georgia,serif;font-size:25px;font-weight:500">Third-party announced pipeline</h2>
-      <p style="margin:0;color:#66645c;font-size:13px;line-height:1.55">Reported by a cited third-party inventory. These rows are not BTW-verified operating capacity and are never added to the verified total.</p>
-      {sections[1]}
-      <p style="margin:30px 0 0"><a href="{SITE_ORIGIN}/data/" style="display:inline-block;padding:12px 18px;border-radius:7px;background:#181812;color:#fff;text-decoration:none;font-weight:600">Inspect the data</a></p>
+      <div style="margin:34px -10px 0;padding:24px 24px 16px;border:1px solid #ead9b3;border-radius:10px;background:#f8efdb">
+        <p style="margin:0 0 7px;font-family:monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:#9a6b10">Reported layer</p>
+        <h2 style="margin:0 0 9px;font-family:Georgia,serif;font-size:28px;font-weight:500;color:#3b311e">Third-party announced pipeline</h2>
+        <p style="margin:0;color:#6b5730;font-size:13px;line-height:1.6">Reported by a cited third-party inventory. These rows are not BTW-verified operating capacity and are never added to the verified total.</p>
+        {sections[1]}
+      </div>
+      <div style="margin:36px 0 0;padding:26px;border-radius:10px;background:#14140f;color:#fbfaf7">
+        <p style="margin:0 0 8px;color:#8fc7aa;font-family:monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase">The evidence stays inspectable</p>
+        <p style="margin:0 0 18px;font-family:Georgia,serif;font-size:25px;line-height:1.3">Every number should lead back to a record.</p>
+        <a href="{SITE_ORIGIN}/data/" style="display:inline-block;padding:12px 18px;border-radius:7px;background:#e4f3ec;color:#0f5f40;text-decoration:none;font-weight:700">Inspect the data →</a>
+      </div>
     </div>
-    <div style="padding:22px 34px;background:#efede6;color:#77756c;font-size:12px;line-height:1.6">
+    <div style="padding:23px 34px;background:#f4f2ec;border-top:1px solid #e6e4dc;color:#77756c;font-size:11px;line-height:1.65">
       <p style="margin:0 0 8px">Generated from published facts and sealed review manifests. Staging facts and watcher candidates are excluded.</p>
       <p style="margin:0 0 8px">All data CC BY 4.0. Cite as: Behind the Watt, behindthewatt.com.</p>
-      <p style="margin:0"><a href="{UNSUBSCRIBE_URL}" style="color:#77756c">Unsubscribe</a></p>
+      <p style="margin:0"><a href="{UNSUBSCRIBE_URL}" style="color:#57564e">Unsubscribe</a></p>
     </div>
   </div>
 </div></body></html>"""
@@ -624,7 +639,10 @@ def build_edition(issue_id: str, start: dt.datetime, end: dt.datetime,
     html_body = render_html(issue_id, start, end, data)
     text_body = render_text(issue_id, start, end, data)
     return {
+        "mode": "review",
         "issue_id": issue_id,
+        "window_start": _iso(start),
+        "window_end": _iso(end),
         "subject": subject,
         "preview_text": _preview(data),
         "html": html_body,
@@ -636,7 +654,9 @@ def build_edition(issue_id: str, start: dt.datetime, end: dt.datetime,
 def deliver(edition: dict[str, Any], endpoint: str = DEFAULT_ENDPOINT) -> dict[str, Any]:
     secret = os.environ.get("DIGEST_TRIGGER_SECRET")
     if not secret:
-        raise RuntimeError("DIGEST_TRIGGER_SECRET is required for --send")
+        raise RuntimeError(
+            "DIGEST_TRIGGER_SECRET is required for --request-review"
+        )
     response = httpx.post(
         endpoint,
         headers={"Authorization": f"Bearer {secret}"},
@@ -661,6 +681,22 @@ def validate_delivery(endpoint: str = DEFAULT_ENDPOINT) -> dict[str, Any]:
     return response.json()
 
 
+def delivery_cursor(endpoint: str = DEFAULT_ENDPOINT) -> dt.datetime | None:
+    """Return the end of the latest editor-approved delivery window."""
+    secret = os.environ.get("DIGEST_TRIGGER_SECRET")
+    if not secret:
+        raise RuntimeError("DIGEST_TRIGGER_SECRET is required for cursor lookup")
+    response = httpx.post(
+        endpoint,
+        headers={"Authorization": f"Bearer {secret}"},
+        json={"mode": "cursor"},
+        timeout=30,
+    )
+    response.raise_for_status()
+    value = response.json().get("window_end")
+    return _datetime(value) if isinstance(value, str) else None
+
+
 def previous_window_end(archive: Path, issue_id: str,
                         default: dt.datetime) -> dt.datetime:
     latest: dt.datetime | None = None
@@ -679,6 +715,15 @@ def previous_window_end(archive: Path, issue_id: str,
     return latest or default
 
 
+def review_window_end(issue_date: dt.date) -> dt.datetime:
+    """Freeze a Tuesday edition for review at 13:00 UTC on Monday."""
+    return dt.datetime.combine(
+        issue_date - dt.timedelta(days=1),
+        dt.time(hour=13),
+        tzinfo=dt.timezone.utc,
+    )
+
+
 def write_receipt(archive: Path, issue_id: str, start: dt.datetime,
                   end: dt.datetime, data: dict[str, Any],
                   edition: dict[str, Any], delivery: dict[str, Any]) -> None:
@@ -686,6 +731,7 @@ def write_receipt(archive: Path, issue_id: str, start: dt.datetime,
     (archive / f"{issue_id}.md").write_text(
         render_markdown(issue_id, start, end, data) + "\n"
     )
+    (archive / f"{issue_id}.html").write_text(edition["html"])
     receipt = {
         "issue_id": issue_id,
         "window": {"start": _iso(start), "end": _iso(end)},
@@ -713,7 +759,7 @@ def main() -> None:
     parser.add_argument("--archive", default="digest")
     parser.add_argument("--endpoint", default=os.environ.get(
         "NEWSLETTER_ENDPOINT", DEFAULT_ENDPOINT))
-    parser.add_argument("--send", action="store_true")
+    parser.add_argument("--request-review", action="store_true")
     parser.add_argument("--validate-delivery", action="store_true")
     args = parser.parse_args()
 
@@ -724,15 +770,15 @@ def main() -> None:
         parser.error("--issue-date must be YYYY-MM-DD")
 
     issue_date = dt.date.fromisoformat(args.issue_date)
-    end = dt.datetime.combine(
-        issue_date, dt.time(hour=13), tzinfo=dt.timezone.utc
-    )
+    # The Tuesday edition is assembled on Monday. The half-open data window
+    # ends when review begins, so facts cannot appear after the editor preview.
+    end = review_window_end(issue_date)
     archive = Path(args.archive)
-    current_receipt = archive / f"{args.issue_date}.json"
-    if current_receipt.exists() and args.send:
-        print(f"edition {args.issue_date} already archived — no send")
-        return
-    start = previous_window_end(archive, args.issue_date, end - dt.timedelta(days=7))
+    default_start = end - dt.timedelta(days=7)
+    if args.request_review:
+        start = delivery_cursor(args.endpoint) or default_start
+    else:
+        start = previous_window_end(archive, args.issue_date, default_start)
     if start >= end:
         raise RuntimeError("edition window start must be before end")
 
@@ -740,7 +786,7 @@ def main() -> None:
     edition = build_edition(args.issue_date, start, end, data)
     delivery = (
         deliver(edition, args.endpoint)
-        if args.send else {"status": "dry_run", "broadcast_id": None}
+        if args.request_review else {"status": "dry_run", "broadcast_id": None}
     )
     write_receipt(archive, args.issue_date, start, end, data, edition, delivery)
     print(json.dumps({

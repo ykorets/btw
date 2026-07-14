@@ -16,10 +16,11 @@ Supabase published facts
         digest.py renders HTML + text + receipt
                  │ authenticated issue_id + content hash
                  ▼
-        Cloudflare Worker → Resend Broadcast → BTW Weekly Segment
+        Cloudflare Worker → Resend draft → editor preview
                  │
-                 ├─ KV: issue id / hash / broadcast id / state
-                 └─ Git: digest/YYYY-MM-DD.{md,json}
+                 ├─ GET review page (never sends)
+                 ├─ POST approval → Tuesday Resend delivery
+                 └─ KV: issue / hash / window / broadcast / state
 ```
 
 ## Truth boundary
@@ -36,8 +37,15 @@ Supabase published facts
 ## Delivery contract
 
 The Worker creates the Broadcast as a draft, stores its Resend id in KV, and
-only then calls the send endpoint. A retry first retrieves that id and status.
-This closes the common “send succeeded but workflow crashed” duplicate path.
+emails the preview only to the editor. It never calls the Broadcast send API
+from the scheduled workflow. A retry retrieves the existing id and does not
+create another draft or preview email.
+
+The email link opens a read-only review page because mail security scanners may
+follow links automatically. Only a separate POST form can approve delivery.
+Approval schedules the current Resend draft for Tuesday at 13:00 UTC, preserving
+any edits made in Resend. The approval call uses a stable idempotency key and
+re-checks Resend state before retrying.
 
 The issue id is the Tuesday UTC date. The Worker rejects the same issue id
 with a different content hash. If KV state is lost, it searches recent Resend
@@ -48,11 +56,13 @@ suppression and unsubscribe handling.
 
 ## Scheduling and recovery
 
-- Schedule: Tuesday at 13:00 UTC.
-- Scheduled runs always send; manual runs default to dry-run.
-- The start cursor is the prior archived edition's `window.end`, not simply
-  “now minus seven days”, so a missed Tuesday is recovered without a gap.
-- A successful send archives the edition Markdown and JSON receipt on `main`.
+- Review schedule: Monday at 13:00 UTC. Approved delivery: Tuesday at 13:00 UTC.
+- Scheduled runs create a review only; manual runs default to dry-run.
+- The start cursor is the last editor-approved delivery window, not simply
+  “now minus seven days”, so a missed or rejected edition is recovered without
+  a gap.
+- Markdown, JSON and HTML previews are retained as GitHub workflow artifacts.
+- An unapproved edition never advances the delivery cursor.
 - A quiet week still sends an honest edition stating that no sealed review was
   promoted; this matches the weekly promise without manufacturing news.
 
