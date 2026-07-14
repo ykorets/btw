@@ -1,0 +1,26 @@
+---
+import FacilityLayout from "../../../layouts/FacilityLayout.astro";
+import FacilityHero from "../../../components/facility/FacilityHero.astro";
+import MachineRecord from "../../../components/facility/MachineRecord.astro";
+import EvidenceLedger from "../../../components/facility/EvidenceLedger.astro";
+import PermitReceipts from "../../../components/facility/PermitReceipts.astro";
+import SourceReceipts from "../../../components/facility/SourceReceipts.astro";
+import { buildFacilityView, loadMirror } from "../../../lib/mirror";
+
+type Mirror = Awaited<ReturnType<typeof loadMirror>>;
+interface Props { facility: Record<string, any>; mirror: Mirror }
+export async function getStaticPaths() {
+  const mirror = await loadMirror();
+  return mirror.facilities.facilities.map((facility: Record<string, any>) => ({ params: { slug: facility.slug }, props: { facility, mirror } }));
+}
+const { facility, mirror } = Astro.props as Props;
+const view = buildFacilityView(facility, mirror.events.events, mirror.summary, mirror.coverage);
+const jsonLd = {
+  "@context": "https://schema.org", "@type": "Dataset", name: `${view.name} evidence dossier`, description: view.description,
+  url: `https://behindthewatt.com/facility/${view.slug}/`, dateModified: view.asOf,
+  license: "https://creativecommons.org/licenses/by/4.0/", creator: { "@type": "Organization", name: "Behind the Watt", url: "https://behindthewatt.com" },
+  spatialCoverage: { "@type": "Place", name: view.location },
+  distribution: { "@type": "DataDownload", encodingFormat: "application/json", contentUrl: "https://raw.githubusercontent.com/ykorets/btw/mirror/data/facilities.json" },
+};
+---
+<FacilityLayout {view} {jsonLd}><FacilityHero {view} /><main><MachineRecord {view} /><EvidenceLedger {view} /><PermitReceipts permits={view.permits} /><SourceReceipts sources={view.sources} /></main></FacilityLayout>

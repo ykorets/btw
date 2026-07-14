@@ -1,0 +1,4 @@
+---
+const { permits } = Astro.props;
+---
+<section id="receipts"><div class="wrap"><div class="eyebrow">Primary records</div><h2>Permits</h2><div class="receipts">{permits.length ? permits.map((permit: any) => <article class="receipt"><div class="eyebrow">Permit</div><h3>{permit.title}</h3><p>{permit.permit_type || "Permit record"}</p><div class="receipt-meta">{permit.meta}</div><div class="receipt-meta">{permit.provenanceLabel}</div></article>) : <p class="muted">No published permit records.</p>}</div></div></section>

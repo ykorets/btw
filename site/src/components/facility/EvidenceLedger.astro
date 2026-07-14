@@ -1,0 +1,7 @@
+---
+const { view } = Astro.props;
+---
+<section><div class="wrap"><div class="eyebrow">Evidence ledger</div><h2>One timeline, different evidence classes</h2><p class="intro">Regulatory, operational, satellite and court records are kept separate rather than blended into one unsupported conclusion.</p>
+  <div class="two-col"><ol class="timeline">{view.timeline.length ? view.timeline.map((event: any) => <li><time datetime={event.date}>{event.displayDate}</time><div><span class="tag">{event.label}</span><p>{event.url ? <a href={event.url} target="_blank" rel="noopener">{event.headline} ↗</a> : event.headline}</p></div></li>) : <p class="muted">No dated public evidence yet.</p>}</ol>
+  <aside class="panel"><div class="eyebrow">Continuous signal</div><h3>Gas-flow monitoring</h3><p>{view.gasStatus}</p><div class="notice">A monitored source is not the same as a published facility fact. No gas-flow value appears here until the public export carries its date, quantity and receipt.</div></aside></div>
+</div></section>

@@ -1,5 +1,0 @@
-facility,location,operator,offtaker,operating_mw,equipment_permitted,permit_authority,permit_id,permit_status,permit_to_power_months,verified,source_url
-xAI Colossus 1,"Memphis, TN",xAI / MZX Tech,xAI,247 permitted / up to 421 observed,15x Solar SMT-130 w/ SCR,Shelby County Health Department,01156-01PC,issued 2025-07-02; under appeal; CAA litigation,-12,operating,https://www.selc.org/news/inside-memphis-fight-against-xai/
-xAI Colossus 2,"Southaven, MS",xAI,xAI,422 observed,41 turbines permitted; 27 mobile units observed,Mississippi DEQ,MDEQ air permit (41 units),approved ~2026-01; appealed,-9,operating,https://mgrid.org/2026/04/14/xai-operates-27-unpermitted-gas-turbines-at-memphis-data-center-generating-422-mw-without-air-permits/
-Crusoe Stargate Abilene,"Abilene, TX",Abilene DC 1 LLC dba Crusoe,OpenAI via Oracle,360,6x Solar Titan 350 + 5x GE LM2500 @ 8760 hr/yr,TCEQ,Standard Permit reg. 177263; Title V O4721,clean,13,operating,https://records.tceq.texas.gov/cs/idcplg?IdcService=TCEQ_EXTERNAL_SEARCH_GET_FILE&dID=8600163&Rendition=Web
-Fleet remainder,US,unverified,unverified,~140,unknown,unknown,unknown,under verification,,unverified,

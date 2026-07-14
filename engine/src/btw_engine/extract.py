@@ -52,10 +52,10 @@ Return STRICT JSON, no markdown fences, exactly this shape:
 "value_num": 0, "unit": "...", "quote": "...", "page": 1}]}
 
 Fields to extract WHEN PRESENT (skip absent ones):
-facility.name, facility.operator, unit.oem, unit.model, unit.count,
-unit.mw_each, unit.mw_total, unit.hours_permitted, permit.no,
-permit.authority, permit.status, permit.date, observation.unit_count,
-observation.mw.
+facility.name, facility.operator, unit.oem, unit.model, unit.fuel, unit.count,
+unit.mw_each, unit.mw_total, unit.hours_permitted, permit.no, permit.type,
+permit.authority, permit.status, permit.filed_at, permit.issued_at,
+observation.unit_count, observation.mw.
 
 Hard rules:
 - "quote" MUST be a verbatim span copied character-for-character from the
@@ -63,6 +63,10 @@ Hard rules:
 - "page" is the page number where the quote appears, per the [PAGE n] markers.
 - "value_num" is the numeric value for numeric facts, else null.
 - "unit" examples: MW, count, hours/year. Null if not applicable.
+- Use permit.filed_at only when the quote explicitly says filed, submitted,
+  received, or application date. Use permit.issued_at only when it explicitly
+  says issued, approved, effective, or permit date. Never emit an ambiguous
+  generic permit date.
 - JSON only. No commentary."""
 
 

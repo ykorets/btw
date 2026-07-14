@@ -1,9 +1,15 @@
 """M5 — deterministic planner tests for normalize (+M3.5 context binding)."""
 
+from btw_engine import normalize
+
 from btw_engine.normalize import (
+    copy_provenance,
     locate_context,
+    plan_permit_links,
     plan_unit_changes,
     resolve_facility,
+    resolve_permit,
+    staged_copy,
 )
 
 TITAN = {"id": "u-titan", "facility_id": "f1", "oem": "Solar Turbines",
@@ -16,7 +22,7 @@ LM = {"id": "u-lm", "facility_id": "f1", "oem": "GE Vernova",
 
 def _c(cid, field, value, value_num, quote):
     return {"id": cid, "field": field, "value": value, "value_num": value_num,
-            "quote": quote, "match_score": 1.0}
+            "quote": quote, "entity_hint": None, "match_score": 1.0}
 
 
 def test_quote_token_binding_stages_updates():
@@ -47,6 +53,26 @@ def test_no_model_token_in_quote_means_no_binding():
                  "8,760 hours per turbine.")]
     links, updates, conflicts = plan_unit_changes([TITAN, LM], claims)
     assert not links and not updates and not conflicts
+
+
+def test_entity_hint_binds_numeric_claim():
+    claim = _c("c-h", "unit.hours_permitted", "8,760 hours", 8760,
+               "increase annual operation to 8,760 hours per turbine")
+    claim["entity_hint"] = "GE LM2500 turbine"
+    links, updates, conflicts = plan_unit_changes([TITAN, LM], [claim])
+    assert not updates and not conflicts
+    assert [(u["id"], f) for u, f, _claim in links] == [
+        ("u-lm", "hours_permitted")]
+
+
+def test_oem_claim_binds_through_model_context():
+    claim = _c("c-oem", "unit.oem", "Solar", None,
+               "15 Solar SMT-130 gas turbines")
+    smt = {**TITAN, "id": "u-smt", "model": "SMT-130",
+           "oem": "Solar Turbines"}
+    links, updates, conflicts = plan_unit_changes([smt], [claim])
+    assert not updates and not conflicts
+    assert [(u["id"], f) for u, f, _claim in links] == [("u-smt", "oem")]
 
 
 def test_conflicting_values_are_skipped():
@@ -124,3 +150,101 @@ def test_resolve_facility_unique_permit():
     both = [_c("c9", "permit.no", "177263", None, "q"),
             _c("c10", "permit.no", "01156-01PC", None, "q")]
     assert resolve_facility(both, permits) is None
+
+
+def test_resolve_permit_and_plan_exact_fields():
+    permit = {"id": "p2", "permit_no": "01156-01PC", "facility_id": "f2",
+              "authority": "Shelby County Health Department",
+              "permit_type": "Air construction permit",
+              "status": "issued; under appeal; CAA litigation",
+              "filed_at": "2025-01-31", "issued_at": "2025-07-02"}
+    claims = [
+        _c("p-no", "permit.no", "01156-01PC", None,
+           "Air Permit No. 01156-01PC"),
+        _c("p-auth", "permit.authority", "Shelby County Health Department",
+           None, "Shelby County Health Department issued the permit"),
+        _c("p-date", "permit.issued_at", "July 2, 2025", None,
+           "issued the permit on July 2, 2025"),
+        _c("p-status", "permit.status", "issued", None,
+           "issuance of Air Permit No. 01156-01PC"),
+    ]
+    assert resolve_permit(claims, [permit]) == permit
+    links = plan_permit_links(permit, claims)
+    got = {(field, method) for _p, field, _claim, method in links}
+    assert got == {("permit_no", "exact permit number"),
+                   ("authority", "text match"),
+                   ("issued_at", "exact typed date"),
+                   ("status", "status component")}
+
+
+def test_permit_date_mismatch_is_not_linked():
+    permit = {"id": "p1", "permit_no": "177263", "facility_id": "f1",
+              "authority": "TCEQ", "permit_type": "standard",
+              "status": "issued", "filed_at": "2024-08-01",
+              "issued_at": None}
+    claim = _c("p-date", "permit.filed_at", "January 11, 2025", None,
+               "Project Received Date January 11, 2025")
+    assert plan_permit_links(permit, [claim]) == []
+
+
+def test_legacy_generic_permit_date_is_never_bound():
+    permit = {"id": "p1", "permit_no": "177263", "facility_id": "f1",
+              "authority": "TCEQ", "permit_type": "standard",
+              "status": "issued", "filed_at": "2025-01-11",
+              "issued_at": None}
+    claim = _c("legacy", "permit.date", "January 11, 2025", None,
+               "Project Received Date January 11, 2025")
+    assert plan_permit_links(permit, [claim]) == []
+
+
+def test_staged_version_inherits_prior_receipts(monkeypatch):
+    class Response:
+        def json(self):
+            return [{"fact_field": "model", "claim_id": "claim-1",
+                     "note": "original receipt", "support_kind": "direct",
+                     "derivation": None}]
+
+    monkeypatch.setattr(normalize, "_rest",
+                        lambda *_args, **_kwargs: Response())
+    calls = []
+    monkeypatch.setattr(
+        normalize, "ensure_provenance",
+        lambda *args: calls.append(args) or True,
+    )
+
+    assert copy_provenance("unit", "old", "staged") == 1
+    assert calls == [
+        ("unit", "staged", "model", "claim-1",
+         "inherited from prior fact version: original receipt",
+         "direct", None)]
+
+
+def test_staged_copy_reuses_logical_identity_and_never_publishes(monkeypatch):
+    calls = []
+
+    class Response:
+        def __init__(self, rows):
+            self.rows = rows
+
+        def json(self):
+            return self.rows
+
+    def fake_rest(method, path, **kwargs):
+        calls.append((method, path, kwargs))
+        if method == "GET":
+            return Response([])
+        return Response([{"id": "staged-id"}])
+
+    monkeypatch.setattr(normalize, "_rest", fake_rest)
+    unit = {**TITAN, "logical_id": "logical-1", "total_mw": None}
+    sid = staged_copy(
+        unit, {"unit_count": (5, {"id": "claim"}, "quote")},
+        basis="permitted", verification_state="source_asserted")
+
+    assert sid == "staged-id"
+    posted = calls[-1][2]["json"][0]
+    assert posted["logical_id"] == "logical-1"
+    assert posted["unit_count"] == 5
+    assert posted["fact_state"] == "staging"
+    assert posted["basis"] == "permitted"
+    assert posted["verification_state"] == "source_asserted"

@@ -1,0 +1,43 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import SiteHeader from "../components/home/SiteHeader.astro";
+import Hero from "../components/home/Hero.astro";
+import AnnouncedCapacity from "../components/home/AnnouncedCapacity.astro";
+import LatestFilings from "../components/home/LatestFilings.astro";
+import FacilityMap from "../components/home/FacilityMap.astro";
+import FleetTracker from "../components/home/FleetTracker.astro";
+import TimeToPower from "../components/home/TimeToPower.astro";
+import CostCalculator from "../components/home/CostCalculator.astro";
+import Audience from "../components/home/Audience.astro";
+import Methodology from "../components/home/Methodology.astro";
+import OpenDataManifesto from "../components/home/OpenDataManifesto.astro";
+import Definitions from "../components/home/Definitions.astro";
+import Research from "../components/home/Research.astro";
+import Newsletter from "../components/home/Newsletter.astro";
+import SiteFooter from "../components/home/SiteFooter.astro";
+import HomeRuntime from "../components/home/HomeRuntime.astro";
+import { loadMirror } from "../lib/mirror";
+
+const mirror = await loadMirror();
+---
+<BaseLayout
+  title="Behind the Watt — the open database of behind-the-meter data center power"
+  description="The economics tracker for behind-the-meter data center power. Verified operating capacity, reported project pipelines, permits and evidence."
+>
+  <SiteHeader />
+  <Hero announcedGw={mirror.announcements.summary.reported_gw} />
+  {mirror.announcements.summary.projects > 0 && <AnnouncedCapacity data={mirror.announcements} />}
+  <LatestFilings />
+  <FacilityMap />
+  <FleetTracker />
+  <TimeToPower />
+  <CostCalculator />
+  <Audience />
+  <Methodology />
+  <OpenDataManifesto />
+  <Definitions />
+  <Research />
+  <Newsletter />
+  <SiteFooter />
+  <HomeRuntime />
+</BaseLayout>

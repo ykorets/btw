@@ -3,6 +3,8 @@ on:
   push:
     branches: [main]
     paths: ["site/**"]
+  schedule:
+    - cron: "17 3 * * *"
   workflow_dispatch: {}
 permissions:
   pages: write
@@ -16,7 +18,23 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        with:
+          ref: mirror
+          path: _mirror
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+          cache: npm
+          cache-dependency-path: site/package-lock.json
+      - run: npm ci
+        working-directory: site
+      - name: Build crawlable Astro site from the public mirror
+        run: npm run build
+        working-directory: site
+        env:
+          BTW_DATA_DIR: ../_mirror/data
       - uses: actions/upload-pages-artifact@v3
-        with: {path: site}
+        with: {path: site/dist}
       - id: deployment
         uses: actions/deploy-pages@v4

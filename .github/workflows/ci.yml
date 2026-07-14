@@ -7,5 +7,71 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with: {python-version: "3.12"}
-      - run: pip install httpx pyyaml pytest rapidfuzz pypdf litellm boto3
-      - run: PYTHONPATH=engine/src pytest engine/tests -q
+      - uses: astral-sh/setup-uv@08807647e7069bb48b6ef5acd8ec9567f424441b # v8.1.0
+        with:
+          version: "0.11.28"
+          enable-cache: true
+          cache-dependency-glob: "engine/uv.lock"
+      - run: uv sync --locked --extra dev
+        working-directory: engine
+      - run: uv run pytest tests -q
+        working-directory: engine
+  database:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:17-alpine
+        env:
+          POSTGRES_PASSWORD: test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 2s
+          --health-timeout 5s
+          --health-retries 10
+    env:
+      PGURL: postgresql://postgres:test@127.0.0.1:5432/postgres
+    steps:
+      - uses: actions/checkout@v4
+      - name: Apply base schema
+        run: psql "$PGURL" -v ON_ERROR_STOP=1 -f engine/schema/001_init.sql
+      - name: Match Supabase roles and extension search path
+        run: >-
+          psql "$PGURL" -v ON_ERROR_STOP=1 -c
+          'create role anon; create role authenticated; create role service_role;
+          create schema extensions;
+          alter extension "uuid-ossp" set schema extensions;
+          alter database postgres set search_path to public, extensions;'
+      - name: Apply migrations 002 through 008
+        run: |
+          for file in engine/schema/00{2..8}_*.sql; do
+            psql "$PGURL" -v ON_ERROR_STOP=1 -f "$file"
+          done
+      - name: Verify immutable manifest and atomic promotion
+        run: >-
+          psql "$PGURL" -v ON_ERROR_STOP=1
+          -f engine/tests/sql/008_truth_integrity_regression.sql
+  site:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        with:
+          ref: mirror
+          path: _mirror
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+          cache: npm
+          cache-dependency-path: site/package-lock.json
+      - run: npm ci
+        working-directory: site
+      - run: npm run check
+        working-directory: site
+        env:
+          BTW_DATA_DIR: ../_mirror/data
+      - run: npm run build
+        working-directory: site
+        env:
+          BTW_DATA_DIR: ../_mirror/data

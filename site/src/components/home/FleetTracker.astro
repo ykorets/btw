@@ -1,0 +1,46 @@
+<section id="tracker">
+  <div class="wrap">
+    <div class="kicker">Operating fleet</div>
+    <h2>Every megawatt that actually runs</h2>
+    <p class="sub">The complete verified operating fleet, with the permit trail on every row. Announced capacity doesn't make this table — first verified megawatts do.</p>
+    <div style="overflow-x:auto;margin-top:22px">
+    <table>
+      <thead><tr><th>Facility</th><th>MW</th><th>Equipment (as permitted)</th><th>Permit</th><th>Permit → power</th><th>Source</th></tr></thead>
+      <tbody>
+        <tr>
+          <td><a href="facility/xai-colossus-1/"><b>xAI Colossus 1</b></a><br><span class="src">Memphis, TN · xAI</span></td>
+          <td class="mono"><span class="mw-live" data-slug="xai-colossus-1">247</span></td>
+          <td class="equip-live" data-slug="xai-colossus-1">15× Solar SMT-130</td>
+          <td><span class="tag tag-red">In litigation</span><br><span class="src">SCHD 01156-01PC · NAACP v. xAI</span></td>
+          <td class="mono ttp-cell" data-slug="xai-colossus-1" style="color:var(--red)">−7 mo</td>
+          <td class="src src-live" data-slug="xai-colossus-1"><a href="https://www.selc.org/news/inside-memphis-fight-against-xai/">SELC</a></td>
+        </tr>
+        <tr>
+          <td><a href="facility/xai-colossus-2/"><b>xAI Colossus 2</b></a><br><span class="src">Southaven, MS · xAI</span></td>
+          <td class="mono"><span class="mw-live" data-slug="xai-colossus-2">422</span></td>
+          <td class="equip-live" data-slug="xai-colossus-2">27× mixed mobile</td>
+          <td><span class="tag tag-red">Appealed</span><br><span class="src">MDEQ · appeal pending</span></td>
+          <td class="mono ttp-cell" data-slug="xai-colossus-2" style="color:var(--ink-3)">—</td>
+          <td class="src src-live" data-slug="xai-colossus-2"><a href="https://mgrid.org/2026/04/14/xai-operates-27-unpermitted-gas-turbines-at-memphis-data-center-generating-422-mw-without-air-permits/">mgrid</a></td>
+        </tr>
+        <tr>
+          <td><a href="facility/crusoe-stargate-abilene/"><b>Crusoe Stargate Abilene</b></a><br><span class="src">Abilene, TX · OpenAI via Oracle</span></td>
+          <td class="mono"><span class="mw-live" data-slug="crusoe-stargate-abilene">360</span></td>
+          <td class="equip-live" data-slug="crusoe-stargate-abilene">5× Solar Titan 350 + 5× GE LM2500</td>
+          <td><span class="tag tag-green">Clean</span><br><span class="src">TCEQ reg. 177263 · Title V O4721</span></td>
+          <td class="mono ttp-cell" data-slug="crusoe-stargate-abilene">13 mo</td>
+          <td class="src src-live" data-slug="crusoe-stargate-abilene"><a href="https://records.tceq.texas.gov/cs/idcplg?IdcService=TCEQ_EXTERNAL_SEARCH_GET_FILE&dID=8600163&Rendition=Web">TCEQ</a></td>
+        </tr>
+      </tbody>
+    </table>
+    </div>
+    <div id="data" style="display:flex;gap:10px;flex-wrap:wrap;margin-top:20px;align-items:center">
+      <a class="btn btn-primary" href="https://raw.githubusercontent.com/ykorets/btw/mirror/data/fleet.csv">Download CSV</a>
+      <a class="btn" href="https://raw.githubusercontent.com/ykorets/btw/mirror/data/facilities.json">JSON + sources</a>
+      <a class="btn" href="https://raw.githubusercontent.com/ykorets/btw/mirror/data/announcements.json">Announcements JSON</a>
+      <a class="btn" href="https://github.com/ykorets/btw/tree/mirror/data">All files</a>
+      <a class="btn" href="https://github.com/ykorets/btw">GitHub</a>
+      <span class="cite">Cite as: Behind the Watt, behindthewatt.com, CC BY 4.0</span>
+    </div>
+  </div>
+</section>
