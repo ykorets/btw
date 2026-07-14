@@ -79,7 +79,15 @@ def test_home_and_dossiers_are_real_astro_components():
 def test_announced_capacity_is_separate_from_verified_fleet():
     publisher = (ROOT / "engine" / "src" / "btw_engine" / "publish.py").read_text()
     component = (SITE / "src" / "components" / "home" / "AnnouncedCapacity.astro").read_text()
+    hero = (SITE / "src" / "components" / "home" / "Hero.astro").read_text()
+    mirror = (SITE / "src" / "lib" / "mirror.ts").read_text()
+    workflow = (ROOT / ".github" / "workflows" / "publish.yml").read_text()
     assert "announcements.json" in publisher
+    assert "--announcements-only" in publisher
     assert "third_party_reported_not_btw_verified" in publisher
     assert "not BTW-verified operating capacity" in component
+    assert "What the 143 GW" not in component
+    assert "74-project EIP inventory" not in hero
+    assert "reported_gw: null" in mirror
+    assert "options: [all, announcements]" in workflow
     assert "90,0,600" not in INDEX

@@ -28,7 +28,10 @@ export async function loadMirror() {
     load("events.json"),
     load("summary.json"),
     load("coverage.json"),
-    loadOptional("announcements.json", { summary: { projects: 0, reported_gw: 0 }, announcements: [] }),
+    loadOptional("announcements.json", {
+      summary: { projects: 0, projects_with_capacity: 0, reported_gw: null },
+      announcements: [],
+    }),
   ]);
   return { facilities, events, summary, coverage, announcements };
 }

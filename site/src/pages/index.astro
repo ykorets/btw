@@ -25,7 +25,10 @@ const mirror = await loadMirror();
   description="The economics tracker for behind-the-meter data center power. Verified operating capacity, reported project pipelines, permits and evidence."
 >
   <SiteHeader />
-  <Hero announcedGw={mirror.announcements.summary.reported_gw} />
+  <Hero
+    announcedGw={mirror.announcements.summary.reported_gw}
+    announcedProjects={mirror.announcements.summary.projects}
+  />
   {mirror.announcements.summary.projects > 0 && <AnnouncedCapacity data={mirror.announcements} />}
   <LatestFilings />
   <FacilityMap />

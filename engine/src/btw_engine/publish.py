@@ -55,7 +55,13 @@ def fetch():
     )
     aggregates = get("aggregate", select="metric,value,method,inputs_note,computed_at",
                      order="computed_at.desc")
-    announcements = get(
+    announcements = fetch_announcements()
+    return facilities, events, aggregates, announcements
+
+
+def fetch_announcements() -> list[dict]:
+    """Fetch the third-party pipeline independently of verified fleet facts."""
+    return get(
         "announcement",
         select="name,state,county,project_type,operating_status,"
                "expected_operating_year,generating_technology,"
@@ -64,7 +70,6 @@ def fetch():
         fact_state="eq.published",
         order="reported_capacity_mw.desc.nullslast,name",
     )
-    return facilities, events, aggregates, announcements
 
 
 def fetch_provenance() -> list[dict]:
@@ -194,6 +199,30 @@ def announcement_summary(announcements: list[dict]) -> dict:
     }
 
 
+def write_announcements(out: str, announcements: list[dict]) -> None:
+    """Write only the separate, third-party announcement evidence layer."""
+    os.makedirs(out, exist_ok=True)
+    rows = []
+    for source_row in announcements:
+        row = dict(source_row)
+        document = row.pop("source_document", None) or {}
+        row["source"] = {
+            "url": document.get("url"),
+            "doc_genre": document.get("doc_genre"),
+        }
+        rows.append(row)
+    with open(f"{out}/announcements.json", "w") as fp:
+        json.dump({
+            "license": "CC BY 4.0",
+            "cite_as": CITE,
+            "classification": "third_party_reported_not_btw_verified",
+            "note": "Reported project pipeline from a cited third-party inventory. "
+                    "Do not add to BTW verified operating capacity.",
+            "summary": announcement_summary(rows),
+            "announcements": rows,
+        }, fp, indent=2, default=str)
+
+
 def write_files(out: str, facilities, events, summary, coverage=None,
                 announcements=None):
     os.makedirs(out, exist_ok=True)
@@ -223,22 +252,7 @@ def write_files(out: str, facilities, events, summary, coverage=None,
         json.dump(summary, fp, indent=2)
 
     if announcements is not None:
-        for row in announcements:
-            document = row.pop("source_document", None) or {}
-            row["source"] = {
-                "url": document.get("url"),
-                "doc_genre": document.get("doc_genre"),
-            }
-        with open(f"{out}/announcements.json", "w") as fp:
-            json.dump({
-                "license": "CC BY 4.0",
-                "cite_as": CITE,
-                "classification": "third_party_reported_not_btw_verified",
-                "note": "Reported project pipeline from a cited third-party inventory. "
-                        "Do not add to BTW verified operating capacity.",
-                "summary": announcement_summary(announcements),
-                "announcements": announcements,
-            }, fp, indent=2, default=str)
+        write_announcements(out, announcements)
 
     with open(f"{out}/fleet.csv", "w", newline="") as fp:
         w = csv.writer(fp)
@@ -261,7 +275,19 @@ def write_files(out: str, facilities, events, summary, coverage=None,
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--out", default="out")
+    ap.add_argument(
+        "--announcements-only", action="store_true",
+        help="publish the separate third-party announcement layer only",
+    )
     args = ap.parse_args()
+
+    if args.announcements_only:
+        announcements = fetch_announcements()
+        write_announcements(args.out, announcements)
+        summary = announcement_summary(announcements)
+        print(f"published {len(announcements)} third-party announcements, "
+              f"reported_gw={summary['reported_gw']} -> {args.out}/")
+        return
 
     facilities, events, aggregates, announcements = fetch()
     provenance = fetch_provenance()
