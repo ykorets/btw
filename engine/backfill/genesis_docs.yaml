@@ -6,6 +6,11 @@
   genre: tceq_standard_permit_review
   note: Crusoe Abilene DC 1 — EGU standard permit technical review (unit list, MW, hours)
 
+- id: tceq-177263-final-action
+  url: "https://records.tceq.texas.gov/cs/idcplg?IdcService=TCEQ_EXTERNAL_SEARCH_GET_FILE&Rendition=Web&dID=8114425"
+  genre: tceq_standard_permit_final_action
+  note: Official TCEQ authorization letter — agency, registration class, and active authorization
+
 - id: tceq-177263-original-review
   url: "https://records.tceq.texas.gov/cs/idcplg?IdcService=TCEQ_EXTERNAL_SEARCH_GET_FILE&Rendition=Web&dID=8143786"
   genre: tceq_standard_permit_review

@@ -15,10 +15,14 @@ on:
         default: false
       genres:
         description: "comma list of doc_genre values to extract"
-        default: "tceq_standard_permit_review,appeal_filing,advocacy_letter,mdeq_psd_permit,permit,court_filing"
+        default: "tceq_standard_permit_review,tceq_standard_permit_final_action,appeal_filing,advocacy_letter,mdeq_psd_permit,mdeq_permit_registry,permit,court_filing"
       sha:
         description: "optional archived document sha256; overrides genres"
         default: ""
+      deterministic_only:
+        description: "run exact regulatory parsers without LLM calls"
+        type: boolean
+        default: false
 jobs:
   extract:
     runs-on: ubuntu-latest
@@ -26,7 +30,14 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with: {python-version: "3.12"}
-      - run: pip install httpx boto3 pyyaml litellm pypdf rapidfuzz
+      - uses: astral-sh/setup-uv@08807647e7069bb48b6ef5acd8ec9567f424441b # v8.1.0
+        with:
+          version: "0.11.28"
+          enable-cache: true
+          cache-dependency-glob: "engine/uv.lock"
+      - name: Install the locked engine runtime
+        run: uv sync --locked
+        working-directory: engine
       - name: Extract anchored claims from archived genesis documents
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
@@ -39,23 +50,26 @@ jobs:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           BTW_MODELS_YAML: engine/models.yaml
           DOCUMENT_SHA: ${{ inputs.sha }}
-          DOCUMENT_GENRES: ${{ inputs.genres || 'tceq_standard_permit_review,appeal_filing,advocacy_letter,mdeq_psd_permit,permit,court_filing' }}
+          DOCUMENT_GENRES: ${{ inputs.genres || 'tceq_standard_permit_review,tceq_standard_permit_final_action,appeal_filing,advocacy_letter,mdeq_psd_permit,mdeq_permit_registry,permit,court_filing' }}
           EXTRACTOR_ROLE: ${{ inputs.role || 'default_extractor' }}
           QUORUM_FLAG: ${{ inputs.quorum && '--quorum' || '' }}
+          DETERMINISTIC_FLAG: ${{ inputs.deterministic_only && '--deterministic-only' || '' }}
         run: |
           if [ -n "$DOCUMENT_SHA" ]; then
-            PYTHONPATH=engine/src python -m btw_engine.extract --sha "$DOCUMENT_SHA" --role "$EXTRACTOR_ROLE" $QUORUM_FLAG
+            engine/.venv/bin/python -m btw_engine.extract --sha "$DOCUMENT_SHA" \
+              --role "$EXTRACTOR_ROLE" $QUORUM_FLAG $DETERMINISTIC_FLAG
           else
-            PYTHONPATH=engine/src python -m btw_engine.extract --genres "$DOCUMENT_GENRES" --role "$EXTRACTOR_ROLE" $QUORUM_FLAG
+            engine/.venv/bin/python -m btw_engine.extract --genres "$DOCUMENT_GENRES" \
+              --role "$EXTRACTOR_ROLE" $QUORUM_FLAG $DETERMINISTIC_FLAG
           fi
       - name: Score against hand-labeled expectations
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
-        run: PYTHONPATH=engine/src python -m btw_engine.evalrun
+        run: engine/.venv/bin/python -m btw_engine.evalrun
       - name: Per-model comparison (recall / precision / ledger cost)
         if: ${{ inputs.compare }}
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
-        run: PYTHONPATH=engine/src python -m btw_engine.evalrun --compare
+        run: engine/.venv/bin/python -m btw_engine.evalrun --compare

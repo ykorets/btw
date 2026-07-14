@@ -1,6 +1,16 @@
 name: archive-backfill
 on:
-  workflow_dispatch: {}
+  workflow_dispatch:
+    inputs:
+      url:
+        description: "Optional single public-record URL; blank runs the manifest"
+        default: ""
+      genre:
+        description: "Document genre for a single URL"
+        default: "permit"
+      source:
+        description: "Registered source id for a single URL"
+        default: "manual-genesis"
 jobs:
   archive:
     runs-on: ubuntu-latest
@@ -8,7 +18,14 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with: {python-version: "3.12"}
-      - run: pip install httpx boto3 pyyaml
+      - uses: astral-sh/setup-uv@08807647e7069bb48b6ef5acd8ec9567f424441b # v8.1.0
+        with:
+          version: "0.11.28"
+          enable-cache: true
+          cache-dependency-glob: "engine/uv.lock"
+      - name: Install the locked engine runtime
+        run: uv sync --locked
+        working-directory: engine
       - name: Archive genesis documents to R2
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
@@ -16,4 +33,14 @@ jobs:
           R2_ACCOUNT_ID: "5ee73f367499e0cda9acfbd5966274e5"  # account id is not a secret (visible in dashboard URLs)
           R2_ACCESS_KEY: ${{ secrets.R2_ACCESS_KEY }}
           R2_SECRET: ${{ secrets.R2_SECRET }}
-        run: PYTHONPATH=engine/src python -m btw_engine.fetch --backfill engine/backfill/genesis_docs.yaml
+          ARCHIVE_URL: ${{ inputs.url }}
+          ARCHIVE_GENRE: ${{ inputs.genre || 'permit' }}
+          ARCHIVE_SOURCE: ${{ inputs.source || 'manual-genesis' }}
+        run: |
+          if [ -n "$ARCHIVE_URL" ]; then
+            engine/.venv/bin/python -m btw_engine.fetch \
+              --url "$ARCHIVE_URL" --genre "$ARCHIVE_GENRE" --source "$ARCHIVE_SOURCE"
+          else
+            engine/.venv/bin/python -m btw_engine.fetch \
+              --backfill engine/backfill/genesis_docs.yaml
+          fi

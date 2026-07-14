@@ -1,6 +1,6 @@
 # ADR-001: Fail-closed, versioned unit and permit facts
 
-**Status:** Implemented and locally verified — database migration not applied
+**Status:** Implemented — migration 008 active; permit reconciliation in progress
 **Date:** 2026-07-13
 **Deciders:** Yaroslav Korets
 
@@ -54,6 +54,12 @@ the 27 machines are identical or individually rated at 18.333333 MW.
     evidence, retract prior logical versions, publish only manifest rows,
     recompute the aggregate, and record the merge commit. Database triggers
     reject equivalent piecemeal REST updates.
+12. Exact regulatory phrases may produce controlled permit claims through a
+    deterministic parser for archived PDF or HTML records. Only this parser,
+    never an ordinary LLM claim, may propose replacement of an already
+    populated but truth-gate-unsupported permit field. The replacement still
+    creates a staged version and requires the same sealed review and atomic
+    promotion as every other correction.
 
 ## Options considered
 
@@ -83,6 +89,8 @@ mechanically impossible and preserves a trace of every correction. Selected.
   labelled as an assertion from the cited court filing, not BTW-verified MW.
 - Review creation fails closed when any proposed unit/permit field lacks a
   compatible receipt. Promotion rechecks the same gate inside the transaction.
+- Compound permit statuses require one direct receipt per component; evidence
+  for `issued` cannot silently cover `under appeal`.
 - Migration 008 and the atomic rollback/idempotency scenarios pass against a
   clean local PostgreSQL 17 database. The same clean-database scenario must
   pass in GitHub Actions before applying the migration to production.

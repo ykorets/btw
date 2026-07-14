@@ -33,6 +33,7 @@ from rapidfuzz import fuzz
 
 CONTEXT_RADIUS = 240          # chars around the located quote
 CONTEXT_LOCATE_THRESHOLD = 85  # partial_ratio_alignment score to trust locate
+DETERMINISTIC_CLAIM_PREFIX = "deterministic-regulatory-v"
 
 FIELD_COLS = {
     "unit.count": "unit_count",
@@ -148,7 +149,13 @@ def _text_supports(published: str | None, claim: dict) -> bool:
                 and re.search(rf"\b{re.escape(want)}\b", quote))
 
 
-def plan_permit_changes(permit: dict, doc_claims: list[dict]):
+def _is_deterministic_claim(claim: dict) -> bool:
+    return str(claim.get("extractor_version") or "").startswith(
+        DETERMINISTIC_CLAIM_PREFIX)
+
+
+def plan_permit_changes(permit: dict, doc_claims: list[dict],
+                        repairable_fields: set[str] | None = None):
     """Plan direct permit receipts and unambiguous staged corrections.
 
     Exact claims corroborate the current value. A unique typed value may fill
@@ -157,6 +164,7 @@ def plan_permit_changes(permit: dict, doc_claims: list[dict]):
     a workflow label mistaken for status must remain an explicit conflict.
     """
     links, changes, conflicts = [], {}, []
+    repairable_fields = repairable_fields or set()
     candidates: dict[str, list[tuple[object, dict, str]]] = {}
 
     def add(col, value, claim, method):
@@ -203,12 +211,12 @@ def plan_permit_changes(permit: dict, doc_claims: list[dict]):
             for row in rows:
                 unique.setdefault(_norm(row[0]), row)
             if current not in (None, ""):
-                candidates = ", ".join(
+                candidate_values = ", ".join(
                     str(row[0]) for row in unique.values()) or "none"
                 conflicts.append(
                     f"permit {permit['permit_no']}: status lacks exact typed "
                     f"support for {', '.join(missing) or current}; candidates "
-                    f"{candidates}; existing value was not overwritten")
+                    f"{candidate_values}; existing value was not overwritten")
             elif len(unique) == 1:
                 value, claim, _method = next(iter(unique.values()))
                 changes[col] = (value, [claim], "unique typed status")
@@ -230,11 +238,21 @@ def plan_permit_changes(permit: dict, doc_claims: list[dict]):
             key = str(row[0]) if col in {"filed_at", "issued_at"} else _norm(row[0])
             unique.setdefault(key, row)
         if current not in (None, "") and unique:
-            candidates = ", ".join(str(row[0]) for row in unique.values())
-            conflicts.append(
-                f"permit {permit['permit_no']}: {col} current value "
-                f"{current!r} has no exact typed support; candidates "
-                f"{candidates}; existing value was not overwritten")
+            deterministic: dict[str, tuple[object, dict, str]] = {}
+            for key, row in unique.items():
+                if _is_deterministic_claim(row[1]):
+                    deterministic[key] = row
+            if col in repairable_fields and len(deterministic) == 1:
+                value, claim, _method = next(iter(deterministic.values()))
+                changes[col] = (
+                    value, [claim], "deterministic truth-gate repair")
+            else:
+                candidate_values = ", ".join(
+                    str(row[0]) for row in unique.values())
+                conflicts.append(
+                    f"permit {permit['permit_no']}: {col} current value "
+                    f"{current!r} has no exact typed support; candidates "
+                    f"{candidate_values}; existing value was not overwritten")
         elif len(unique) == 1:
             value, claim, method = next(iter(unique.values()))
             changes[col] = (value, [claim], method)
@@ -243,6 +261,32 @@ def plan_permit_changes(permit: dict, doc_claims: list[dict]):
                 f"permit {permit['permit_no']}: {col} has "
                 f"{len(unique)} competing typed values")
     return links, changes, conflicts
+
+
+def permit_coverage_gaps(permit: dict, permit_links: list,
+                         permit_updates: dict, is_supported) -> list[str]:
+    """Every compound status component needs its own direct receipt."""
+    linked: dict[str, list[dict]] = {}
+    for _permit, field, claim, _method in permit_links:
+        linked.setdefault(field, []).append(claim)
+
+    gaps = []
+    for field in ("authority", "permit_no", "permit_type", "status",
+                  "filed_at", "issued_at"):
+        value = permit.get(field)
+        if value in (None, "") or field in permit_updates:
+            continue
+        if field == "status":
+            for component in [part.strip() for part in
+                              re.split(r"[;,]", str(value)) if part.strip()]:
+                planned = any(_norm(claim.get("value") or "") == _norm(component)
+                              for claim in linked.get(field, []))
+                if not planned and not is_supported(field, component):
+                    gaps.append(f"status component {component!r}")
+            continue
+        if field not in linked and not is_supported(field, value):
+            gaps.append(field)
+    return gaps
 
 
 def plan_permit_links(permit: dict, doc_claims: list[dict]):
@@ -617,16 +661,17 @@ def provenance_facility_map(provenance: list[dict], units: list[dict],
     return out
 
 
-def fact_field_supported(table: str, fact: dict, field: str) -> bool:
+def fact_field_supported(table: str, fact: dict, field: str,
+                         value=None) -> bool:
     """Ask migration 008's semantic gate about an existing fact field."""
-    value = fact.get(field)
-    numeric = value if table == "unit" and field in {
+    checked_value = fact.get(field) if value is None else value
+    numeric = checked_value if table == "unit" and field in {
         "unit_count", "mw_each", "total_mw", "hours_permitted"} else None
     result = _rest("POST", "rpc/btw_fact_field_supported", json={
         "p_fact_table": table,
         "p_fact_id": fact["id"],
         "p_fact_field": field,
-        "p_value": None if value is None else str(value),
+        "p_value": None if checked_value is None else str(checked_value),
         "p_numeric_value": numeric,
     }).json()
     return result is True
@@ -693,7 +738,7 @@ def main() -> None:
         "select": "id,slug"}).json()}
     claims = _rest("GET", "claim", params={
         "select": "id,document_id,entity_hint,field,value,value_num,quote,page,"
-                  "match_score,numeric_check,anchor,bbox,"
+                  "match_score,numeric_check,anchor,bbox,extractor_version,"
                   "document:document_id(doc_genre)",
         "status": "eq.validated"}).json()
     context_of = _make_context_of()
@@ -826,17 +871,25 @@ def main() -> None:
 
         for permit in permits_by_facility.get(fac_id, []):
             permit_claims = permit_claims_by_id.get(permit["id"], [])
+            repairable_fields = {
+                field for field in (
+                    "authority", "permit_no", "permit_type",
+                    "filed_at", "issued_at")
+                if permit.get(field) not in (None, "")
+                and not fact_field_supported("permit", permit, field)
+            }
             permit_links, permit_updates, permit_conflicts = \
-                plan_permit_changes(permit, permit_claims)
+                plan_permit_changes(
+                    permit, permit_claims,
+                    repairable_fields=repairable_fields)
             for msg in permit_conflicts:
                 print(f"CONFLICT {slug}: {msg}")
             covered = {field for _p, field, _claim, _method in permit_links}
             covered |= set(permit_updates)
-            missing = [field for field in (
-                "authority", "permit_no", "permit_type", "status",
-                "filed_at", "issued_at")
-                if permit.get(field) is not None and field not in covered
-                and not fact_field_supported("permit", permit, field)]
+            missing = permit_coverage_gaps(
+                permit, permit_links, permit_updates,
+                lambda field, value: fact_field_supported(
+                    "permit", permit, field, value))
             if args.dry_run:
                 for p, field, c, method in permit_links:
                     print(f"DRY LINK  {slug}/permit {p['permit_no']}.{field} "
