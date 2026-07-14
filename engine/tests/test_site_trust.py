@@ -141,3 +141,15 @@ def test_data_portal_has_ready_to_use_mcp_connections():
     assert "claude mcp add --transport http --scope user" in component
     assert "Streamable HTTP" in component
     assert "Authentication</dt><dd>None" in component
+
+
+def test_marketing_pages_and_dossiers_share_design_foundations():
+    global_css = (SITE / "src" / "styles" / "global.css").read_text()
+    facility_css = (SITE / "src" / "styles" / "facility.css").read_text()
+    layout = (SITE / "src" / "layouts" / "FacilityLayout.astro").read_text()
+    assert '@import "./tokens.css"' in global_css
+    assert ":root" not in facility_css
+    assert "--ink2" not in facility_css
+    assert "--ink3" not in facility_css
+    assert "<SiteHeader" in layout
+    assert "<SiteFooter" in layout

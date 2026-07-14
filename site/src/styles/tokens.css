@@ -1,0 +1,8 @@
+:root{
+  --ink:#14140f; --ink-2:#57564e; --ink-3:#8a897f;
+  --bg:#fbfaf7; --card:#ffffff; --line:#e6e4dc; --line-2:#d4d2c7;
+  --green:#157a54; --green-bg:#e4f3ec; --red:#b3362c; --red-bg:#faeae8;
+  --amber:#9a6b10; --amber-bg:#f8efdb; --blue:#1f5fa8; --blue-bg:#e8f0fa;
+  --sans:'Inter',system-ui,sans-serif; --serif:'Source Serif 4',Georgia,serif; --mono:'IBM Plex Mono',ui-monospace,monospace;
+  --content-width:1060px; --section-y:64px; --card-radius:14px;
+}
