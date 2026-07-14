@@ -1,0 +1,114 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import SiteHeader from "../../components/home/SiteHeader.astro";
+import SiteFooter from "../../components/home/SiteFooter.astro";
+import { loadMirror } from "../../lib/mirror";
+import "../../styles/data.css";
+
+const mirror = await loadMirror();
+const asOf = mirror.summary.as_of || "latest published snapshot";
+const facilities = mirror.summary.facilities_tracked ?? mirror.facilities.facilities?.length ?? 0;
+const announcements = mirror.announcements.summary.projects ?? 0;
+const endpoints = [
+  { name: "Verified facilities", format: "JSON", href: "/api/v1/facilities.json", detail: "Facilities, unit cohorts, permits, quotes, source URLs, checksums and archived evidence." },
+  { name: "Operating fleet", format: "CSV", href: "/api/v1/fleet.csv", detail: "Flat file for spreadsheets, analysis and quick imports." },
+  { name: "Announcements", format: "JSON", href: "/api/v1/announcements.json", detail: "Third-party reported projects, kept separate from verified operating capacity." },
+  { name: "Events", format: "JSON", href: "/api/v1/events.json", detail: "Dated filings, regulatory actions and other published events." },
+  { name: "Coverage", format: "JSON", href: "/api/v1/coverage.json", detail: "What public sources the engine watches and when they were last checked." },
+  { name: "API manifest", format: "JSON", href: "/api/v1/index.json", detail: "Machine-readable map of every stable v1 endpoint and its semantics." },
+];
+---
+<BaseLayout
+  title="Behind the Watt Data API — open power data for humans and AI agents"
+  description="Download verified behind-the-meter power data as CSV or JSON. No signup, no API key, with provenance and agent-readable documentation."
+  canonical="https://behindthewatt.com/data/"
+>
+  <SiteHeader />
+  <main>
+    <section class="data-hero">
+      <div class="wrap data-hero-grid">
+        <div>
+          <div class="kicker">Open data · no signup · CC BY 4.0</div>
+          <h1>Take the data.<br><span>Keep the receipts.</span></h1>
+          <p>Direct files for people, stable endpoints for code, and explicit instructions for AI agents. Every verified number stays connected to its evidence.</p>
+          <div class="data-actions">
+            <a class="btn btn-primary" href="/api/v1/fleet.csv" download>Download CSV</a>
+            <a class="btn" href="/api/v1/facilities.json">Open verified JSON</a>
+            <a class="btn" href="/api/v1/openapi.json">OpenAPI 3.1</a>
+          </div>
+        </div>
+        <aside class="snapshot">
+          <div class="kicker">Current snapshot</div>
+          <dl>
+            <div><dt>Published</dt><dd>{asOf}</dd></div>
+            <div><dt>Verified facilities</dt><dd>{facilities}</dd></div>
+            <div><dt>Reported projects</dt><dd>{announcements}</dd></div>
+            <div><dt>Authentication</dt><dd>None</dd></div>
+          </dl>
+        </aside>
+      </div>
+    </section>
+
+    <section>
+      <div class="wrap">
+        <div class="kicker">Choose a dataset</div>
+        <h2>One click to a real file</h2>
+        <p class="sub">These URLs are stable and served from behindthewatt.com with cross-origin access enabled.</p>
+        <div class="dataset-grid">
+          {endpoints.map((endpoint) => <a class="dataset" href={endpoint.href}>
+            <div><span class="tag tag-blue">{endpoint.format}</span><b>{endpoint.name}</b></div>
+            <p>{endpoint.detail}</p>
+            <code>{endpoint.href}</code>
+          </a>)}
+        </div>
+      </div>
+    </section>
+
+    <section class="agent-layer">
+      <div class="wrap agent-grid">
+        <div>
+          <div class="kicker">For AI agents</div>
+          <h2>Start here. No scraping required.</h2>
+          <p class="sub">An agent can discover the dataset, understand the evidence classes and retrieve the latest snapshot without interpreting the visual website.</p>
+          <div class="agent-links">
+            <a href="/llms.txt"><b>llms.txt</b><span>Natural-language routing and interpretation rules</span></a>
+            <a href="/api/v1/index.json"><b>API manifest</b><span>Canonical endpoint inventory</span></a>
+            <a href="/api/v1/openapi.json"><b>OpenAPI 3.1</b><span>Tool generation and typed HTTP access</span></a>
+            <a href="https://mcp.behindthewatt.com/mcp"><b>Remote MCP</b><span>Four read-only tools over Streamable HTTP</span></a>
+          </div>
+        </div>
+        <div class="code-card">
+          <div class="code-head"><span>Agent request</span><span>No key required</span></div>
+          <pre><code>{"GET https://behindthewatt.com/api/v1/facilities.json\nAccept: application/json"}</code></pre>
+          <div class="code-note">Use <code>sources[]</code> for provenance. Treat <code>null</code> as unknown, never as zero. Keep announcements separate from verified operating capacity.</div>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <div class="wrap semantics">
+        <div><div class="kicker">Evidence semantics</div><h2>Three rules that prevent bad answers</h2></div>
+        <ol>
+          <li><b>Operating ≠ announced.</b><span>Verified operating capacity and the third-party pipeline are separate datasets.</span></li>
+          <li><b>Null ≠ zero.</b><span>Missing means unknown or still under verification.</span></li>
+          <li><b>Cite the receipt.</b><span>Prefer facility sources and archived copies when making a factual claim.</span></li>
+        </ol>
+      </div>
+    </section>
+  </main>
+  <SiteFooter />
+  <script is:inline type="application/ld+json" set:html={JSON.stringify({
+    "@context": "https://schema.org",
+    "@type": "Dataset",
+    name: "Behind the Watt public power dataset",
+    description: "Verified behind-the-meter data center power facilities, permits, evidence, events and separately classified third-party announcements.",
+    url: "https://behindthewatt.com/data/",
+    license: "https://creativecommons.org/licenses/by/4.0/",
+    creator: { "@type": "Organization", name: "Behind the Watt", url: "https://behindthewatt.com/" },
+    distribution: endpoints.map((endpoint) => ({
+      "@type": "DataDownload",
+      encodingFormat: endpoint.format === "CSV" ? "text/csv" : "application/json",
+      contentUrl: `https://behindthewatt.com${endpoint.href}`,
+    })),
+  })} />
+</BaseLayout>

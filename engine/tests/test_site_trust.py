@@ -104,3 +104,28 @@ def test_receipts_keep_source_and_fail_closed_archive_copy():
     assert "archive_url" in publisher
     assert "BTW_ARCHIVE_BASE_URL" in (
         ROOT / ".github" / "workflows" / "publish.yml").read_text()
+
+
+def test_data_cta_opens_agent_friendly_data_portal():
+    header = (SITE / "src" / "components" / "home" / "SiteHeader.astro").read_text()
+    hero = (SITE / "src" / "components" / "home" / "Hero.astro").read_text()
+    portal = (SITE / "src" / "pages" / "data" / "index.astro").read_text()
+    assert 'href="/data/"' in header
+    assert 'href="/data/"' in hero
+    assert "#data" not in header
+    assert "/api/v1/facilities.json" in portal
+    assert "/api/v1/openapi.json" in portal
+    assert "/llms.txt" in portal
+
+
+def test_agent_api_is_versioned_and_mcp_reads_only_public_mirror():
+    api = SITE / "src" / "pages" / "api" / "v1"
+    for name in ["index.json.ts", "openapi.json.ts", "facilities.json.ts",
+                 "announcements.json.ts", "events.json.ts", "summary.json.ts",
+                 "coverage.json.ts", "fleet.csv.ts"]:
+        assert (api / name).exists()
+    mcp = (ROOT / "mcp" / "src" / "index.ts").read_text()
+    assert 'const API = "https://behindthewatt.com/api/v1"' in mcp
+    assert "SUPABASE" not in mcp
+    assert "createMcpHandler" in mcp
+    assert 'url.pathname !== "/mcp"' in mcp
