@@ -3,6 +3,7 @@
 from btw_engine.extract import (
     MATCH_THRESHOLD,
     _values_match,
+    canonical_claims,
     quorum_verdicts,
     validate_claim,
 )
@@ -107,3 +108,26 @@ def test_values_match_text_containment():
     b = _q("unit.model", "Solar Turbines SMT-130", None, "q2")
     assert _values_match(a, b)
     assert not _values_match(a, _q("unit.model", "LM2500", None, "q3"))
+
+
+def test_canonical_claims_types_explicit_legacy_date():
+    source = {"field": "permit.date", "value": "March 11, 2026",
+              "value_num": None,
+              "quote": "MDEQ issued MZX a permit on March 11, 2026.",
+              "page": 6, "entity_hint": "permit"}
+    got = canonical_claims([source])
+    typed = [c for c in got if c["field"] == "permit.issued_at"]
+    assert len(typed) == 1
+    assert typed[0]["value"] == "March 11, 2026"
+    assert typed[0]["quote"] == source["quote"]
+
+
+def test_canonical_claims_extracts_explicit_gas_fuel_once():
+    source = {"field": "observation.unit_count", "value": "27",
+              "value_num": 27,
+              "quote": "Twenty-seven gas-fired turbines were on site.",
+              "page": 7, "entity_hint": "observation"}
+    got = canonical_claims([source, source])
+    fuels = [c for c in got if c["field"] == "unit.fuel"]
+    assert len(fuels) == 1
+    assert fuels[0]["value"] == "natural gas"

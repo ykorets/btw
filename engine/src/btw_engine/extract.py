@@ -186,6 +186,47 @@ def _parse_claims(raw: str) -> list[dict]:
     raise ValueError(f"unparseable LLM response ({len(raw)} chars)")
 
 
+def canonical_claims(claims: list[dict]) -> list[dict]:
+    """Add deterministic typed claims from explicit anchored language.
+
+    This is deliberately narrower than extraction: it never invents a value
+    and reuses the same verbatim quote/page.  It repairs two recurring legacy
+    classifications before validation: ambiguous ``permit.date`` output when
+    the quote itself says issued/filed, and fuel omitted from an explicit
+    ``gas-fired`` equipment sentence.
+    """
+    out = list(claims)
+    seen = {(
+        c.get("field"), _norm(str(c.get("value") or "")),
+        _norm(str(c.get("quote") or "")), c.get("page")
+    ) for c in out}
+
+    def append(source: dict, field: str, value: str,
+               value_num=None, unit=None) -> None:
+        key = (field, _norm(value), _norm(source.get("quote") or ""),
+               source.get("page"))
+        if key in seen:
+            return
+        row = dict(source)
+        row.update({"field": field, "value": value,
+                    "value_num": value_num, "unit": unit})
+        out.append(row)
+        seen.add(key)
+
+    for claim in claims:
+        quote = _norm(str(claim.get("quote") or ""))
+        if claim.get("field") == "permit.date":
+            if re.search(r"\b(issued|approved|effective)\b", quote):
+                append(claim, "permit.issued_at", str(claim.get("value") or ""))
+            elif re.search(r"\b(filed|submitted|received)\b", quote):
+                append(claim, "permit.filed_at", str(claim.get("value") or ""))
+        if (str(claim.get("field") or "").startswith(
+                ("unit.", "observation."))
+                and re.search(r"\b(?:natural\s+)?gas-fired\b", quote)):
+            append(claim, "unit.fuel", "natural gas")
+    return out
+
+
 def _values_match(a: dict, b: dict) -> bool:
     """Same fact? Numeric claims compare value_num with 0.1% tolerance;
     textual claims compare normalized values by containment either way."""
@@ -270,7 +311,7 @@ def extract_document(doc: dict, role: str = "default_extractor",
     if len(marked) > MAX_CHARS_TO_LLM:
         marked = marked[:MAX_CHARS_TO_LLM]
 
-    claims = _llm_claims(role, marked, doc["id"])
+    claims = canonical_claims(_llm_claims(role, marked, doc["id"]))
 
     # Anchor validation (layer 1+2) for every primary claim.
     anchored_flags: list[tuple[float, bool | None, int]] = [

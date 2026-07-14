@@ -15,7 +15,10 @@ on:
         default: false
       genres:
         description: "comma list of doc_genre values to extract"
-        default: "tceq_standard_permit_review,appeal_filing,advocacy_letter,mdeq_psd_permit"
+        default: "tceq_standard_permit_review,appeal_filing,advocacy_letter,mdeq_psd_permit,permit,court_filing"
+      sha:
+        description: "optional archived document sha256; overrides genres"
+        default: ""
 jobs:
   extract:
     runs-on: ubuntu-latest
@@ -35,11 +38,16 @@ jobs:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           BTW_MODELS_YAML: engine/models.yaml
-        run: >
-          PYTHONPATH=engine/src python -m btw_engine.extract
-          --genres "${{ inputs.genres || 'tceq_standard_permit_review,appeal_filing,advocacy_letter,mdeq_psd_permit' }}"
-          --role "${{ inputs.role || 'default_extractor' }}"
-          ${{ inputs.quorum && '--quorum' || '' }}
+          DOCUMENT_SHA: ${{ inputs.sha }}
+          DOCUMENT_GENRES: ${{ inputs.genres || 'tceq_standard_permit_review,appeal_filing,advocacy_letter,mdeq_psd_permit,permit,court_filing' }}
+          EXTRACTOR_ROLE: ${{ inputs.role || 'default_extractor' }}
+          QUORUM_FLAG: ${{ inputs.quorum && '--quorum' || '' }}
+        run: |
+          if [ -n "$DOCUMENT_SHA" ]; then
+            PYTHONPATH=engine/src python -m btw_engine.extract --sha "$DOCUMENT_SHA" --role "$EXTRACTOR_ROLE" $QUORUM_FLAG
+          else
+            PYTHONPATH=engine/src python -m btw_engine.extract --genres "$DOCUMENT_GENRES" --role "$EXTRACTOR_ROLE" $QUORUM_FLAG
+          fi
       - name: Score against hand-labeled expectations
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}

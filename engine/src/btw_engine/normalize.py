@@ -73,8 +73,17 @@ def _permit_key(s: str) -> str:
     return re.sub(r"[^0-9a-z]", "", (s or "").lower())
 
 
-def resolve_facility(doc_claims: list[dict], permits: list[dict]) -> str | None:
-    """Document → facility via permit.no claim match; unique or nothing."""
+def resolve_facility(doc_claims: list[dict], permits: list[dict],
+                     provenance_facilities: set[str] | None = None
+                     ) -> str | None:
+    """Document → facility via permit number, then existing provenance.
+
+    A court filing often names the plant but not the regulator's exact permit
+    number.  Reusing an already reviewed receipt from the same archived
+    document is deterministic and avoids guessing from names or geography.
+    The fallback is accepted only when every existing unit/permit receipt for
+    the document points to one facility.
+    """
     hits = set()
     for c in doc_claims:
         if c["field"] != "permit.no":
@@ -85,7 +94,10 @@ def resolve_facility(doc_claims: list[dict], permits: list[dict]) -> str | None:
         for p in permits:
             if _permit_key(p["permit_no"]) == key:
                 hits.add(p["facility_id"])
-    return hits.pop() if len(hits) == 1 else None
+    if len(hits) == 1:
+        return hits.pop()
+    fallback = set(provenance_facilities or set())
+    return fallback.pop() if not hits and len(fallback) == 1 else None
 
 
 def resolve_permit(doc_claims: list[dict], permits: list[dict]) -> dict | None:
@@ -128,21 +140,26 @@ def _text_supports(published: str | None, claim: dict) -> bool:
                 and re.search(rf"\b{re.escape(want)}\b", quote))
 
 
-def plan_permit_links(permit: dict, doc_claims: list[dict]):
-    """Pure planner for exact permit corroborations.
+def plan_permit_changes(permit: dict, doc_claims: list[dict]):
+    """Plan direct permit receipts and unambiguous staged corrections.
 
-    Dates link only when they equal a published date. Compound statuses may
-    be supported one explicit component at a time; the method records that
-    distinction for the provenance note.
+    Exact claims corroborate the current value.  If no claim supports the
+    current value and one unique typed value remains, the planner stages that
+    source value.  Multiple competing values are held for human review.
     """
-    links = []
+    links, changes, conflicts = [], {}, []
+    candidates: dict[str, list[tuple[object, dict, str]]] = {}
+
+    def add(col, value, claim, method):
+        candidates.setdefault(col, []).append((value, claim, method))
+
     for c in doc_claims:
         field = c.get("field")
         if field in {"permit.filed_at", "permit.issued_at"}:
             iso = _date_value(c.get("value"))
             col = field.removeprefix("permit.")
-            if iso and permit.get(col) and str(permit[col]) == iso:
-                links.append((permit, col, c, "exact typed date"))
+            if iso:
+                add(col, iso, c, "exact typed date")
             continue
         if field == "permit.date":
             # Legacy extraction output is intentionally held.  A bare date
@@ -150,20 +167,67 @@ def plan_permit_links(permit: dict, doc_claims: list[dict]):
             continue
         if field == "permit.status":
             got = _norm(c.get("value") or "")
-            parts = [_norm(x) for x in
-                     re.split(r"[;,]", permit.get("status") or "")]
-            if got and got in parts:
-                method = "exact" if len(parts) == 1 else "status component"
-                links.append((permit, "status", c, method))
+            if got:
+                add("status", c.get("value").strip(), c,
+                    "status component")
             continue
         col = PERMIT_FIELD_COLS.get(field)
         if col == "permit_no":
             if (_permit_key(c.get("value") or "")
                     == _permit_key(permit["permit_no"])):
                 links.append((permit, col, c, "exact permit number"))
-        elif col and _text_supports(permit.get(col), c):
-            links.append((permit, col, c, "text match"))
-    return links
+        elif col:
+            add(col, c.get("value"), c, "text match")
+
+    for col, rows in candidates.items():
+        current = permit.get(col)
+        if col == "status":
+            parts = [_norm(x) for x in re.split(r"[;,]", current or "")]
+            exact = [row for row in rows if _norm(row[0]) in parts]
+            for _value, claim, method in exact:
+                links.append((permit, col, claim, method))
+            supported = {_norm(value) for value, _claim, _method in exact}
+            missing = [part for part in parts if part not in supported]
+            if exact and not missing:
+                continue
+            unique: dict[str, tuple[object, dict, str]] = {}
+            for row in rows:
+                unique.setdefault(_norm(row[0]), row)
+            if unique and not exact:
+                values = [row[0] for row in unique.values()]
+                changes[col] = ("; ".join(str(v) for v in values),
+                                [row[1] for row in unique.values()],
+                                "typed status set")
+            elif missing:
+                conflicts.append(
+                    f"permit {permit['permit_no']}: status lacks typed "
+                    f"support for {', '.join(missing)}")
+            continue
+
+        exact = [row for row in rows if (
+            str(current) == str(row[0]) if col in {"filed_at", "issued_at"}
+            else _text_supports(current, row[1]))]
+        if exact:
+            for _value, claim, method in exact:
+                links.append((permit, col, claim, method))
+            continue
+        unique: dict[str, tuple[object, dict, str]] = {}
+        for row in rows:
+            key = str(row[0]) if col in {"filed_at", "issued_at"} else _norm(row[0])
+            unique.setdefault(key, row)
+        if len(unique) == 1:
+            value, claim, method = next(iter(unique.values()))
+            changes[col] = (value, [claim], method)
+        elif len(unique) > 1:
+            conflicts.append(
+                f"permit {permit['permit_no']}: {col} has "
+                f"{len(unique)} competing typed values")
+    return links, changes, conflicts
+
+
+def plan_permit_links(permit: dict, doc_claims: list[dict]):
+    """Compatibility wrapper for callers interested only in receipts."""
+    return plan_permit_changes(permit, doc_claims)[0]
 
 
 def locate_context(page_text: str, quote: str,
@@ -200,22 +264,12 @@ def plan_unit_changes(units: list[dict], doc_claims: list[dict],
               used only when the quote itself names no model token (M3.5).
     """
     links, updates, conflicts = [], {}, []
+    numeric_candidates: dict[tuple[str, str], list[tuple[dict, dict, str]]] = {}
     tokens = [_norm(u["model"]) for u in units]
 
     def bind(u, c, col, method):
-        new = float(c["value_num"])
-        old = u.get(col)
-        if old is not None and abs(float(old) - new) < 1e-9:
-            links.append((u, col, c))
-        else:
-            prev = updates.setdefault(u["id"], {}).get(col)
-            if prev is not None and abs(prev[0] - new) > 1e-9:
-                conflicts.append(
-                    f"unit {u['model']}: {col} proposed both {prev[0]} "
-                    f"and {new} — skipped, needs human")
-                updates[u["id"]].pop(col, None)
-            else:
-                updates[u["id"]][col] = (new, c, method)
+        numeric_candidates.setdefault((u["id"], col), []).append(
+            (u, c, method))
 
     for u in units:
         token = _norm(u["model"])
@@ -260,6 +314,52 @@ def plan_unit_changes(units: list[dict], doc_claims: list[dict],
             u = _sole_context_unit(units, ctx)
             if u is not None:
                 bind(u, c, col, "context")
+
+    # A facility-scoped observation or cohort total can safely bind to the
+    # sole unit row.  Equipment-specific permit rows still require a model
+    # token, so a mixed permit envelope cannot collapse into one cohort.
+    if len(units) == 1:
+        u = units[0]
+        for c in doc_claims:
+            col = FIELD_COLS.get(c.get("field"))
+            if (col is None or c.get("value_num") is None
+                    or c.get("field") not in {
+                        "observation.unit_count", "observation.mw",
+                        "unit.mw_total"}):
+                continue
+            key = (u["id"], col)
+            if not any(existing is c for _unit, existing, _method
+                       in numeric_candidates.get(key, [])):
+                bind(u, c, col, "sole facility cohort")
+
+    # Decide only after seeing every candidate. Historical observations often
+    # contain several valid counts. If one corroborates the published value,
+    # retain it and do not let a later observation silently overwrite it.
+    for (uid, col), rows in numeric_candidates.items():
+        u = rows[0][0]
+        old = u.get(col)
+        exact = [row for row in rows if old is not None and
+                 abs(float(old) - float(row[1]["value_num"])) < 1e-9]
+        if exact:
+            links.extend((u, col, claim) for _u, claim, _method in exact)
+            other = {float(claim["value_num"]) for _u, claim, _method in rows
+                     if abs(float(old) - float(claim["value_num"])) >= 1e-9}
+            if other:
+                conflicts.append(
+                    f"unit {u.get('model') or uid}: {col} also has "
+                    f"historical/competing values {sorted(other)}; retained "
+                    f"corroborated published value {old}")
+            continue
+        by_value: dict[float, tuple[dict, dict, str]] = {}
+        for row in rows:
+            by_value.setdefault(float(row[1]["value_num"]), row)
+        if len(by_value) == 1:
+            new, (_u, claim, method) = next(iter(by_value.items()))
+            updates.setdefault(uid, {})[col] = (new, claim, method)
+        elif len(by_value) > 1:
+            conflicts.append(
+                f"unit {u.get('model') or uid}: {col} proposed "
+                f"{sorted(by_value)} — skipped, needs human")
     return links, updates, conflicts
 
 
@@ -286,8 +386,8 @@ def staged_copy(unit: dict, changes: dict, *, basis: str,
     existing = _rest("GET", "unit", params={
         "select": "id", "logical_id": f"eq.{unit['logical_id']}",
         "fact_state": "eq.staging"}).json()
-    patch = {col: (int(new) if col in ("unit_count", "hours_permitted")
-                   else new)
+    patch = {col: (int(new) if new is not None
+                   and col in ("unit_count", "hours_permitted") else new)
              for col, (new, *_rest_) in changes.items()}
     patch.update({"basis": basis, "verification_state": verification_state})
     if existing:
@@ -304,21 +404,23 @@ def staged_copy(unit: dict, changes: dict, *, basis: str,
     return created[0]["id"]
 
 
-def staged_permit_copy(permit: dict, *, verification_state: str) -> str:
+def staged_permit_copy(permit: dict, changes: dict, *,
+                       verification_state: str) -> str:
     """Create the staging version that receives new permit evidence."""
     existing = _rest("GET", "permit", params={
         "select": "id", "logical_id": f"eq.{permit['logical_id']}",
         "fact_state": "eq.staging"}).json()
+    patch = {col: value for col, (value, *_rest_) in changes.items()}
+    patch["verification_state"] = verification_state
     if existing:
         sid = existing[0]["id"]
-        _rest("PATCH", "permit", params={"id": f"eq.{sid}"},
-              json={"verification_state": verification_state})
+        _rest("PATCH", "permit", params={"id": f"eq.{sid}"}, json=patch)
         return sid
     row = {key: permit.get(key) for key in (
         "logical_id", "facility_id", "authority", "permit_no", "permit_type",
         "status", "filed_at", "issued_at")}
-    row.update({"verification_state": verification_state,
-                "fact_state": "staging"})
+    row.update(patch)
+    row["fact_state"] = "staging"
     created = _rest("POST", "permit", json=[row],
                     headers={"Prefer": "return=representation"}).json()
     return created[0]["id"]
@@ -374,6 +476,38 @@ def _verification_state(claims: list[dict]) -> tuple[str, str]:
     return "source_asserted", "one archived document supports this version"
 
 
+def provenance_facility_map(provenance: list[dict], units: list[dict],
+                            permits: list[dict]) -> dict[str, set[str]]:
+    """Archived document -> facilities named by existing reviewed receipts."""
+    owners = {
+        ("unit", row["id"]): row["facility_id"] for row in units
+    } | {
+        ("permit", row["id"]): row["facility_id"] for row in permits
+    }
+    out: dict[str, set[str]] = {}
+    for row in provenance:
+        facility_id = owners.get((row.get("fact_table"), row.get("fact_id")))
+        document_id = ((row.get("claim") or {}).get("document_id"))
+        if facility_id and document_id:
+            out.setdefault(document_id, set()).add(facility_id)
+    return out
+
+
+def fact_field_supported(table: str, fact: dict, field: str) -> bool:
+    """Ask migration 008's semantic gate about an existing fact field."""
+    value = fact.get(field)
+    numeric = value if table == "unit" and field in {
+        "unit_count", "mw_each", "total_mw", "hours_permitted"} else None
+    result = _rest("POST", "rpc/btw_fact_field_supported", json={
+        "p_fact_table": table,
+        "p_fact_id": fact["id"],
+        "p_fact_field": field,
+        "p_value": None if value is None else str(value),
+        "p_numeric_value": numeric,
+    }).json()
+    return result is True
+
+
 def _make_context_of():
     """Claim -> sentence window around its quote in the archived page text.
     Lazy R2 + pypdf; one document fetched at most once. Returns None (and
@@ -427,6 +561,10 @@ def main() -> None:
         "select": "id,logical_id,permit_no,facility_id,authority,permit_type,"
                   "status,filed_at,issued_at,verification_state",
         "fact_state": "eq.published"}).json()
+    all_units = _rest("GET", "unit", params={
+        "select": "id,logical_id,facility_id,oem,model,unit_count,mw_each,"
+                  "total_mw,fuel,hours_permitted,basis,verification_state",
+        "fact_state": "eq.published"}).json()
     facilities = {f["id"]: f for f in _rest("GET", "facility", params={
         "select": "id,slug"}).json()}
     claims = _rest("GET", "claim", params={
@@ -442,25 +580,60 @@ def main() -> None:
     for c in claims:
         by_doc.setdefault(c["document_id"], []).append(c)
 
-    n_links = n_stage = 0
+    prior_receipts = _rest("GET", "fact_provenance", params={
+        "select": "fact_table,fact_id,claim:claim_id(document_id)"
+    }).json()
+    doc_facilities = provenance_facility_map(
+        prior_receipts, all_units, permits)
+    units_by_facility: dict[str, list[dict]] = {}
+    permits_by_facility: dict[str, list[dict]] = {}
+    for row in all_units:
+        units_by_facility.setdefault(row["facility_id"], []).append(row)
+    for row in permits:
+        permits_by_facility.setdefault(row["facility_id"], []).append(row)
+
+    facility_claims: dict[str, list[dict]] = {}
+    permit_claims_by_id: dict[str, list[dict]] = {}
     for doc_id, doc_claims in sorted(by_doc.items()):
         permit = resolve_permit(doc_claims, permits)
-        if permit is None:
-            print(f"UNRESOLVED doc {doc_id[:8]}: no unique permit match "
-                  f"({len(doc_claims)} claims held back)")
+        fac_id = (permit["facility_id"] if permit else resolve_facility(
+            doc_claims, permits, doc_facilities.get(doc_id)))
+        if fac_id is None:
+            print(f"UNRESOLVED doc {doc_id[:8]}: no unique permit or "
+                  f"reviewed provenance scope ({len(doc_claims)} claims held back)")
             continue
-        fac_id = permit["facility_id"]
+        facility_claims.setdefault(fac_id, []).extend(doc_claims)
+        if permit is None:
+            scoped_permits = permits_by_facility.get(fac_id, [])
+            permit = scoped_permits[0] if len(scoped_permits) == 1 else None
+        if permit is not None:
+            permit_claims_by_id.setdefault(permit["id"], []).extend(doc_claims)
+
+    n_links = n_stage = 0
+    for fac_id, doc_claims in sorted(facility_claims.items()):
         slug = facilities[fac_id]["slug"]
-        units = _rest("GET", "unit", params={
-            "select": "id,logical_id,facility_id,oem,model,unit_count,mw_each,"
-                      "total_mw,fuel,hours_permitted,basis,verification_state",
-            "facility_id": f"eq.{fac_id}",
-            "fact_state": "eq.published"}).json()
+        units = units_by_facility.get(fac_id, [])
         links, updates, conflicts = plan_unit_changes(
             units, doc_claims, context_of=context_of)
-        permit_links = plan_permit_links(permit, doc_claims)
         for msg in conflicts:
             print(f"CONFLICT {slug}: {msg}")
+
+        # Any non-null field that still fails migration 008's semantic gate is
+        # removed from the new version unless this run has a compatible claim
+        # to replace it. Unknown equipment attributes are nullable by design.
+        linked_by_unit = {(u["id"], field) for u, field, _claim in links}
+        for unit in units:
+            chg = updates.setdefault(unit["id"], {})
+            for field in ("oem", "model", "unit_count", "mw_each", "total_mw",
+                          "fuel", "hours_permitted"):
+                if (unit.get(field) is not None
+                        and (unit["id"], field) not in linked_by_unit
+                        and field not in chg
+                        and not fact_field_supported("unit", unit, field)):
+                    chg[field] = (None, None, "truth-gate prune")
+            if not chg:
+                updates.pop(unit["id"], None)
+
         if args.dry_run:
             for u, field, c in links:
                 print(f"DRY LINK  {slug}/{u['model']}.{field} <- claim "
@@ -470,60 +643,96 @@ def main() -> None:
                 for col, (new, _c, method) in chg.items():
                     print(f"DRY STAGE {slug}/{u['model']}.{col}: "
                           f"{u.get(col)} -> {new} [{method}]")
-            for p, field, c, method in permit_links:
-                print(f"DRY LINK  {slug}/permit {p['permit_no']}.{field} "
-                      f"<- claim {c['id'][:8]} [{method}]")
-            continue
-        # Every evidence change creates/updates a staging version. Published
-        # rows and their receipts are immutable until an approved manifest is
-        # promoted atomically.
-        touched_units = {u["id"] for u, _field, _claim in links} | set(updates)
-        for uid in touched_units:
-            u = next(x for x in units if x["id"] == uid)
-            unit_links = [(field, claim) for linked, field, claim in links
-                          if linked["id"] == uid]
-            chg = updates.get(uid, {})
-            direct_claims = [claim for _field, claim in unit_links]
-            direct_claims += [item[1] for item in chg.values()]
-            basis, basis_derivation = _unit_basis(direct_claims)
-            verification, verification_derivation = _verification_state(
-                direct_claims)
-            sid = staged_copy(u, chg, basis=basis,
-                              verification_state=verification)
-            replaced = {field for field, _claim in unit_links} | set(chg)
-            replaced |= {"basis", "verification_state"}
-            copy_provenance("unit", u["id"], sid,
-                            exclude_fields=replaced)
-            for field, c in unit_links:
-                if ensure_provenance(
-                        "unit", sid, field, c["id"],
-                        f"corroborated by anchored quote "
-                        f"(match {c['match_score']})"):
-                    n_links += 1
-            for col, (new, c, method) in chg.items():
-                note = (f"staged update {u.get(col)} -> {new}"
-                        + (" (bound via sentence context)"
-                           if method == "context" else ""))
-                ensure_provenance("unit", sid, col, c["id"], note)
-                n_stage += 1
-                print(f"STAGE {slug}/{u['model']}.{col}: "
-                      f"{u.get(col)} -> {new} [{method}]")
-            representative = direct_claims[0]
-            ensure_provenance(
-                "unit", sid, "basis", representative["id"],
-                "engine classification", "derived", basis_derivation)
-            ensure_provenance(
-                "unit", sid, "verification_state", representative["id"],
-                "engine classification", "derived", verification_derivation)
+        else:
+            # Every evidence change creates/updates a staging version.
+            # Published rows remain immutable until manifest promotion.
+            touched_units = ({u["id"] for u, _field, _claim in links}
+                             | set(updates))
+            for uid in touched_units:
+                u = next(x for x in units if x["id"] == uid)
+                unit_links = [(field, claim) for linked, field, claim in links
+                              if linked["id"] == uid]
+                chg = updates.get(uid, {})
+                direct_claims = [claim for _field, claim in unit_links]
+                direct_claims += [item[1] for item in chg.values()
+                                  if item[1] is not None]
+                if not direct_claims:
+                    print(f"HOLD {slug}/{u.get('model') or uid}: no compatible "
+                          "claim remains after truth-gate pruning")
+                    continue
+                basis, basis_derivation = _unit_basis(direct_claims)
+                verification, verification_derivation = _verification_state(
+                    direct_claims)
+                sid = staged_copy(u, chg, basis=basis,
+                                  verification_state=verification)
+                replaced = {field for field, _claim in unit_links} | set(chg)
+                replaced |= {"basis", "verification_state"}
+                copy_provenance("unit", u["id"], sid,
+                                exclude_fields=replaced)
+                for field, c in unit_links:
+                    if ensure_provenance(
+                            "unit", sid, field, c["id"],
+                            f"corroborated by anchored quote "
+                            f"(match {c['match_score']})"):
+                        n_links += 1
+                for col, (new, c, method) in chg.items():
+                    if c is not None:
+                        note = (f"staged update {u.get(col)} -> {new}"
+                                + (" (bound via sentence context)"
+                                   if method == "context" else ""))
+                        ensure_provenance("unit", sid, col, c["id"], note)
+                    n_stage += 1
+                    print(f"STAGE {slug}/{u['model']}.{col}: "
+                          f"{u.get(col)} -> {new} [{method}]")
+                representative = direct_claims[0]
+                ensure_provenance(
+                    "unit", sid, "basis", representative["id"],
+                    "engine classification", "derived", basis_derivation)
+                ensure_provenance(
+                    "unit", sid, "verification_state", representative["id"],
+                    "engine classification", "derived",
+                    verification_derivation)
 
-        if permit_links:
-            permit_claims = [claim for _p, _field, claim, _method
-                             in permit_links]
-            verification, derivation = _verification_state(permit_claims)
+        for permit in permits_by_facility.get(fac_id, []):
+            permit_claims = permit_claims_by_id.get(permit["id"], [])
+            permit_links, permit_updates, permit_conflicts = \
+                plan_permit_changes(permit, permit_claims)
+            for msg in permit_conflicts:
+                print(f"CONFLICT {slug}: {msg}")
+            covered = {field for _p, field, _claim, _method in permit_links}
+            covered |= set(permit_updates)
+            missing = [field for field in (
+                "authority", "permit_no", "permit_type", "status",
+                "filed_at", "issued_at")
+                if permit.get(field) is not None and field not in covered
+                and not fact_field_supported("permit", permit, field)]
+            if args.dry_run:
+                for p, field, c, method in permit_links:
+                    print(f"DRY LINK  {slug}/permit {p['permit_no']}.{field} "
+                          f"<- claim {c['id'][:8]} [{method}]")
+                for col, (new, _claims, method) in permit_updates.items():
+                    print(f"DRY STAGE {slug}/permit {permit['permit_no']}."
+                          f"{col}: {permit.get(col)} -> {new} [{method}]")
+                if missing:
+                    print(f"DRY HOLD  {slug}/permit {permit['permit_no']}: "
+                          f"missing compatible claims for {', '.join(missing)}")
+                continue
+            if missing:
+                print(f"HOLD {slug}/permit {permit['permit_no']}: missing "
+                      f"compatible claims for {', '.join(missing)}")
+                continue
+            if not permit_links and not permit_updates:
+                continue
+            permit_direct_claims = [claim for _p, _field, claim, _method
+                                    in permit_links]
+            permit_direct_claims += [claim for _value, claims_for_change, _method
+                                     in permit_updates.values()
+                                     for claim in claims_for_change]
+            verification, derivation = _verification_state(
+                permit_direct_claims)
             sid = staged_permit_copy(
-                permit, verification_state=verification)
-            replaced = {field for _p, field, _claim, _method in permit_links}
-            replaced.add("verification_state")
+                permit, permit_updates, verification_state=verification)
+            replaced = covered | {"verification_state"}
             copy_provenance("permit", permit["id"], sid,
                             exclude_fields=replaced)
             for _p, field, c, method in permit_links:
@@ -532,10 +741,20 @@ def main() -> None:
                         f"corroborated by anchored quote ({method}; "
                         f"match {c['match_score']})"):
                     n_links += 1
-            representative = permit_claims[0]
+            for field, (new, claims_for_change, method) in permit_updates.items():
+                for c in claims_for_change:
+                    ensure_provenance(
+                        "permit", sid, field, c["id"],
+                        f"staged update {permit.get(field)} -> {new} "
+                        f"({method}; match {c['match_score']})")
+                n_stage += 1
+                print(f"STAGE {slug}/permit {permit['permit_no']}.{field}: "
+                      f"{permit.get(field)} -> {new} [{method}]")
+            representative = permit_direct_claims[0]
             ensure_provenance(
                 "permit", sid, "verification_state", representative["id"],
                 "engine classification", "derived", derivation)
+
     print(f"normalize: {n_links} new provenance links, "
           f"{n_stage} staged field updates")
 
