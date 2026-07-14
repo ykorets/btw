@@ -61,7 +61,15 @@ def _rest(method: str, path: str, **kw) -> httpx.Response:
     headers = {"apikey": key, "Authorization": f"Bearer {key}"}
     headers.update(kw.pop("headers", {}))
     r = httpx.request(method, base, headers=headers, timeout=60, **kw)
-    r.raise_for_status()
+    try:
+        r.raise_for_status()
+    except httpx.HTTPStatusError as exc:
+        # PostgREST returns the database constraint/trigger explanation in
+        # the response body. Preserve it in CI without ever printing auth.
+        detail = (r.text or "").strip().replace("\n", " ")[:1000]
+        raise RuntimeError(
+            f"Supabase {method} {path} failed ({r.status_code}): {detail}"
+        ) from exc
     return r
 
 
@@ -454,8 +462,20 @@ def copy_provenance(fact_table: str, source_id: str, target_id: str,
 
 
 def _unit_basis(claims: list[dict]) -> tuple[str, str]:
+    """Classify a unit cohort from the claims that support its facts.
+
+    Equipment metadata (for example ``unit.model``) and unrelated imagery
+    must not override the evidence class of count/capacity facts. A permit
+    cohort can legitimately have satellite evidence in the same facility
+    dossier; that does not make a permit-authorized count an observation.
+    """
     fields = {claim.get("field") or "" for claim in claims}
-    if any(field.startswith("observation.") for field in fields):
+    unit_quantitative = {
+        "unit.count", "unit.mw_each", "unit.mw_total",
+        "unit.hours_permitted",
+    }
+    observation_quantitative = {"observation.unit_count", "observation.mw"}
+    if fields & observation_quantitative and not fields & unit_quantitative:
         return "observed", "observation.* claim classifies the cohort as observed"
     genres = {
         ((claim.get("document") or {}).get("doc_genre") or "").lower()
@@ -466,6 +486,45 @@ def _unit_basis(claims: list[dict]) -> tuple[str, str]:
            for genre in genres):
         return "permitted", "regulatory document classifies the cohort as permitted"
     return "reported", "non-regulatory source classifies the cohort as reported"
+
+
+def _unit_receipt_compatible(basis: str, fact_field: str,
+                             claim: dict) -> bool:
+    """Local mirror of migration 008's direct field compatibility gate.
+
+    This preflight prevents a deterministic semantic error from leaving a
+    half-populated staging version. Database triggers remain authoritative.
+    """
+    claim_field = claim.get("field") or ""
+    expected = {
+        "oem": {"unit.oem"},
+        "model": {"unit.model"},
+        "mw_each": {"unit.mw_each"},
+        "total_mw": {"unit.mw_total", "observation.mw"},
+        "fuel": {"unit.fuel"},
+        "hours_permitted": {"unit.hours_permitted"},
+    }
+    if fact_field == "unit_count":
+        allowed = ({"observation.unit_count"} if basis == "observed"
+                   else {"unit.count"})
+    else:
+        allowed = expected.get(fact_field, set())
+    return claim_field in allowed
+
+
+def _basis_claim(claims: list[dict], basis: str) -> dict:
+    """Choose a receipt that migration 008 accepts for derived ``basis``."""
+    prefix = "observation." if basis == "observed" else "unit."
+    for claim in claims:
+        if (claim.get("field") or "").startswith(prefix):
+            return claim
+    # ``reported`` accepts both unit.* and observation.*. The branch above
+    # already prefers unit.*, but retain a defensive deterministic fallback.
+    if basis == "reported":
+        for claim in claims:
+            if (claim.get("field") or "").startswith("observation."):
+                return claim
+    raise ValueError(f"no compatible claim can derive unit basis {basis!r}")
 
 
 def _verification_state(claims: list[dict]) -> tuple[str, str]:
@@ -663,6 +722,23 @@ def main() -> None:
                 basis, basis_derivation = _unit_basis(direct_claims)
                 verification, verification_derivation = _verification_state(
                     direct_claims)
+                planned_receipts = list(unit_links)
+                planned_receipts += [
+                    (field, item[1]) for field, item in chg.items()
+                    if item[1] is not None
+                ]
+                incompatible = [
+                    (field, claim.get("field"))
+                    for field, claim in planned_receipts
+                    if not _unit_receipt_compatible(basis, field, claim)
+                ]
+                if incompatible:
+                    detail = ", ".join(
+                        f"{field} <- {claim_field}"
+                        for field, claim_field in incompatible)
+                    print(f"HOLD {slug}/{u.get('model') or uid}: basis "
+                          f"{basis} is incompatible with {detail}")
+                    continue
                 sid = staged_copy(u, chg, basis=basis,
                                   verification_state=verification)
                 replaced = {field for field, _claim in unit_links} | set(chg)
@@ -684,7 +760,7 @@ def main() -> None:
                     n_stage += 1
                     print(f"STAGE {slug}/{u['model']}.{col}: "
                           f"{u.get(col)} -> {new} [{method}]")
-                representative = direct_claims[0]
+                representative = _basis_claim(direct_claims, basis)
                 ensure_provenance(
                     "unit", sid, "basis", representative["id"],
                     "engine classification", "derived", basis_derivation)
