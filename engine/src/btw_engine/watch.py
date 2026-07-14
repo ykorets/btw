@@ -25,6 +25,7 @@ import glob
 import hashlib
 import json
 import os
+import random
 import re
 import sys
 import time
@@ -275,18 +276,37 @@ def gdelt_candidates(payload: dict) -> list[dict]:
 
 def run_gdelt(cfg: dict) -> list[dict]:
     p = cfg.get("params", {})
-    r = httpx.get(cfg["url"], params={
+    params = {
         "query": p.get("query", ""),
         "mode": "artlist", "format": "json",
         "timespan": p.get("timespan", "2d"),
         "maxrecords": str(p.get("maxrecords", 40)),
-    }, headers=BROWSER_HEADERS, timeout=60)
-    r.raise_for_status()
-    try:
-        payload = r.json()
-    except ValueError as e:
-        raise RuntimeError(f"GDELT non-JSON reply: {r.text[:120]}") from e
-    return gdelt_candidates(payload)
+    }
+    # GDELT's free DOC API rate-limits by IP, and shared CI egress (GitHub
+    # runners) gets 429/503 in bursts. We issue one query per day, so a short
+    # backoff almost always clears the throttle before the SLO alarm fires.
+    # Retry-After is honored when present; jitter avoids lockstep with other
+    # callers on the same runner IP pool.
+    backoffs = [5, 15, 40]
+    for attempt in range(len(backoffs) + 1):
+        r = httpx.get(cfg["url"], params=params, headers=BROWSER_HEADERS,
+                      timeout=60)
+        if r.status_code in (429, 503) and attempt < len(backoffs):
+            ra = r.headers.get("Retry-After")
+            try:
+                wait = float(ra) if ra else backoffs[attempt]
+            except ValueError:
+                wait = backoffs[attempt]
+            print(f"gdelt: HTTP {r.status_code}, retry in ~{wait:.0f}s "
+                  f"(attempt {attempt + 1}/{len(backoffs)})")
+            time.sleep(wait + random.uniform(0, 3))
+            continue
+        r.raise_for_status()
+        try:
+            payload = r.json()
+        except ValueError as e:
+            raise RuntimeError(f"GDELT non-JSON reply: {r.text[:120]}") from e
+        return gdelt_candidates(payload)
 
 
 # ------------------------------------------------- Sentinel-2 (Island Watch) --
