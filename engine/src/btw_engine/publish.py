@@ -18,6 +18,7 @@ from datetime import date
 import httpx
 
 from btw_engine.truth import assert_provenance
+from btw_engine.public_archive import archive_url, load_manifest
 
 BASE = os.environ["SUPABASE_URL"].rstrip("/") + "/rest/v1"
 KEY = os.environ["SUPABASE_SERVICE_KEY"]
@@ -78,7 +79,7 @@ def fetch_provenance() -> list[dict]:
                select="fact_table,fact_id,fact_field,note,support_kind,"
                       "derivation,claim(field,value,value_num,status,anchor,"
                       "quote,page,bbox,match_score,numeric_check,"
-                      "document(url,r2_key,doc_genre))")
+                      "document(url,r2_key,sha256,fetched_at,doc_genre))")
 
 
 def attach_sources(facilities: list[dict], prov: list[dict]) -> None:
@@ -97,6 +98,7 @@ def attach_sources(facilities: list[dict], prov: list[dict]) -> None:
         for p in f.get("permit", []):
             owner[("permit", p["id"])] = f
 
+    public_manifest = load_manifest()
     for row in prov:
         claim = row.get("claim") or {}
         doc = claim.get("document") or {}
@@ -105,9 +107,27 @@ def attach_sources(facilities: list[dict], prov: list[dict]) -> None:
         if not url or f is None:
             continue
         srcs = f.setdefault("sources", [])
-        hit = next((s for s in srcs if s["url"] == url), None)
+        sha256 = doc.get("sha256")
+        # A publisher may replace a file at the same URL. Treat the immutable
+        # content hash as the document identity so both captures remain visible.
+        hit = next((s for s in srcs if (
+            sha256 and s.get("sha256") == sha256
+        ) or (not sha256 and s["url"] == url)), None)
         if hit is None:
-            hit = {"url": url, "doc_genre": doc.get("doc_genre"), "facts": []}
+            archived_copy = archive_url(
+                sha256, doc.get("r2_key"), manifest=public_manifest)
+            hit = {
+                "url": url,
+                "archive_url": archived_copy,
+                "sha256": sha256,
+                "archived_at": doc.get("fetched_at"),
+                "archive_status": (
+                    "public" if archived_copy else
+                    "approved_pending_endpoint" if sha256 in public_manifest else
+                    "preserved_private"),
+                "doc_genre": doc.get("doc_genre"),
+                "facts": [],
+            }
             srcs.append(hit)
         label = f"{row['fact_table']}.{row['fact_field']}"
         if label not in hit["facts"]:

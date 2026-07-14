@@ -29,6 +29,7 @@ jobs:
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+          BTW_ARCHIVE_BASE_URL: ${{ vars.BTW_ARCHIVE_BASE_URL }}
         run: PYTHONPATH=engine/src python -m btw_engine.publish --out out
       - name: Push mirror branch
         run: |

@@ -1,0 +1,13 @@
+.checksum {
+  color: var(--ink3);
+  display: block;
+  font: 10px var(--mono);
+  margin-top: 8px;
+  overflow-wrap: anywhere;
+}
+
+.receipt-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+}

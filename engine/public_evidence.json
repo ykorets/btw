@@ -1,0 +1,21 @@
+{
+  "version": 1,
+  "documents": {
+    "13bd44e0d6070bd8d1c616d4832c162dd7ee13fbe2e509e32e853248b3957176": {
+      "rights_basis": "public_record",
+      "note": "TCEQ technical review"
+    },
+    "ab75444eb75f82d1d14a18db75bf689df091ca2c8f4ca34782f6120f617fef40": {
+      "rights_basis": "public_record",
+      "note": "Administrative appeal filing"
+    },
+    "e96ef09159edf43aa35d2d48b8f457958c928c1a222afb65515dee62b70a320f": {
+      "rights_basis": "public_record",
+      "note": "MDEQ air permit"
+    },
+    "b6692335ccef7ffa855246a6ac2fdba0adc086f37ae17b7a3c32b1563236c757": {
+      "rights_basis": "public_record",
+      "note": "Court filing"
+    }
+  }
+}

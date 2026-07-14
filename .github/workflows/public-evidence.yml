@@ -1,0 +1,29 @@
+name: public-evidence-archive
+on:
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "Plan copies without writing to the public bucket"
+        type: boolean
+        default: true
+permissions:
+  contents: read
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: "3.12"}
+      - run: pip install boto3 httpx pyyaml
+      - name: Copy only redistribution-approved immutable objects
+        env:
+          R2_ACCOUNT_ID: "5ee73f367499e0cda9acfbd5966274e5"
+          R2_ACCESS_KEY: ${{ secrets.R2_ACCESS_KEY }}
+          R2_SECRET: ${{ secrets.R2_SECRET }}
+        run: |
+          if [ "${{ inputs.dry_run }}" = "true" ]; then
+            PYTHONPATH=engine/src python -m btw_engine.public_archive --dry-run
+          else
+            PYTHONPATH=engine/src python -m btw_engine.public_archive
+          fi

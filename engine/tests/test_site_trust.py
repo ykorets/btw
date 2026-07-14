@@ -91,3 +91,16 @@ def test_announced_capacity_is_separate_from_verified_fleet():
     assert "reported_gw: null" in mirror
     assert "options: [all, announcements]" in workflow
     assert "90,0,600" not in INDEX
+
+
+def test_receipts_keep_source_and_fail_closed_archive_copy():
+    component = (SITE / "src" / "components" / "facility" /
+                 "SourceReceipts.astro").read_text()
+    publisher = (ROOT / "engine" / "src" / "btw_engine" /
+                 "publish.py").read_text()
+    assert "Source ↗" in component
+    assert "Archived copy ↗" in component
+    assert "checksumLabel" in component
+    assert "archive_url" in publisher
+    assert "BTW_ARCHIVE_BASE_URL" in (
+        ROOT / ".github" / "workflows" / "publish.yml").read_text()
