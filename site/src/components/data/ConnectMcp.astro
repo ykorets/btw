@@ -24,7 +24,7 @@ const claudeCommand = `claude mcp add --transport http --scope user behind-the-w
         <span>Endpoint</span>
         <code>{endpoint}</code>
       </div>
-      <button type="button" data-mcp-copy={endpoint} aria-label="Copy MCP endpoint">Copy endpoint</button>
+      <button class="btn mcp-copy" type="button" data-mcp-copy={endpoint} aria-label="Copy MCP endpoint">Copy endpoint</button>
     </div>
 
     <div class="mcp-client-grid">
@@ -33,25 +33,20 @@ const claudeCommand = `claude mcp add --transport http --scope user behind-the-w
         <p>Add it once from the terminal. Codex CLI, the IDE extension and the desktop app share the same MCP configuration.</p>
         <div class="mcp-command">
           <pre><code>{codexCommand}</code></pre>
-          <button type="button" data-mcp-copy={codexCommand} aria-label="Copy Codex command">Copy</button>
+          <button class="btn mcp-copy" type="button" data-mcp-copy={codexCommand} aria-label="Copy Codex command">Copy</button>
         </div>
         <small>Then open <code>/mcp</code> to confirm the four tools.</small>
       </article>
 
       <article class="mcp-client">
-        <div class="mcp-client-title"><span>02</span><h3>Claude Code</h3></div>
-        <p>Install the remote server at user scope so it is available across your projects.</p>
+        <div class="mcp-client-title"><span>02</span><h3>Claude</h3></div>
+        <p>Use the command for Claude Code, or add the same endpoint as a custom connector in Claude, Cowork or Claude Desktop.</p>
         <div class="mcp-command">
           <pre><code>{claudeCommand}</code></pre>
-          <button type="button" data-mcp-copy={claudeCommand} aria-label="Copy Claude Code command">Copy</button>
+          <button class="btn mcp-copy" type="button" data-mcp-copy={claudeCommand} aria-label="Copy Claude Code command">Copy</button>
         </div>
-        <small>Run <code>claude mcp list</code> or use <code>/mcp</code> to verify.</small>
-      </article>
-
-      <article class="mcp-client">
-        <div class="mcp-client-title"><span>03</span><h3>Claude · Cowork</h3></div>
-        <p>Open <b>Customize → Connectors</b>, choose <b>Add custom connector</b>, and paste the endpoint above. The same remote connector works in Claude, Cowork and Claude Desktop.</p>
-        <a class="text-link" href="https://support.claude.com/en/articles/11175166-get-started-with-custom-connectors-using-remote-mcp" target="_blank" rel="noopener">Claude setup guide ↗</a>
+        <small>Claude Code: run <code>claude mcp list</code>. Apps: <b>Customize → Connectors → Add custom connector</b>.</small>
+        <a class="text-link" href="https://support.claude.com/en/articles/11175166-get-started-with-custom-connectors-using-remote-mcp" target="_blank" rel="noopener">Remote connector guide ↗</a>
       </article>
     </div>
 
@@ -72,21 +67,7 @@ const claudeCommand = `claude mcp add --transport http --scope user behind-the-w
 <script>
   const status = document.querySelector<HTMLElement>(".mcp-copy-status");
   async function copyText(value: string) {
-    try {
-      await navigator.clipboard.writeText(value);
-      return;
-    } catch {
-      const field = document.createElement("textarea");
-      field.value = value;
-      field.setAttribute("readonly", "");
-      field.style.position = "fixed";
-      field.style.opacity = "0";
-      document.body.appendChild(field);
-      field.select();
-      const copied = document.execCommand("copy");
-      field.remove();
-      if (!copied) throw new Error("Clipboard unavailable");
-    }
+    await navigator.clipboard.writeText(value);
   }
   document.querySelectorAll<HTMLButtonElement>("[data-mcp-copy]").forEach((button) => {
     button.addEventListener("click", async () => {
