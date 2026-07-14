@@ -17,7 +17,14 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with: {python-version: "3.12"}
-      - run: pip install httpx
+      - uses: astral-sh/setup-uv@08807647e7069bb48b6ef5acd8ec9567f424441b # v8.1.0
+        with:
+          version: "0.11.28"
+          enable-cache: true
+          cache-dependency-glob: "engine/uv.lock"
+      - name: Install the locked engine runtime
+        run: uv sync --locked
+        working-directory: engine
       - name: Generate mirror files from Postgres
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
@@ -26,9 +33,9 @@ jobs:
           PUBLISH_SCOPE: ${{ inputs.scope || 'all' }}
         run: |
           if [ "$PUBLISH_SCOPE" = "announcements" ]; then
-            PYTHONPATH=engine/src python -m btw_engine.publish --out out --announcements-only
+            engine/.venv/bin/python -m btw_engine.publish --out out --announcements-only
           else
-            PYTHONPATH=engine/src python -m btw_engine.publish --out out
+            engine/.venv/bin/python -m btw_engine.publish --out out
           fi
       - name: Push mirror branch (same repo, built-in token)
         # TODO(M5): switch target back to ykorets/btw-data once GH_BOT_TOKEN
