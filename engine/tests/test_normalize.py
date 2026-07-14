@@ -6,6 +6,7 @@ from btw_engine.normalize import (
     copy_provenance,
     locate_context,
     plan_permit_links,
+    plan_permit_changes,
     plan_unit_changes,
     resolve_facility,
     resolve_permit,
@@ -152,6 +153,36 @@ def test_resolve_facility_unique_permit():
     assert resolve_facility(both, permits) is None
 
 
+def test_resolve_facility_uses_unique_reviewed_provenance_fallback():
+    permits = [{"id": "p1", "permit_no": "0680-00119",
+                "facility_id": "southaven"}]
+    claims = [_c("court", "unit.mw_total", "495 MW", 495,
+                 "combined generating capacity of at least 495 MW")]
+    assert resolve_facility(claims, permits, {"southaven"}) == "southaven"
+    assert resolve_facility(claims, permits, {"southaven", "memphis"}) is None
+
+
+def test_sole_cohort_binding_retains_corroborated_historical_count():
+    cohort = {**TITAN, "id": "cohort", "model": "unverified",
+              "unit_count": 27, "mw_each": 18.333333, "total_mw": None}
+    claims = [
+        _c("old", "observation.unit_count", "18", 18,
+           "18 gas-fired turbines had been built on site"),
+        _c("current", "observation.unit_count", "27", 27,
+           "27 turbines were still on site"),
+        _c("later", "observation.unit_count", "57", 57,
+           "satellite images revealed 57 turbines at the facility"),
+        _c("mw", "unit.mw_total", "495 MW", 495,
+           "27 turbines have a combined capacity of at least 495 MW"),
+    ]
+    links, updates, conflicts = plan_unit_changes([cohort], claims)
+    assert [(field, claim["id"]) for _u, field, claim in links] == [
+        ("unit_count", "current")]
+    assert updates["cohort"]["total_mw"][0] == 495
+    assert "unit_count" not in updates["cohort"]
+    assert any("retained corroborated" in conflict for conflict in conflicts)
+
+
 def test_resolve_permit_and_plan_exact_fields():
     permit = {"id": "p2", "permit_no": "01156-01PC", "facility_id": "f2",
               "authority": "Shelby County Health Department",
@@ -175,6 +206,24 @@ def test_resolve_permit_and_plan_exact_fields():
                    ("authority", "text match"),
                    ("issued_at", "exact typed date"),
                    ("status", "status component")}
+
+
+def test_plan_permit_changes_stages_one_unique_typed_value():
+    permit = {"id": "p", "permit_no": "177263", "facility_id": "f",
+              "authority": "TCEQ", "permit_type": "legacy label",
+              "status": "issued", "filed_at": None, "issued_at": None}
+    claims = [
+        _c("no", "permit.no", "177263", None, "Registration 177263"),
+        _c("type", "permit.type", "Standard Permit Application", None,
+           "Project Type Standard Permit Application"),
+        _c("status", "permit.status", "currently permitted", None,
+           "units are currently permitted under Registration 177263"),
+    ]
+    links, changes, conflicts = plan_permit_changes(permit, claims)
+    assert not conflicts
+    assert {field for _p, field, _c, _m in links} == {"permit_no"}
+    assert changes["permit_type"][0] == "Standard Permit Application"
+    assert changes["status"][0] == "currently permitted"
 
 
 def test_permit_date_mismatch_is_not_linked():
