@@ -2,6 +2,8 @@ __pycache__/
 *.pyc
 .venv/
 node_modules/
+site/.astro/
+site/dist/
 .env
 .DS_Store
 engine/fixtures/*.pdf

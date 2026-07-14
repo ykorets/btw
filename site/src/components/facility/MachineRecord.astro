@@ -1,0 +1,7 @@
+---
+const { view } = Astro.props;
+---
+<section><div class="wrap"><div class="eyebrow">Machine record</div><h2>What is published</h2><p class="intro">Structured facts that have passed the review gate. Unknown values remain visibly unknown.</p>
+  <div class="fact-grid"><div class="fact"><span>Status</span><b>{view.statusLabel}</b></div><div class="fact"><span>Permit → power</span><b>{view.ttp}</b></div><div class="fact"><span>Published units</span><b>{view.publishedUnits}</b></div><div class="fact"><span>Permit envelope</span><b>{view.permitEnvelope}</b></div></div>
+  <div class="equipment">{view.equipment.length ? view.equipment.map((unit: any) => <div class="fact-line"><b>{unit.name}</b><span>{unit.details}</span></div>) : <p class="muted">Equipment under verification.</p>}</div>
+</div></section>

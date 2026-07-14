@@ -1,0 +1,12 @@
+---
+const { view } = Astro.props;
+---
+<div class="wrap hero">
+  <div class="eyebrow">Evidence dossier · data as of {view.asOf}</div>
+  <div class="statusline"><span class="status">{view.statusLabel}</span>{view.flags?.length ? view.flags.map((flag: string) => <span class="risk">{flag.replaceAll("_", " ")}</span>) : <span class="quiet">No published risk flags</span>}</div>
+  <h1>{view.name}</h1><p class="location">{view.location} · {view.developer || "Under verification"} → {view.offtaker || "Under verification"}</p>
+  <div class="hero-grid">
+    <div class="capacity"><div><span class="number">{view.capacityMw}</span> <span class="unit">MW published operating capacity</span></div><p>{view.capacityNote}</p></div>
+    <aside class="signal"><div class="eyebrow">Satellite evidence</div><h2>{view.satellite.date}</h2><p>{view.satellite.text}</p><p class="eyebrow" style="margin-top:12px">{view.satellite.coords}</p><a href={view.satellite.url} target="_blank" rel="noopener">{view.satellite.label}</a></aside>
+  </div>
+</div>

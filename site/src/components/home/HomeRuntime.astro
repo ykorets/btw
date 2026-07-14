@@ -1,0 +1,176 @@
+<script is:inline src="https://cdn.jsdelivr.net/npm/d3@7"></script>
+<script is:inline src="https://cdn.jsdelivr.net/npm/topojson-client@3"></script>
+<script is:inline>
+// The mirror branch is the only source of truth for verified facts.
+const MIRROR="https://raw.githubusercontent.com/ykorets/btw/mirror/data";
+const FAC=fetch(MIRROR+"/facilities.json").then(r=>r.json()).catch(()=>({facilities:[]}));
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const GENRE={tceq_standard_permit_review:"TCEQ permit",permit:"MDEQ permit",appeal_filing:"Permit appeal",court_filing:"Court filing",satellite_scene:"Satellite",advocacy_letter:"SELC letter",third_party_inventory:"EIP inventory",third_party_report:"GEM report"};
+const col={op:"#157a54"};
+const svg=d3.select("#usmap");
+const path=d3.geoPath(d3.geoAlbersUsa().scale(1280).translate([487,305]));
+Promise.all([d3.json("https://cdn.jsdelivr.net/npm/us-atlas@3/states-10m.json"),FAC]).then(([us,d])=>{
+  svg.selectAll("path").data(topojson.feature(us,us.objects.states).features).join("path")
+    .attr("d",path).attr("fill","#f1f0ea").attr("stroke","#dedcd2").attr("stroke-width",.7);
+  const proj=d3.geoAlbersUsa().scale(1280).translate([487,305]);
+  const r=d3.scaleSqrt([100,8000],[5,26]);
+  const ops=(d.facilities||[]).flatMap(f=>{
+    const m=/\((-?[0-9.]+),(-?[0-9.]+)\)/.exec(f.geo||"");
+    if(!m||f.status!=="operating")return[];
+    const mw=(f.unit||[]).reduce((a,u)=>a+(u.unit_count||0)*(+u.mw_each||0),0);
+    return[{n:f.name,c:[+m[1],+m[2]],mw:Math.round(mw),s:"op",v:1,f}];
+  });
+  const stageLbl={op:"Operating"};
+  const stageTag={op:"tag-green"};
+  const info=document.getElementById("map-info");
+  function showInfo(d){
+    let h='<div class="mi-h"><b>'+esc(d.n)+'</b><span class="tag '+stageTag[d.s]+'">'+stageLbl[d.s]+'</span><span class="mi-mw">'+d.mw.toLocaleString()+' MW'+(d.v?' verified':' as announced/filed')+'</span></div>';
+    if(d.v&&d.f){
+      const f=d.f, units=(f.unit||[]).map(u=>u.unit_count+"× "+((u.model&&u.model!=="unverified")?u.model:u.oem)).join(" + ");
+      h+='<div style="margin-top:4px">'+esc([f.county,f.state].filter(Boolean).join(" County, "))+
+         (f.developer?' · '+esc(f.developer):'')+(f.offtaker?' → '+esc(f.offtaker):'')+'</div>';
+      if(units)h+='<div>'+esc(units)+'</div>';
+      if(f.first_permit_filed&&f.first_power){
+        const mo=Math.round((new Date(f.first_power)-new Date(f.first_permit_filed))/2629800000);
+        h+='<div>Permit → power: '+(mo<0?"−":"")+Math.abs(mo)+' mo</div>';
+      }
+      const srcs=f.sources||[];
+      if(srcs.length)h+='<div class="mi-src">Sources: '+srcs.map(s=>'<a href="'+esc(s.url)+'" target="_blank" rel="noopener">'+esc(GENRE[s.doc_genre]||s.doc_genre||"document")+'</a>').join(" · ")+'</div>';
+    }
+    info.innerHTML=h;
+  }
+  const circles=svg.selectAll("circle").data(ops).join("circle")
+    .attr("cx",d=>proj(d.c)[0]).attr("cy",d=>proj(d.c)[1])
+    .attr("r",d=>Math.max(r(d.mw),12)).attr("fill",d=>col[d.s]).attr("fill-opacity",.9)
+    .attr("stroke","#fff").attr("stroke-width",1.2)
+    .attr("tabindex",0).attr("role","button")
+    .attr("aria-label",d=>d.n+" — "+d.mw.toLocaleString()+" MW verified")
+    .on("click",function(_e,d){circles.classed("sel",false);d3.select(this).classed("sel",true);showInfo(d);})
+    .on("keydown",function(e,d){if(e.key==="Enter"||e.key===" "){e.preventDefault();circles.classed("sel",false);d3.select(this).classed("sel",true);showInfo(d);}});
+  circles.append("title").text(d=>d.n+" — "+d.mw.toLocaleString()+" MW"+(d.v?" · engine-verified":" · as announced/filed"));
+});
+
+const $=id=>document.getElementById(id);
+const fmt=n=>n.toLocaleString("en-US");
+const ids=["capex","hr","gas","om","cf","grid","mo","rev"];
+function setPreset(capex,hr,gas,om,cf,grid,mo,rev){
+  $("capex").value=capex;$("hr").value=hr;$("gas").value=gas;$("om").value=om;
+  $("cf").value=cf;$("grid").value=grid;$("mo").value=mo;$("rev").value=rev;calc();
+}
+document.querySelectorAll(".preset[data-preset]").forEach(button=>button.addEventListener("click",()=>{
+  setPreset(...button.dataset.preset.split(",").map(Number));
+}));
+function calc(){
+  const capex=+$("capex").value,hr=+$("hr").value,gas=+$("gas").value,om=+$("om").value,
+        cf=+$("cf").value/100,grid=+$("grid").value,mo=+$("mo").value,rev=+$("rev").value;
+  $("capex-out").textContent=fmt(capex);$("hr-out").textContent=fmt(hr);
+  $("gas-out").textContent=gas.toFixed(2);$("om-out").textContent=om;
+  $("cf-out").textContent=Math.round(cf*100);$("grid-out").textContent=grid;
+  $("mo-out").textContent=mo;$("rev-out").textContent=rev;
+  const r=.10,n=15,crf=r*Math.pow(1+r,n)/(Math.pow(1+r,n)-1);
+  const fuel=hr/1000*gas, cap=capex*1000*crf/(8760*cf), btm=fuel+cap+om;
+  const maxV=Math.max(btm,grid)*1.05;
+  $("seg-fuel").style.width=(fuel/maxV*100)+"%";
+  $("seg-capex").style.width=(cap/maxV*100)+"%";
+  $("seg-om").style.width=(om/maxV*100)+"%";
+  $("seg-grid").style.width=(grid/maxV*100)+"%";
+  $("btm-total").textContent="$"+Math.round(btm)+"/MWh ("+Math.round(fuel)+" fuel + "+Math.round(cap)+" capex + "+Math.round(om)+" O&M)";
+  $("grid-total").textContent="$"+grid+"/MWh";
+  const prem=btm-grid;
+  $("premium").textContent=(prem<0?"−":"+")+"$"+Math.abs(Math.round(prem))+"/MWh";
+  $("premium").style.color=prem<0?"var(--green)":"var(--ink)";
+  const prem10=Math.max(0,prem)*8760*cf*10/1e6;
+  $("prem10").textContent="$"+prem10.toFixed(1)+"M";
+  const tv=mo/12*rev;
+  $("timeval").textContent="$"+tv.toFixed(0)+"M";
+  let v;
+  if(prem<=0) v="At these inputs, self-generation is cheaper than the grid outright — the time question doesn't even come up.";
+  else if(tv>prem10) v="Ten years of power premium costs $"+prem10.toFixed(1)+"M per MW. Connecting "+mo+" months earlier unlocks $"+tv.toFixed(0)+"M per MW of compute revenue. Time outweighs the premium "+(prem10>0?Math.round(tv/prem10)+"×":"entirely")+" — the island pays for itself.";
+  else v="The value of time saved ($"+tv.toFixed(0)+"M) doesn't cover the 10-year power premium ($"+prem10.toFixed(1)+"M). At these inputs, waiting for the grid wins.";
+  $("verdict").textContent=v;
+}
+ids.forEach(id=>$(id).addEventListener("input",calc));
+calc();
+
+function countUp(el,target,decimals,dur){
+  const t0=performance.now();
+  function step(t){
+    const p=Math.min((t-t0)/dur,1), e=1-Math.pow(1-p,3);
+    el.textContent=(target*e).toFixed(decimals);
+    if(p<1)requestAnimationFrame(step);
+  }
+  requestAnimationFrame(step);
+}
+countUp($("n-ann"),Number($("n-ann").dataset.target||0),1,600);
+fetch(MIRROR+"/summary.json").then(r=>r.json()).then(s=>{
+  countUp($("n-op"),s.operating_gw,1,600);
+  $("asof").textContent="Data as of "+s.as_of+" · engine-generated";
+}).catch(()=>{countUp($("n-op"),1.0,1,600);});
+FAC.then(d=>{
+  const bySlug={};(d.facilities||[]).forEach(f=>bySlug[f.slug]=f);
+  const months=f=>{
+    if(!f.first_permit_filed||!f.first_power)return null;
+    return Math.round((new Date(f.first_power)-new Date(f.first_permit_filed))/2629800000);
+  };
+  // Equipment cells are rebuilt only from published units.
+  document.querySelectorAll(".equip-live").forEach(td=>{
+    const f=bySlug[td.dataset.slug], units=(f&&f.unit)||[];
+    if(!units.length)return;
+    const s=units.map(u=>u.unit_count+"× "+((u.model&&u.model!=="unverified")?u.model:u.oem)).join(" + ");
+    td.textContent=s;
+  });
+  // permit -> power: computed from published dates only
+  document.querySelectorAll(".ttp-cell").forEach(td=>{
+    const f=bySlug[td.dataset.slug];
+    if(!f)return;
+    const mo=months(f);
+    if(mo===null){td.textContent="—";td.style.color="var(--ink-3)";td.title="permit/power dates not yet verified";return;}
+    td.textContent=(mo<0?"−":"")+Math.abs(mo)+" mo";
+    td.style.color=mo<0?"var(--red)":"var(--ink)";
+  });
+  // time-to-power board: rows rebuilt from the same dates
+  const live=document.getElementById("ttp-live");
+  if(live&&(d.facilities||[]).length){
+    const rows=d.facilities.filter(f=>f.status==="operating").map(f=>({f,mo:months(f)}));
+    rows.sort((a,b)=>(a.mo===null?99:a.mo)-(b.mo===null?99:b.mo));
+    live.innerHTML=rows.map(({f,mo})=>{
+      const head='<span><b>'+esc(f.name)+'</b> <span class="src">'+esc(f.state||"")+'</span></span>';
+      if(mo===null)return '<div class="ttp-row">'+head+'<div class="ttp-track"><div class="ttp-zero"></div></div><span class="ttp-val" style="color:var(--ink-3)">dates under verification</span></div>';
+      const w=Math.min(Math.abs(mo)*1.8,38);
+      const bar=mo<0?'right:60%;width:'+w+'%;background:var(--red)':'left:40%;width:'+w+'%;background:var(--green)';
+      return '<div class="ttp-row">'+head+'<div class="ttp-track"><div class="ttp-zero"></div><div class="ttp-bar" style="'+bar+'"></div></div><span class="ttp-val"'+(mo<0?' style="color:var(--red)"':'')+'>'+(mo<0?"−":"")+Math.abs(mo)+' mo</span></div>';
+    }).join("");
+  }
+  document.querySelectorAll(".mw-live").forEach(el=>{
+    const f=bySlug[el.dataset.slug];
+    if(!f)return;
+    const units=f.unit||[];
+    const v=units.reduce((a,u)=>a+(u.unit_count||0)*(+u.mw_each||0),0);
+    el.textContent=Math.round(v);
+    el.title=units.map(u=>u.unit_count+"× "+((u.model||u.oem||"unit")+" @ "+u.mw_each+" MW")).join(" + ")+" — engine-verified, documents in the Source column";
+  });
+  // every number gets its receipt: engine provenance -> Source column
+  document.querySelectorAll(".src-live").forEach(td=>{
+    const f=bySlug[td.dataset.slug], srcs=(f&&f.sources)||[];
+    if(!srcs.length)return;
+    td.innerHTML=srcs.map(s=>{
+      const tip=(s.facts||[]).join(", ")+(s.quote?" — “"+s.quote+"”":"");
+      return '<a href="'+esc(s.url)+'" target="_blank" rel="noopener" title="'+esc(tip)+'">'+esc(GENRE[s.doc_genre]||s.doc_genre||"document")+'</a>';
+    }).join("<br>");
+  });
+}).catch(()=>{});
+// live feed from the mirror: headline + clickable source document
+const DOCLBL=[[/courtlistener|uscourts/,"Court record"],[/deq\.state\.ms/,"MDEQ"],[/tceq/,"TCEQ"],[/puco?\.|opsb/,"OPSB"],[/ferc/,"FERC"],[/arcgis/,"Satellite"],[/epa\.gov/,"EPA"]];
+fetch(MIRROR+"/events.json").then(r=>r.json()).then(d=>{
+  const evs=(d.events||[]).slice(0,6);
+  if(!evs.length)return;
+  document.querySelector(".feed").innerHTML=evs.map(e=>{
+    const dt=new Date(e.date+"T00:00:00").toLocaleDateString("en-US",{month:"short",day:"numeric",year:"numeric"});
+    let lbl=(e.type||"").replace(/_/g," ");
+    if(e.source_url){for(const [re,l] of DOCLBL){if(re.test(e.source_url)){lbl=l;break}}
+      if(lbl===(e.type||"").replace(/_/g," ")){try{lbl=new URL(e.source_url).hostname.replace(/^www\./,"")}catch(_){}}
+      return '<li><span class="d">'+dt+'</span><span>'+esc(e.headline)+'</span><a class="doc" href="'+esc(e.source_url)+'" target="_blank" rel="noopener">'+esc(lbl)+' ↗</a></li>';}
+    return '<li><span class="d">'+dt+'</span><span>'+esc(e.headline)+'</span><span class="doc">'+esc(lbl)+'</span></li>';
+  }).join("");
+}).catch(()=>{});
+</script>

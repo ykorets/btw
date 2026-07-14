@@ -1,0 +1,56 @@
+---
+interface Props { data: Record<string, any> }
+const { data } = Astro.props;
+const summary = data.summary;
+const rows = data.announcements || [];
+const top = rows.filter((row: any) => row.reported_capacity_mw != null).slice(0, 12);
+const proposed = summary.statuses?.Proposed || { projects: 0, reported_mw: 0 };
+const construction = summary.statuses?.["Under Construction"] || { projects: 0, reported_mw: 0 };
+const source = rows[0]?.source;
+const asOf = rows[0]?.source_as_of;
+const maxState = Math.max(...(summary.top_states || []).map((row: any) => row.reported_gw), 1);
+---
+<section id="announcements" class="announced-layer">
+  <div class="wrap">
+    <div class="kicker">The announcement pipeline · separate evidence class</div>
+    <div class="announced-head">
+      <div>
+        <h2>What the 143 GW of announcements actually contains</h2>
+        <p class="sub">A third-party inventory of proposed behind-the-meter gas plants—not BTW-verified operating capacity. We publish it as a comparison layer so the gap is inspectable rather than rhetorical.</p>
+      </div>
+      <span class="tag tag-amber">Third-party reported</span>
+    </div>
+    <div class="announcement-metrics">
+      <article><span>Projects</span><b>{summary.projects}</b><small>{summary.projects_with_capacity} disclose capacity</small></article>
+      <article><span>Reported pipeline</span><b>{summary.reported_gw} GW</b><small>known capacities only</small></article>
+      <article><span>Proposed</span><b>{proposed.projects}</b><small>{(proposed.reported_mw / 1000).toFixed(1)} reported GW</small></article>
+      <article><span>Under construction</span><b>{construction.projects}</b><small>{(construction.reported_mw / 1000).toFixed(1)} reported GW</small></article>
+    </div>
+    <div class="announcement-grid">
+      <div class="state-bars">
+        <h3>Where the reported pipeline concentrates</h3>
+        {(summary.top_states || []).map((row: any) => (
+          <div class="state-row">
+            <span>{row.state}</span><div><i style={`width:${row.reported_gw / maxState * 100}%`}></i></div><b>{row.reported_gw} GW</b>
+          </div>
+        ))}
+      </div>
+      <div class="evidence-note">
+        <div class="kicker">How to read this</div>
+        <p><b>Reported</b> means a source lists a project and capacity. It does not mean financed, permitted, built, or operating.</p>
+        <p>Capacity bases differ by disclosure, and four projects have no published capacity. The total must not be added to the verified fleet.</p>
+        {source?.url && <a class="btn" href={source.url} target="_blank" rel="noopener">Open EIP source inventory ↗</a>}
+        <div class="src">Inventory as of {asOf} · imported into BTW with row-level source linkage</div>
+      </div>
+    </div>
+    <details class="announcement-table">
+      <summary>Inspect the 12 largest reported projects</summary>
+      <div class="announcement-scroll"><table>
+        <thead><tr><th>Project</th><th>State</th><th>Status</th><th>Expected</th><th>Technology</th><th>Reported MW</th></tr></thead>
+        <tbody>{top.map((row: any) => <tr>
+          <td><b>{row.name}</b></td><td>{row.state || "—"}</td><td><span class={`tag ${row.operating_status === "Under Construction" ? "tag-blue" : "tag-amber"}`}>{row.operating_status}</span></td><td>{row.expected_operating_year}</td><td>{row.generating_technology}</td><td class="mono">{Number(row.reported_capacity_mw).toLocaleString("en-US")}</td>
+        </tr>)}</tbody>
+      </table></div>
+    </details>
+  </div>
+</section>

@@ -1,0 +1,41 @@
+<section id="calc">
+  <div class="wrap">
+    <div class="kicker">The open cost model</div>
+    <h2>What does a megawatt-hour really cost behind the meter?</h2>
+    <p class="sub">Fuel by heat rate, capex annualized over 15 years at 10%, O&M — against your grid tariff, and against the value of connecting earlier. Load a real facility or set your own assumptions.</p>
+    <div class="presets" style="margin-top:22px">
+      <button class="preset" data-preset="1600,9500,4,10,90,65,20,20">Crusoe Abilene profile</button>
+      <button class="preset" data-preset="1400,10500,4.25,14,85,65,24,22">xAI Memphis profile</button>
+      <button class="preset" data-preset="1800,8500,3.5,9,92,68,18,18">Williams × Meta profile</button>
+      <button class="preset" data-preset="1600,9500,8,10,90,65,20,20">2022 gas shock</button>
+      <button class="preset" data-preset="1600,9500,4,10,60,65,20,20">Underused island</button>
+    </div>
+    <div class="calc-grid">
+      <div class="crow"><label for="capex">Capex, $/kW</label><output id="capex-out">1,600</output><input type="range" id="capex" min="800" max="2500" step="50" value="1600"></div>
+      <div class="crow"><label for="hr">Heat rate, Btu/kWh</label><output id="hr-out">9,500</output><input type="range" id="hr" min="7500" max="11500" step="100" value="9500"></div>
+      <div class="crow"><label for="gas">Gas, $/MMBtu</label><output id="gas-out">4.00</output><input type="range" id="gas" min="2" max="8" step="0.25" value="4"></div>
+      <div class="crow"><label for="om">O&M, $/MWh</label><output id="om-out">10</output><input type="range" id="om" min="5" max="20" step="1" value="10"></div>
+      <div class="crow"><label for="cf">Capacity factor, %</label><output id="cf-out">90</output><input type="range" id="cf" min="50" max="95" step="1" value="90"></div>
+      <div class="crow"><label for="grid">Grid tariff, $/MWh</label><output id="grid-out">65</output><input type="range" id="grid" min="40" max="120" step="1" value="65"></div>
+      <div class="crow"><label for="mo">Months saved vs queue</label><output id="mo-out">20</output><input type="range" id="mo" min="0" max="36" step="1" value="20"></div>
+      <div class="crow"><label for="rev">Compute revenue, $M/MW·yr</label><output id="rev-out">20</output><input type="range" id="rev" min="2" max="30" step="1" value="20"></div>
+    </div>
+    <p class="calc-src">Where the defaults come from: heat rate and 8,760 hr/yr utilization — <a href="https://records.tceq.texas.gov/cs/idcplg?IdcService=TCEQ_EXTERNAL_SEARCH_GET_FILE&dID=8600163&Rendition=Web" target="_blank" rel="noopener">TCEQ reg. 177263 technical review</a> (Crusoe Abilene); gas price — <a href="https://www.eia.gov/dnav/ng/hist/rngwhhdD.htm" target="_blank" rel="noopener">EIA Henry Hub daily spot</a>; grid tariff band — <a href="https://www.eia.gov/electricity/monthly/epm_table_grapher.php?t=epmt_5_6_a" target="_blank" rel="noopener">EIA industrial average by state</a>. Capex and O&amp;M are model assumptions, not sourced facts — that's why they're sliders. Every output is arithmetic on your inputs.</p>
+    <div class="legend">
+      <span><span class="dot" style="background:#c9971c;border-radius:3px"></span>Fuel</span>
+      <span><span class="dot" style="background:#1f5fa8;border-radius:3px"></span>Capex</span>
+      <span><span class="dot" style="background:#8a897f;border-radius:3px"></span>O&M</span>
+      <span><span class="dot" style="background:#157a54;border-radius:3px"></span>Grid tariff</span>
+    </div>
+    <div class="bar-lbl"><span>Behind the meter</span><b id="btm-total" class="mono"></b></div>
+    <div class="cost-bar"><div id="seg-fuel" style="background:#c9971c"></div><div id="seg-capex" style="background:#1f5fa8"></div><div id="seg-om" style="background:#8a897f"></div></div>
+    <div class="bar-lbl"><span>Grid</span><b id="grid-total" class="mono"></b></div>
+    <div class="cost-bar"><div id="seg-grid" style="background:#157a54"></div></div>
+    <div class="metric-row">
+      <div class="metric"><div class="l">BTM premium</div><div class="v" id="premium"></div></div>
+      <div class="metric"><div class="l">10-yr power premium, per MW</div><div class="v" id="prem10"></div></div>
+      <div class="metric"><div class="l">Value of time saved, per MW</div><div class="v" id="timeval" style="color:var(--green)"></div></div>
+    </div>
+    <div id="verdict"></div>
+  </div>
+</section>

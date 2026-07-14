@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://behindthewatt.com/sitemap.xml

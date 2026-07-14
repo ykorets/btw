@@ -3,6 +3,7 @@ on:
   workflow_dispatch: {}
 permissions:
   contents: write
+  actions: write
 jobs:
   publish:
     runs-on: ubuntu-latest
@@ -37,3 +38,7 @@ jobs:
           git diff --cached --quiet && echo "no changes" && exit 0
           git commit -m "publish: $(date -u +%F) mirror export"
           git push origin mirror
+      - name: Rebuild dossier pages
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh workflow run pages.yml --ref main

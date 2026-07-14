@@ -1,0 +1,20 @@
+---
+import "../styles/facility.css";
+interface Props { view: Record<string, any>; jsonLd: Record<string, any> }
+const { view, jsonLd } = Astro.props;
+const canonical = `https://behindthewatt.com/facility/${view.slug}/`;
+---
+<!doctype html><html lang="en"><head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width" />
+  <title>{view.name} — evidence dossier · Behind the Watt</title>
+  <meta name="description" content={view.description} /><link rel="canonical" href={canonical} />
+  <meta property="og:title" content={`${view.name} — Behind the Watt`} /><meta property="og:description" content={view.description} />
+  <meta property="og:type" content="article" /><meta property="og:url" content={canonical} /><meta property="og:image" content="https://behindthewatt.com/og.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" /><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="icon" href="/brand/mark.svg" /><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <script is:inline type="application/ld+json" set:html={JSON.stringify(jsonLd)}></script>
+</head><body>
+  <header><div class="wrap nav"><a class="logo" href="/"><span>behind</span> │ the watt</a><a class="back" href="/#tracker">← Operating fleet</a></div></header>
+  <slot />
+  <footer><div class="wrap foot"><span>Behind the Watt · CC BY 4.0</span><span><a href="https://raw.githubusercontent.com/ykorets/btw/mirror/data/facilities.json">JSON</a> · <a href="https://github.com/ykorets/btw">GitHub</a> · <a href="mailto:hello@behindthewatt.com">Contact</a></span></div></footer>
+</body></html>

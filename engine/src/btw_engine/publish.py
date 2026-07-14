@@ -17,6 +17,8 @@ from datetime import date
 
 import httpx
 
+from btw_engine.truth import assert_provenance
+
 BASE = os.environ["SUPABASE_URL"].rstrip("/") + "/rest/v1"
 KEY = os.environ["SUPABASE_SERVICE_KEY"]
 HEADERS = {"apikey": KEY, "Authorization": f"Bearer {KEY}"}
@@ -35,8 +37,10 @@ def fetch():
         "facility",
         select="id,slug,name,aliases,state,county,geo,developer,offtaker,status,flags,"
                "first_permit_filed,first_power,"
-               "unit(id,oem,model,unit_count,mw_each,hours_permitted),"
-               "permit(id,authority,permit_no,permit_type,status,filed_at,issued_at)",
+               "unit(id,oem,model,unit_count,mw_each,total_mw,fuel,"
+               "hours_permitted,basis,verification_state),"
+               "permit(id,authority,permit_no,permit_type,status,filed_at,"
+               "issued_at,verification_state)",
         fact_state="eq.published",
         order="slug",
         # embedded resources need their own filters or staging rows leak in
@@ -51,14 +55,25 @@ def fetch():
     )
     aggregates = get("aggregate", select="metric,value,method,inputs_note,computed_at",
                      order="computed_at.desc")
-    return facilities, events, aggregates
+    announcements = get(
+        "announcement",
+        select="name,state,county,project_type,operating_status,"
+               "expected_operating_year,generating_technology,"
+               "reported_capacity_mw,source_as_of,"
+               "source_document:document!announcement_source_document_id_fkey(url,doc_genre)",
+        fact_state="eq.published",
+        order="reported_capacity_mw.desc.nullslast,name",
+    )
+    return facilities, events, aggregates, announcements
 
 
 def fetch_provenance() -> list[dict]:
     """The receipt for every fact: fact_provenance -> claim -> document."""
     return get("fact_provenance",
-               select="fact_table,fact_id,fact_field,note,"
-                      "claim(quote,page,document(url,doc_genre))")
+               select="fact_table,fact_id,fact_field,note,support_kind,"
+                      "derivation,claim(field,value,value_num,status,anchor,"
+                      "quote,page,bbox,match_score,numeric_check,"
+                      "document(url,r2_key,doc_genre))")
 
 
 def attach_sources(facilities: list[dict], prov: list[dict]) -> None:
@@ -124,7 +139,9 @@ def fetch_coverage() -> list[dict]:
 
 
 def facility_mw(f: dict) -> float:
-    return sum((u.get("unit_count") or 0) * float(u.get("mw_each") or 0)
+    return sum(float(u["total_mw"])
+               if u.get("total_mw") is not None
+               else (u.get("unit_count") or 0) * float(u.get("mw_each") or 0)
                for u in f.get("unit", []))
 
 
@@ -144,14 +161,41 @@ def build_summary(facilities: list[dict], aggregates: list[dict]) -> dict:
         "operating_gw": operating_gw,
         "operating_facilities": len(operating),
         "facilities_tracked": len(facilities),
-        "method": "sum(unit_count*mw_each) over facilities with status=operating; "
-                  "unit ratings from permits/observations, per-facility method in provenance",
+        "method": "sum(coalesce(total_mw, unit_count*mw_each)) over facilities "
+                  "with status=operating; basis and derivation are retained "
+                  "per unit cohort",
         "license": "CC BY 4.0",
         "cite_as": CITE,
     }
 
 
-def write_files(out: str, facilities, events, summary, coverage=None):
+def announcement_summary(announcements: list[dict]) -> dict:
+    known = [a for a in announcements if a.get("reported_capacity_mw") is not None]
+    total_mw = sum(float(a["reported_capacity_mw"]) for a in known)
+    statuses: dict[str, dict] = {}
+    states: dict[str, float] = {}
+    for a in announcements:
+        mw = float(a.get("reported_capacity_mw") or 0)
+        status = a.get("operating_status") or "Unknown"
+        bucket = statuses.setdefault(status, {"projects": 0, "reported_mw": 0.0})
+        bucket["projects"] += 1
+        bucket["reported_mw"] += mw
+        if a.get("state"):
+            states[a["state"]] = states.get(a["state"], 0.0) + mw
+    return {
+        "projects": len(announcements),
+        "projects_with_capacity": len(known),
+        "reported_gw": round(total_mw / 1000, 1),
+        "statuses": statuses,
+        "top_states": [
+            {"state": state, "reported_gw": round(mw / 1000, 1)}
+            for state, mw in sorted(states.items(), key=lambda item: item[1], reverse=True)[:6]
+        ],
+    }
+
+
+def write_files(out: str, facilities, events, summary, coverage=None,
+                announcements=None):
     os.makedirs(out, exist_ok=True)
 
     if coverage is not None:
@@ -178,6 +222,24 @@ def write_files(out: str, facilities, events, summary, coverage=None):
     with open(f"{out}/summary.json", "w") as fp:
         json.dump(summary, fp, indent=2)
 
+    if announcements is not None:
+        for row in announcements:
+            document = row.pop("source_document", None) or {}
+            row["source"] = {
+                "url": document.get("url"),
+                "doc_genre": document.get("doc_genre"),
+            }
+        with open(f"{out}/announcements.json", "w") as fp:
+            json.dump({
+                "license": "CC BY 4.0",
+                "cite_as": CITE,
+                "classification": "third_party_reported_not_btw_verified",
+                "note": "Reported project pipeline from a cited third-party inventory. "
+                        "Do not add to BTW verified operating capacity.",
+                "summary": announcement_summary(announcements),
+                "announcements": announcements,
+            }, fp, indent=2, default=str)
+
     with open(f"{out}/fleet.csv", "w", newline="") as fp:
         w = csv.writer(fp)
         w.writerow(["slug", "name", "state", "status", "flags", "mw",
@@ -201,12 +263,15 @@ def main():
     ap.add_argument("--out", default="out")
     args = ap.parse_args()
 
-    facilities, events, aggregates = fetch()
-    attach_sources(facilities, fetch_provenance())
+    facilities, events, aggregates, announcements = fetch()
+    provenance = fetch_provenance()
+    assert_provenance(facilities, provenance, gate="PUBLISH TRUTH GATE")
+    attach_sources(facilities, provenance)
     coverage = fetch_coverage()
     summary = build_summary(facilities, aggregates)
-    write_files(args.out, facilities, events, summary, coverage)
+    write_files(args.out, facilities, events, summary, coverage, announcements)
     print(f"published {len(facilities)} facilities, {len(events)} events, "
+          f"{len(announcements)} third-party announcements, "
           f"{len(coverage)} sources in coverage, "
           f"operating_gw={summary['operating_gw']} -> {args.out}/")
 

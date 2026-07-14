@@ -6,10 +6,35 @@
   genre: tceq_standard_permit_review
   note: Crusoe Abilene DC 1 — EGU standard permit technical review (unit list, MW, hours)
 
+- id: tceq-177263-original-review
+  url: "https://records.tceq.texas.gov/cs/idcplg?IdcService=TCEQ_EXTERNAL_SEARCH_GET_FILE&Rendition=Web&dID=8143786"
+  genre: tceq_standard_permit_review
+  note: Original Aug 2024 EGU technical review — closes initial registration dates/status
+
+- id: tceq-177263-maert
+  url: "https://records.tceq.texas.gov/cs/idcplg?IdcService=TCEQ_EXTERNAL_SEARCH_GET_FILE&Rendition=Web&dID=8600167&searchType=External"
+  genre: tceq_maert
+  note: Current maximum emission rates table — 5 Titan 350 + 5 LM2500, natural gas, 8,760 max hours/year
+
+- id: tceq-o4721-title-v-permit
+  url: "https://www.tceq.texas.gov/assets/public/permitting/air/publicnotice/37589sop.pdf"
+  genre: tceq_title_v_permit
+  note: Issued Title V/Federal Operating Permit O4721, issuance date 2026-01-16
+
 - id: schd-01156-01pc-appeal
   url: "https://cdn.arstechnica.net/wp-content/uploads/2025/07/NAACP-and-YGGs-xAI-Air-Permit-Appeal-7-15-2025.pdf"
   genre: appeal_filing
   note: NAACP/YGG appeal — quotes CTC permit 01156-01PC terms (15x SMT-130)
+
+- id: schd-01156-01pc-evaluation
+  url: "https://www.shelbytnhealth.com/DocumentCenter/View/7175"
+  genre: schd_construction_permit_evaluation
+  note: Official SCHD construction-permit evaluation and review for 01156-01PC
+
+- id: schd-01156-01pc-appeal-notice
+  url: "https://www.shelbytnhealth.com/DocumentCenter/View/7467"
+  genre: schd_public_notice
+  note: Official Air Pollution Control Board notice confirming appeal of issued permit 01156-01PC
 
 - id: selc-schd-letter-2025-04-09
   url: "https://cleanenergy.org/wp-content/uploads/2025-04-09-Letter-from-SELC-et-al.-to-SCHD-re-xAIs-New-Turbines.pdf"
@@ -33,9 +58,14 @@
 
 - id: mdeq-xai-41-units
   url: "https://opcgis.deq.state.ms.us/ensearchonline/get_doc.aspx?dt=dpermit&id=1825411"
-  doc_genre: mdeq_psd_permit
+  genre: mdeq_psd_permit
   note: MDEQ PSD Construction Permit 0680-00119 (MZX Tech / xAI Southaven,
     41 turbines 1.2 GW) — direct get_doc URL, found 2026-07-11
+
+- id: mdeq-xai-facility-registry
+  url: "https://opcgis.deq.state.ms.us/enOnline/ai_info.aspx?ai=12592"
+  genre: mdeq_permit_registry
+  note: Official MDEQ registry — 0680-00119 Air-Construction PSD, Permit Issued 2026-03-11
 
 - id: naacp-v-xai-complaint-2026-04-14
   url: "https://naacp.org/sites/default/files/documents/1%20-%20Complaint.pdf"

@@ -1,0 +1,19 @@
+{
+  "name": "behind-the-watt-site",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "check": "astro check"
+  },
+  "dependencies": {
+    "astro": "7.0.9"
+  },
+  "devDependencies": {
+    "@astrojs/check": "^0.9.9",
+    "@types/node": "^26.1.1",
+    "typescript": "^6.0.3"
+  }
+}
