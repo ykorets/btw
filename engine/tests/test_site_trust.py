@@ -45,7 +45,10 @@ def test_footer_links_to_the_editor_instead_of_a_dead_email():
     assert "mailto:hello@behindthewatt.com" not in footer
     assert 'href="https://korets.net/"' in footer
     assert 'rel="author"' in footer
-    assert "Yaroslav Korets" in footer
+    assert "Built by" in footer
+    assert "Yaro Korets" in footer
+    assert "autonomous AI research agents" in footer
+    assert "Publication stays human-approved" in footer
 
 
 def test_map_points_have_keyboard_contract():
