@@ -39,6 +39,15 @@ def test_newsletter_uses_confirmed_subscription_flow():
     assert (SITE / "src" / "pages" / "newsletter" / "confirmed.astro").exists()
 
 
+def test_footer_links_to_the_editor_instead_of_a_dead_email():
+    footer = (SITE / "src" / "components" / "home" /
+              "SiteFooter.astro").read_text()
+    assert "mailto:hello@behindthewatt.com" not in footer
+    assert 'href="https://korets.net/"' in footer
+    assert 'rel="author"' in footer
+    assert "Yaroslav Korets" in footer
+
+
 def test_map_points_have_keyboard_contract():
     assert '.attr("tabindex",0).attr("role","button")' in INDEX
     assert '.on("keydown"' in INDEX
