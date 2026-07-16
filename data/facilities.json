@@ -308,6 +308,7 @@
           "facts": [
             "permit.permit_no",
             "permit.status",
+            "permit.permit_type",
             "permit.issued_at"
           ],
           "quote": "Air - Air-Construction PSD 0680-00119 03/11/2026",
