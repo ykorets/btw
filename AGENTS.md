@@ -8,3 +8,5 @@
 - Full-site Lighthouse, broad browser/device matrices and recovery rehearsals belong locally or in an explicitly requested diagnostic run. Preserve independent GitHub checks for the final candidate, security boundaries, tenant isolation, migrations and deployment correctness.
 - Never raise the Actions budget, rerun a budget-blocked job, replace required checks with local receipts, or bypass a deployment gate to make a release green. Production deployment authorization remains separate.
 - Canonical cross-repository policy: https://github.com/ykorets/infrastructure/blob/main/CI-POLICY.md.
+
+Lighthouse is only for public indexable SEO pages. Never run it against internal applications, dashboards, authenticated routes, previews or noindex pages; use functional, accessibility and access-control checks for those surfaces.
