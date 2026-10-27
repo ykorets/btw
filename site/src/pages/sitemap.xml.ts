@@ -10,6 +10,7 @@ export const GET: APIRoute = async () => {
   const urls = [
     "https://behindthewatt.com/",
     "https://behindthewatt.com/data/",
+    "https://behindthewatt.com/privacy/",
     ...topics.map(t => `https://behindthewatt.com${t.path}`),
     ...mirror.facilities.facilities.map(
       (facility: Record<string, any>) =>

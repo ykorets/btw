@@ -1,0 +1,73 @@
+<section class="topic-section wrap" id="request" aria-labelledby="request-heading">
+  <div class="pilot-request">
+    <div><h2 id="request-heading">Request a scoped pilot</h2><p>Tell Yaro which projects you follow and the decision the research needs to support. We will review source coverage and agree the work and fixed fee before the pilot starts.</p><p class="topic-small">Sending this form creates a nonbinding inquiry. It does not charge you, start a contract or subscribe you to the newsletter.</p><p class="topic-small">Prefer email? <a href="mailto:yaroslav.korets@gmail.com?subject=BTW%20pilot%20scope">Contact Yaro about a pilot</a>.</p></div>
+    <div>
+      <form id="pilot-inquiry" action="https://newsletter.behindthewatt.com/pilot-inquiry" method="post">
+        <div class="pilot-fields">
+          <div><label for="pilot-name">Your name</label><input id="pilot-name" name="name" autocomplete="name" minlength="2" maxlength="100" required /></div>
+          <div><label for="pilot-email">Work email</label><input id="pilot-email" name="email" type="email" autocomplete="email" maxlength="254" required /></div>
+          <div><label for="pilot-company">Company</label><input id="pilot-company" name="company" autocomplete="organization" minlength="2" maxlength="160" required /></div>
+          <div><label for="pilot-role">Role <span>(optional)</span></label><input id="pilot-role" name="role" autocomplete="organization-title" maxlength="120" /></div>
+        </div>
+        <label for="pilot-projects">Projects or states you want to follow</label><textarea id="pilot-projects" name="projects" rows="3" minlength="3" maxlength="1500" placeholder="For example: Abilene, Texas; onsite gas generation" required></textarea>
+        <label for="pilot-question">What decision should the research help you make?</label><textarea id="pilot-question" name="question" rows="4" minlength="10" maxlength="2000" placeholder="Describe the change, equipment question or client research task you need to track." required></textarea>
+        <div class="pilot-hp" aria-hidden="true"><label for="pilot-website">Website</label><input id="pilot-website" name="website" tabindex="-1" autocomplete="off" /></div>
+        <input type="hidden" name="source_path" value="/monitoring-pilot/" />
+        <input type="hidden" name="request_id" value="" />
+        <label class="pilot-consent"><input type="checkbox" name="consent" value="yes" required /><span>I agree that Behind the Watt may use these details to review and reply to my inquiry, as described in the <a href="/privacy/">privacy notice</a>.</span></label>
+        <p class="topic-small">Please send only information you are comfortable sharing by email. Do not include confidential files, credentials or sensitive client information.</p>
+        <button class="btn btn-primary" type="submit">Request a scoped pilot</button>
+      </form>
+      <div id="pilot-status" class="pilot-status" role="status" aria-live="polite" tabindex="-1"></div>
+    </div>
+  </div>
+</section>
+<script>
+  import { track } from "../../lib/analytics";
+  const form = document.querySelector<HTMLFormElement>("#pilot-inquiry");
+  const status = document.querySelector<HTMLElement>("#pilot-status");
+  const button = form?.querySelector<HTMLButtonElement>('button[type="submit"]');
+  if (form && status && button) {
+    let requestId = crypto.randomUUID();
+    let attemptedPayload = "";
+    let started = false;
+    form.addEventListener("focusin", () => {
+      if (!started) { started = true; track("pilot_form_start", {form_id:"pilot-inquiry"}); }
+    }, {once:true});
+    form.addEventListener("submit", async event => {
+      event.preventDefault();
+      const fields = new FormData(form);
+      const payload = Object.fromEntries(["name","email","company","role","projects","question","website","consent","source_path"].map(k => [k, String(fields.get(k) || "")]));
+      const signature = JSON.stringify(payload);
+      if (attemptedPayload && attemptedPayload !== signature) requestId = crypto.randomUUID();
+      attemptedPayload = signature;
+      button.disabled = true;
+      button.textContent = "Sending inquiry…";
+      status.textContent = "Sending your scope request. Please keep this page open.";
+      try {
+        const response = await fetch(form.action, {method:"POST", headers:{"Content-Type":"application/json",Accept:"application/json"},
+          body:JSON.stringify({...payload,request_id:requestId}), signal:AbortSignal.timeout(15_000)});
+        const result = await response.json();
+        if (response.ok && result.ok && ["received","filtered"].includes(result.status)) {
+          form.hidden = true;
+          status.textContent = "Inquiry received. Yaro will review the requested scope before discussing a fee. No payment or newsletter subscription was created.";
+          status.focus();
+          if (result.status === "received") {
+            const isTest = new URLSearchParams(location.search).get("btw_test") === "1";
+            track(isTest ? "pilot_inquiry_test" : "generate_lead", {form_id:"pilot-inquiry",lead_source:"monitoring_pilot"});
+          }
+          return;
+        }
+        status.textContent = response.status === 429 ? "Too many requests. Please wait a minute and retry."
+          : response.status < 500 ? "Your inquiry was not accepted. Check the required fields and privacy consent, then retry."
+          : "Delivery could not be confirmed. Retry the same request here, or contact Yaro by email if the problem continues.";
+        track("pilot_form_error", {form_id:"pilot-inquiry",error_type:response.status < 500 ? "validation_or_limit" : "delivery_unconfirmed"});
+      } catch {
+        status.textContent = "Delivery could not be confirmed. Check your connection and retry the same request here. If it remains unconfirmed, contact Yaro by email.";
+        track("pilot_form_error", {form_id:"pilot-inquiry",error_type:"network_unconfirmed"});
+      }
+      button.disabled = false;
+      button.textContent = "Request a scoped pilot";
+    });
+  }
+</script>

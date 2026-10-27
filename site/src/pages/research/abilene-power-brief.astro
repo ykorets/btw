@@ -1,0 +1,47 @@
+---
+import TopicLayout from "../../layouts/TopicLayout.astro";
+import "../../styles/pilot.css";
+const original = "https://records.tceq.texas.gov/cs/idcplg?IdcService=TCEQ_EXTERNAL_SEARCH_GET_FILE&Rendition=Web&dID=8143786";
+const amendment = "https://records.tceq.texas.gov/cs/idcplg?IdcService=TCEQ_EXTERNAL_SEARCH_GET_FILE&Rendition=Web&dID=8600163";
+---
+<TopicLayout title="Abilene Data Center Power: Sample Research Memo | BTW" description="A source-linked Abilene research memo: TCEQ 177263 equipment changes, O4721 issuance, capacity boundaries, open questions and implications for suppliers." path="/research/abilene-power-brief/" heading="Abilene power: what the permit changes establish" deck="Sample research memo · Longhorn Data Center / Crusoe Stargate Abilene. A dated example of the work a scoped monitoring pilot delivers." label="Abilene sample memo">
+  <section class="topic-section wrap">
+    <p class="memo-summary">The January 2025 amendment changes the permitted turbine configuration to five LM2500 units and five Titan 350 units, totaling 360.5 site-rated MW. The later O4721 issuance adds a documented federal operating-permit milestone. Neither record establishes current metered output or an open equipment procurement.</p>
+    <dl class="memo-meta"><div><dt>Record reviewed</dt><dd>October 27, 2026</dd></div><div><dt>Location</dt><dd>Taylor County, Texas</dd></div><div><dt>Applicant in the air record</dt><dd>Abilene DC 1, LLC</dd></div><div><dt>Purpose of this sample</dt><dd>Demonstrate evidence and change interpretation</dd></div></dl>
+    <p class="topic-small">This is a retrospective demonstration using the existing reviewed public record. It is not a paid client case, a new discovery on October 27 or a finding that every permitted unit is operating.</p>
+  </section>
+  <section class="topic-section wrap">
+    <h2>What changed in the record?</h2>
+    <div class="topic-table" tabindex="0" role="region" aria-label="Abilene before and after record"><table><caption>Changes described in the January 2025 modification technical review</caption><thead><tr><th scope="col">Field</th><th scope="col">Earlier configuration described by the review</th><th scope="col">Modified configuration</th></tr></thead><tbody>
+      <tr><td>Titan 350 count</td><td>6</td><td>5</td></tr><tr><td>Titan 350 site rating</td><td>Review describes an increase; earlier rating not reproduced here</td><td>38 MW per unit</td></tr><tr><td>LM2500 count</td><td>6</td><td>5</td></tr><tr><td>LM2500 site rating</td><td>Review describes a reduction; earlier rating not reproduced here</td><td>34.1 MW per unit</td></tr><tr><td>LM2500 annual permitted hours</td><td>5,880</td><td>8,760</td></tr>
+    </tbody></table></div>
+    <p>The modification was received January 11, 2025 and approved January 22. It is a later filing under registration 177263. The original registration review records a receipt date of August 15, 2024; using January 11 as the first-ever filing would move the start of the timeline.</p>
+    <p>The later O4721 federal operating permit was issued January 16, 2026. Its issuance should be kept as a separate regulatory event. It does not replace the need for current operating evidence.</p>
+  </section>
+  <section class="topic-section wrap">
+    <h2>What is confirmed, and on what basis?</h2>
+    <div class="topic-table" tabindex="0" role="region" aria-label="Abilene facts and evidence"><table><thead><tr><th scope="col">Finding</th><th scope="col">Evidence</th><th scope="col">Boundary</th></tr></thead><tbody>
+      <tr><td>360.5 MW turbine cohort</td><td>5 × 34.1 MW + 5 × 38 MW in the <a href={amendment}>177263 modification review</a></td><td>Permitted site ratings, not current net delivery to IT load</td></tr>
+      <tr><td>Onsite computing purpose</td><td>The same review describes onsite data-center and computing use</td><td>Purpose stated in the document, not an observed dispatch profile</td></tr>
+      <tr><td>Federal operating permit issued</td><td><a href="https://www.tceq.texas.gov/assets/public/permitting/air/publicnotice/37589sop.pdf">O4721</a>, January 16, 2026</td><td>Issued authorization, not proof of each unit's current operation</td></tr>
+      <tr><td>Data center live by an operator report</td><td><a href="https://www.crusoe.ai/resources/newsroom/crusoe-announces-flagship-abilene-data-center-is-live">Crusoe announcement</a>, September 30, 2025</td><td>Operation by that report; exact first BTM generation day not established</td></tr>
+    </tbody></table></div>
+  </section>
+  <section class="topic-section wrap">
+    <h2>What does this mean for a supplier or consultant?</h2>
+    <p><strong>Research interpretation:</strong> use the amended five-plus-five configuration when describing this permitted cohort. Preserve the earlier six-plus-six description as history. Combining both versions as separate equipment would overstate the documented fleet.</p>
+    <p>The longer LM2500 permitted-hours envelope changes the authorization described by the review. It does not establish annual run hours, availability, capacity factor or service demand. Those commercial and operating assumptions need their own evidence.</p>
+    <p>The legal-entity and site-name match is useful for following later filings: the permit uses Abilene DC 1 / Longhorn, while the project is commonly discussed as Crusoe Stargate Abilene. The record does not establish an unawarded order or identify a supplier opportunity that is currently available.</p>
+    <h2>What remains unknown?</h2>
+    <ul><li>Current installed and operating configuration across the complete campus.</li><li>Measured net generation and power delivered to computing at a defined time.</li><li>The exact first day of behind-the-meter generation.</li><li>Project-specific heat rate, delivered gas price, installed cost and service economics.</li><li>Current procurement, construction and service packages available to outside suppliers.</li></ul>
+    <h2>What would the next research check cover?</h2>
+    <ol><li>Look for later records under the matched entity, site, registration and permit identifiers; record the date and result of the check.</li><li>Compare the scope of any later filing with the existing cohort before treating it as additional equipment.</li><li>Seek dated commissioning or operating evidence for claims about current configuration or output.</li><li>Validate commercial participants and available scope directly before qualifying a sales opportunity.</li></ol>
+    <p>These are proposed follow-up checks, not claims that a new filing or contract exists. Automated TCEQ retrieval currently has access limits; a pilot must agree a workable source-review route rather than promise uninterrupted coverage.</p>
+  </section>
+  <section class="topic-section wrap">
+    <h2>Source trail and reproducibility</h2>
+    <ul class="topic-source-list"><li><a href={original}>Original registration technical review, TCEQ 177263</a>: original receipt date. Record identity dID 8143786.</li><li><a href={amendment}>Modification technical review, TCEQ 177263</a>: changes, site ratings, unit counts and modification dates. Record identity dID 8600163.</li><li><a href="https://www.tceq.texas.gov/assets/public/permitting/air/publicnotice/37589sop.pdf">TCEQ federal operating permit O4721</a>: January 16, 2026 issuance.</li><li><a href="/facility/crusoe-stargate-abilene/">Complete Abilene dossier</a>: source receipts, published equipment, event dates and document hashes.</li></ul>
+    <h3>Why do the document and review dates differ?</h3><p>The documents describe events in 2024–2026. October 27, 2026 is the date BTW checked this source set. Reviewing an older document does not make its event new.</p>
+    <h3>Can this format be applied to my watchlist?</h3><p>The <a href="/monitoring-pilot/">paid monitoring pilot</a> uses an agreed project list, source scope and cadence. <a href="/monitoring-pilot/#request" data-pilot-cta="sample-memo">Request a scoped pilot</a> to check whether the available public records can support your question.</p>
+  </section>
+</TopicLayout>

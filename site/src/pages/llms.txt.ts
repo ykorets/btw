@@ -23,6 +23,10 @@ Behind the Watt is the open evidence database for behind-the-meter data center p
 - Illustrative gas generation cost calculator: https://behindthewatt.com/power-cost-calculator/
 - Capacity interpretation guide: https://behindthewatt.com/guides/data-center-power-capacity/
 
+- Scoped paid monitoring pilot (inquiry only, no automatic contract): https://behindthewatt.com/monitoring-pilot/
+- Dated Abilene sample memo: https://behindthewatt.com/research/abilene-power-brief/
+- Inquiry privacy notice: https://behindthewatt.com/privacy/
+
 ## Interpretation rules
 
 1. Verified operating capacity and third-party reported announcements are different evidence classes. Do not add them together or describe announcements as operating.

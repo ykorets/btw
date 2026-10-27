@@ -3,4 +3,6 @@ export const topics = [
   { path: "/equipment/lm2500-titan-350/", label: "LM2500 & Titan 350", title: "LM2500 and Titan 350 data center turbines", description: "Read the Abilene permit: unit counts, site ratings, changes and limits of the evidence." },
   { path: "/power-cost-calculator/", label: "Power cost calculator", title: "Behind-the-meter power cost calculator", description: "Compare gas generation with a grid tariff. Change assumptions and share a reproducible scenario." },
   { path: "/guides/data-center-power-capacity/", label: "Capacity guide", title: "Data center power: permitted vs. operating capacity", description: "Reconcile announced, permitted, installed and delivered MW using real project records." },
+  { path: "/monitoring-pilot/", label: "Monitoring pilot", title: "A paid pilot for your project watchlist", description: "Agree the projects, sources and fixed fee before four weeks of focused research begin." },
+  { path: "/research/abilene-power-brief/", label: "Abilene sample", title: "Abilene: a source-linked research memo", description: "A dated sample showing what changed, what is confirmed, what is unknown and what to check next." },
 ];
