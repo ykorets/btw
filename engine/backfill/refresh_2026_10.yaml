@@ -1,0 +1,22 @@
+# Primary documents reviewed 2026-10-27. Authoring inputs, not a second data export.
+- id: tceq-177263-original-reviewed
+  url: "https://records.tceq.texas.gov/cs/idcplg?IdcService=TCEQ_EXTERNAL_SEARCH_GET_FILE&Rendition=Web&dID=8143786"
+  genre: tceq_standard_permit_review
+- id: tceq-o4721-issued
+  url: "https://www.tceq.texas.gov/assets/public/permitting/air/publicnotice/37589sop.pdf"
+  genre: tceq_title_v_permit
+- id: mdeq-0680-00119-final
+  url: "https://opcgis.deq.state.ms.us/enOnline/get_doc.aspx?dt=finalp&id=1834338"
+  genre: mdeq_psd_permit
+- id: mdeq-current-registry
+  url: "https://opcgis.deq.state.ms.us/enOnline/ai_info.aspx?ai=12592"
+  genre: mdeq_permit_registry
+- id: schd-october-notice
+  url: "https://www.shelbytnhealth.com/DocumentCenter/View/7965"
+  genre: schd_public_notice
+- id: southaven-october-court-order
+  url: "https://earthjustice.org/wp-content/uploads/2026/10/show_temp.pdf"
+  genre: court_order
+- id: abilene-operator-confirmation
+  url: "https://www.crusoe.ai/resources/newsroom/crusoe-announces-flagship-abilene-data-center-is-live"
+  genre: operator_report

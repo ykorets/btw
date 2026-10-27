@@ -1,0 +1,96 @@
+{
+  "reviewed_on": "2026-10-27",
+  "method": "Exact primary-document quote validation; no model calls",
+  "claims": [
+    {
+      "field": "permit.no",
+      "value": "O4721",
+      "value_num": null,
+      "quote": "Permit No:  O4721",
+      "page": 1,
+      "id": "81b0566b-271b-5f4b-922b-7b8d58973669",
+      "sha256": "908e869b003eae12ac20db300a0959f473d4ba5f862ae1d359bb38a1e148cc0f",
+      "match_score": 1.0
+    },
+    {
+      "field": "permit.type",
+      "value": "Federal Operating Permit",
+      "value_num": null,
+      "quote": "FEDERAL OPERATING PERMIT",
+      "page": 1,
+      "id": "732c6285-d6bc-5e6d-9b92-b3a3d5f065a3",
+      "sha256": "908e869b003eae12ac20db300a0959f473d4ba5f862ae1d359bb38a1e148cc0f",
+      "match_score": 1.0
+    },
+    {
+      "field": "permit.status",
+      "value": "issued",
+      "value_num": null,
+      "quote": "A FEDERAL OPERATING PERMIT IS HEREBY ISSUED TO",
+      "page": 1,
+      "id": "3aad4ab0-62e1-5cd7-a52a-d8e70a66bfa8",
+      "sha256": "908e869b003eae12ac20db300a0959f473d4ba5f862ae1d359bb38a1e148cc0f",
+      "match_score": 1.0
+    },
+    {
+      "field": "permit.issued_at",
+      "value": "2026-01-16",
+      "value_num": null,
+      "quote": "Issuance Date:  January 16, 2026",
+      "page": 1,
+      "id": "4c54ff75-4c13-56a0-b392-c15d8fc2079f",
+      "sha256": "908e869b003eae12ac20db300a0959f473d4ba5f862ae1d359bb38a1e148cc0f",
+      "match_score": 1.0
+    },
+    {
+      "field": "permit.authority",
+      "value": "TCEQ",
+      "value_num": null,
+      "quote": "Texas Commission on Environmental Quality (TCEQ)",
+      "page": 3,
+      "id": "f93ae947-fbe3-5f55-aa43-3397132c752a",
+      "sha256": "908e869b003eae12ac20db300a0959f473d4ba5f862ae1d359bb38a1e148cc0f",
+      "match_score": 1.0
+    },
+    {
+      "field": "permit.issued_at",
+      "value": "2025-01-22",
+      "value_num": null,
+      "quote": "Authorization No.:  177263 Issuance Date:  01/22/2025",
+      "page": 42,
+      "id": "97c7259d-83bb-543f-8735-b4f97985f8fd",
+      "sha256": "908e869b003eae12ac20db300a0959f473d4ba5f862ae1d359bb38a1e148cc0f",
+      "match_score": 1.0
+    },
+    {
+      "field": "facility.first_permit_filed",
+      "value": "2024-08-15",
+      "value_num": null,
+      "quote": "Project Received DateAugust 15, 2024",
+      "page": 1,
+      "id": "8afa9370-b789-50ff-b885-58a00387adb3",
+      "sha256": "d137070b957b1a356aba850bac2b863989ab035e62201f8f7196f044fc8eb805",
+      "match_score": 1.0
+    },
+    {
+      "field": "permit.no",
+      "value": "0680-00119",
+      "value_num": null,
+      "quote": "Permit No.: 0680-00119",
+      "page": 1,
+      "id": "1011bfa1-2394-5bbc-934a-95621f4e9960",
+      "sha256": "62734b21f553899dfc3abb82bd8b2ef3de34357b29bb09522e24d0f9ba155fe4",
+      "match_score": 1.0
+    },
+    {
+      "field": "permit.issued_at",
+      "value": "2026-03-11",
+      "value_num": null,
+      "quote": "Issued:____March 11, 2026_____",
+      "page": 1,
+      "id": "90b95705-041e-55c9-8850-b7a46468f2e6",
+      "sha256": "62734b21f553899dfc3abb82bd8b2ef3de34357b29bb09522e24d0f9ba155fe4",
+      "match_score": 1.0
+    }
+  ]
+}

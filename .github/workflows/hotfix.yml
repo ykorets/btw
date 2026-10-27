@@ -6,7 +6,7 @@ on:
       date: {description: "event date YYYY-MM-DD", required: true}
       type: {description: "event type (enforcement/filing/observation/...)", required: true}
       headline: {description: "one-line headline", required: true}
-      url: {description: "evidence URL (optional)", required: false, default: ""}
+      url: {description: "public evidence URL", required: true}
 permissions:
   contents: write
   pull-requests: write
@@ -23,10 +23,12 @@ jobs:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
           GITHUB_TOKEN: ${{ github.token }}
-        run: >
-          PYTHONPATH=engine/src python -m btw_engine.hotfix
-          ${{ inputs.facility && format('--facility {0}', inputs.facility) || '' }}
-          --date "${{ inputs.date }}"
-          --type "${{ inputs.type }}"
-          --headline "${{ inputs.headline }}"
-          ${{ inputs.url && format('--url {0}', inputs.url) || '' }}
+          EVENT_FACILITY: ${{ inputs.facility }}
+          EVENT_DATE: ${{ inputs.date }}
+          EVENT_TYPE: ${{ inputs.type }}
+          EVENT_HEADLINE: ${{ inputs.headline }}
+          EVENT_URL: ${{ inputs.url }}
+        run: |
+          args=(--date "$EVENT_DATE" --type "$EVENT_TYPE" --headline "$EVENT_HEADLINE" --url "$EVENT_URL")
+          if [ -n "$EVENT_FACILITY" ]; then args+=(--facility "$EVENT_FACILITY"); fi
+          PYTHONPATH=engine/src python -m btw_engine.hotfix "${args[@]}"

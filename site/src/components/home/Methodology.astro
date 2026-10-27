@@ -1,12 +1,22 @@
+---
+import { dateLabel } from "../../lib/facts";
+const { coverage } = Astro.props;
+const sources = (coverage.sources || []).filter((s: any) => s.schedule !== "once");
+const generated = Date.now();
+function stale(source: any) {
+ const days = Number(/([0-9]+)\s*days?/.exec(source.slo_interval || "")?.[1] || 7);
+ return !source.last_hit_at || generated - Date.parse(source.last_hit_at) > days * 86400000;
+}
+---
 <section id="method">
   <div class="wrap">
     <div class="kicker">Methodology</div>
     <h2>Show your work</h2>
     <p class="sub">Every row links to the government document it came from. Here's the pipeline — and what a source actually looks like.</p>
     <div class="steps">
-      <div class="step"><div><b>Monitor the permit trail daily</b><span>State air and siting registries — TCEQ, Ohio PSB, MDEQ, Shelby County, EPA, FERC — scanned every day for new filings, modifications, and approvals.</span></div></div>
+      <div class="step"><div><b>Check the permit trail</b><span>State air and siting registries — TCEQ, Ohio PSB, MDEQ, Shelby County, EPA, FERC — have scheduled checks for new filings, modifications, and approvals. Failed or overdue checks are shown below.</span></div></div>
       <div class="step"><div><b>Extract the machine record</b><span>Permits name what press releases don't: turbine OEM and model, unit counts, rated MW, permitted hours, emissions class.</span></div></div>
-      <div class="step"><div><b>Verify actual operation</b><span>Grid-tie records, gas flows, satellite imagery, and court filings separate "operating" from "announced." A megawatt counts when it verifiably serves compute load.</span></div></div>
+      <div class="step"><div><b>Verify actual operation</b><span>Grid-tie records, gas flows, satellite imagery, and court filings separate "operating" from "announced." Equipment ratings, permitted capacity and observed operation remain separate claims. A gas nomination or a satellite image alone does not measure delivered electricity.</span></div></div>
       <div class="step"><div><b>Publish with the receipt</b><span>Every row carries its source document. Disagree with a number? The primary source is one click away.</span></div></div>
     </div>
     <div class="permit">
@@ -15,6 +25,7 @@
       "…reduce the count of <span class="hl">GE LM2500</span> simple-cycle turbines from six to five, reduce the site-rated power to <span class="hl">34.1 MW per turbine</span>, and increase the annual hours of operation from 5,880 to <span class="hl">8,760 hours per turbine</span>…"
       <div class="note">One paragraph of one filing: equipment, capacity, and utilization the developer never announced. This is why we read permits.</div>
     </div>
+    <div id="coverage" style="margin-top:28px"><h3>Source coverage · exported {coverage.generated}</h3><p class="src">A successful source sweep is a retrieval check, not a new verification of every facility fact.</p><div style="overflow-x:auto"><table><thead><tr><th>Source</th><th>Last successful sweep</th><th>Freshness at site build</th></tr></thead><tbody>{sources.map((source: any) => <tr><td><a href={source.url} target="_blank" rel="noopener">{source.id}</a></td><td>{source.last_hit_at ? dateLabel(source.last_hit_at) : "No successful sweep recorded"}</td><td>{stale(source) ? "Overdue / unavailable" : "Within source interval"}</td></tr>)}</tbody></table></div></div>
     <div class="sources-strip">
       <span>TCEQ</span><span>Ohio Power Siting Board</span><span>MDEQ</span><span>Shelby County Health Dept</span><span>EPA</span><span>FERC</span><span>EIA</span><span>Federal courts</span>
     </div>

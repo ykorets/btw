@@ -186,6 +186,8 @@ def build_summary(facilities: list[dict], aggregates: list[dict]) -> dict:
         "operating_gw": operating_gw,
         "operating_facilities": len(operating),
         "facilities_tracked": len(facilities),
+        "date_semantics": "as_of is the export date; record_reviewed events state the scope and date of primary-record checks",
+        "capacity_semantics": "documented equipment cohorts at sites historically classified operating; not live generation or a complete national fleet",
         "method": "sum(coalesce(total_mw, unit_count*mw_each)) over facilities "
                   "with status=operating; basis and derivation are retained "
                   "per unit cohort",

@@ -1,5 +1,6 @@
 import { readFile } from "node:fs/promises";
 import path from "node:path";
+import { capacity, capacityLabel, monthsToPower, hasReceipt } from "./facts";
 
 type Json = Record<string, any>;
 
@@ -59,27 +60,6 @@ function displayDate(value?: string | null): string {
   }).format(date);
 }
 
-function facilityMw(facility: Json): number {
-  return (facility.unit || []).reduce(
-    (sum: number, unit: Json) =>
-      sum + (unit.total_mw != null
-        ? Number(unit.total_mw)
-        : (unit.unit_count || 0) * Number(unit.mw_each || 0)),
-    0,
-  );
-}
-
-function monthsToPower(facility: Json): string {
-  if (!facility.first_permit_filed || !facility.first_power) {
-    return "Dates under verification";
-  }
-  const days =
-    (Date.parse(facility.first_power) - Date.parse(facility.first_permit_filed)) /
-    86_400_000;
-  const months = Math.round(days / 30.4375);
-  return `${months < 0 ? "−" : ""}${Math.abs(months)} months`;
-}
-
 const genreLabels: Record<string, string> = {
   satellite_scene: "Satellite scene",
   permit: "Permit",
@@ -108,7 +88,9 @@ export function buildFacilityView(
   summary: Json,
   coverage: Json,
 ): Json {
-  const capacity = facilityMw(facility);
+  const publishedCapacity = capacity(facility);
+  const months = monthsToPower(facility);
+  const review = events.find((event) => event.facility === facility.slug && event.type === "record_reviewed");
   const [latitude, longitude] = coordinates(facility.geo);
   const satelliteSource = (facility.sources || []).find(
     (source: Json) => source.doc_genre === "satellite_scene",
@@ -125,18 +107,20 @@ export function buildFacilityView(
   const timeline: Array<Json> = events
     .filter((event) => event.facility === facility.slug)
     .map((event) => ({ date: event.date, displayDate: displayDate(event.date), label: human(event.type || "Event"), headline: event.headline, url: event.source_url }));
-  if (facility.first_power) timeline.push({ date: facility.first_power, displayDate: displayDate(facility.first_power), label: "Operation", headline: "First verified power date", url: null });
+  if (hasReceipt(facility, "facility.first_power") && facility.first_power) timeline.push({ date: facility.first_power, displayDate: displayDate(facility.first_power), label: "Operation", headline: "First verified power date", url: null });
   for (const permit of facility.permit || []) {
     if (permit.filed_at) timeline.push({ date: permit.filed_at, displayDate: displayDate(permit.filed_at), label: "Permit", headline: `${permit.authority} ${permit.permit_no} filed`, url: null });
     if (permit.issued_at) timeline.push({ date: permit.issued_at, displayDate: displayDate(permit.issued_at), label: "Permit", headline: `${permit.authority} ${permit.permit_no} issued`, url: null });
   }
   timeline.sort((a, b) => b.date.localeCompare(a.date));
-  const description = `Evidence dossier for ${facility.name}: ${capacity.toFixed(1)} MW published operating capacity, permits, events and source documents.`;
+  const description = `Evidence dossier for ${facility.name}: ${capacityLabel(facility)} MW documented equipment capacity, permits, dated observations and source documents.`;
   return {
     ...facility,
     statusLabel: human(facility.status || "Under review"),
     location: [facility.county, facility.state].filter(Boolean).join(", "),
-    capacityMw: capacity.toFixed(1),
+    capacityMw: capacityLabel(facility),
+    capacityPartial: publishedCapacity.partial,
+    recordReview: review ? { date: displayDate(review.date), text: review.headline, url: review.source_url } : null,
     capacityNote: supportedFacts.has("unit.total_mw")
       ? "Uses a directly sourced cohort total where the source does not establish an individual unit rating."
       : supportedFacts.has("unit.unit_count") && supportedFacts.has("unit.mw_each")
@@ -144,7 +128,7 @@ export function buildFacilityView(
         : "Calculated from published unit count × unit rating. The configuration is public, but receipts for both unit-level inputs are not yet present in the export.",
     asOf: summary.as_of || "under review",
     description,
-    ttp: monthsToPower(facility),
+    ttp: months == null ? "Dates lack field-level receipts" : `${months < 0 ? "−" : ""}${Math.abs(months)} months`,
     publishedUnits: (facility.unit || []).reduce((sum: number, unit: Json) => sum + (unit.unit_count || 0), 0) || "Under verification",
     permitEnvelope: permitEnvelope(facility),
     equipment: (facility.unit || []).map((unit: Json) => ({

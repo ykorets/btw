@@ -2,6 +2,11 @@ name: archive-backfill
 on:
   workflow_dispatch:
     inputs:
+      manifest:
+        description: "Document batch when URL is blank"
+        type: choice
+        options: [genesis, refresh-2026-10]
+        default: genesis
       url:
         description: "Optional single public-record URL; blank runs the manifest"
         default: ""
@@ -36,10 +41,14 @@ jobs:
           ARCHIVE_URL: ${{ inputs.url }}
           ARCHIVE_GENRE: ${{ inputs.genre || 'permit' }}
           ARCHIVE_SOURCE: ${{ inputs.source || 'manual-genesis' }}
+          ARCHIVE_MANIFEST: ${{ inputs.manifest || 'genesis' }}
         run: |
           if [ -n "$ARCHIVE_URL" ]; then
             engine/.venv/bin/python -m btw_engine.fetch \
               --url "$ARCHIVE_URL" --genre "$ARCHIVE_GENRE" --source "$ARCHIVE_SOURCE"
+          elif [ "$ARCHIVE_MANIFEST" = "refresh-2026-10" ]; then
+            engine/.venv/bin/python -m btw_engine.fetch \
+              --backfill engine/backfill/refresh_2026_10.yaml
           else
             engine/.venv/bin/python -m btw_engine.fetch \
               --backfill engine/backfill/genesis_docs.yaml
