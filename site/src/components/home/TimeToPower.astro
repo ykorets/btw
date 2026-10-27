@@ -1,27 +1,11 @@
-<section id="ttp">
-  <div class="wrap">
-    <div class="kicker">Time-to-Power Board</div>
-    <h2>Months from air permit to first megawatt</h2>
-    <p class="sub">The industry promises "months, not years." Here's what the record actually shows. Negative numbers mean the turbines ran before the permit existed.</p>
-    <div style="margin-top:26px">
-      <div id="ttp-live">
-      <div class="ttp-row">
-        <span><b>xAI Colossus 1</b> <span class="src">TN</span></span>
-        <div class="ttp-track"><div class="ttp-zero"></div><div class="ttp-bar" style="right:60%;width:13%;background:var(--red)"></div></div>
-        <span class="ttp-val" style="color:var(--red)">−7 mo</span>
-      </div>
-      <div class="ttp-row">
-        <span><b>Crusoe Stargate Abilene</b> <span class="src">TX</span></span>
-        <div class="ttp-track"><div class="ttp-zero"></div><div class="ttp-bar" style="left:40%;width:22%;background:var(--green)"></div></div>
-        <span class="ttp-val">13 mo</span>
-      </div>
-      <div class="ttp-row">
-        <span><b>xAI Colossus 2</b> <span class="src">MS</span></span>
-        <div class="ttp-track"><div class="ttp-zero"></div></div>
-        <span class="ttp-val" style="color:var(--ink-3)">dates under verification</span>
-      </div>
-      </div>
-      <p class="src" style="margin-top:14px">Zero = first air-permit filing; months computed from engine-verified dates — rows show a number only when both dates are published with sources. Grid interconnection median for comparison: 60+ months. Red = operation preceded permit; both xAI sites are in active Clean Air Act litigation.</p>
-    </div>
-  </div>
-</section>
+---
+import { monthsToPower } from "../../lib/facts";
+const { facilities } = Astro.props;
+---
+<section id="ttp"><div class="wrap"><div class="kicker">Time-to-power</div><h2>Dates need their own evidence</h2>
+<p class="sub">A permit date, a campus opening and the first delivery from a particular power plant are different milestones. We publish an interval only when both endpoint fields carry receipts.</p>
+<div id="ttp-live" style="margin-top:26px">{facilities.map((f: any) => {
+ const months = monthsToPower(f);
+ return <div class="ttp-row"><span><b>{f.name}</b> <span class="src">{f.state}</span></span><div class="ttp-track"><div class="ttp-zero"></div>{months != null && <div class="ttp-bar" style={`${months < 0 ? "right:60%" : "left:40%"};width:${Math.min(Math.abs(months) * 1.8, 38)}%;background:var(--green)`}></div>}</div><span class="ttp-val">{months == null ? "Dates under verification" : `${months < 0 ? "−" : ""}${Math.abs(months)} mo`}</span></div>;
+})}</div><p class="src" style="margin-top:14px">Legacy dates remain available in the dataset for traceability. Missing endpoint receipts keep them out of this calculation.</p>
+</div></section>

@@ -2,13 +2,13 @@
   <div class="wrap">
     <div class="kicker">The open cost model</div>
     <h2>What does a megawatt-hour really cost behind the meter?</h2>
-    <p class="sub">Fuel by heat rate, capex annualized over 15 years at 10%, O&M — against your grid tariff, and against the value of connecting earlier. Load a real facility or set your own assumptions.</p>
+    <p class="sub">Fuel by heat rate, capex annualized over 15 years at 10%, O&M — against your grid tariff, and against the value of connecting earlier. Use illustrative scenarios or set your own assumptions.</p>
     <div class="presets" style="margin-top:22px">
-      <button class="preset" data-preset="1600,9500,4,10,90,65,20,20">Crusoe Abilene profile</button>
-      <button class="preset" data-preset="1400,10500,4.25,14,85,65,24,22">xAI Memphis profile</button>
-      <button class="preset" data-preset="1800,8500,3.5,9,92,68,18,18">Williams × Meta profile</button>
-      <button class="preset" data-preset="1600,9500,8,10,90,65,20,20">2022 gas shock</button>
-      <button class="preset" data-preset="1600,9500,4,10,60,65,20,20">Underused island</button>
+      <button class="preset" data-preset="1600,9500,4,10,90,65,20,20,20">Aeroderivative scenario</button>
+      <button class="preset" data-preset="1400,10500,4.25,14,85,65,24,22,20">Mobile turbine scenario</button>
+      <button class="preset" data-preset="1800,8500,3.5,9,92,68,18,18,20">Lower heat-rate scenario</button>
+      <button class="preset" data-preset="1600,9500,8,10,90,65,20,20,20">High gas price</button>
+      <button class="preset" data-preset="1600,9500,4,10,60,65,20,20,20">Underused island</button>
     </div>
     <div class="calc-grid">
       <div class="crow"><label for="capex">Capex, $/kW</label><output id="capex-out">1,600</output><input type="range" id="capex" min="800" max="2500" step="50" value="1600"></div>
@@ -19,8 +19,9 @@
       <div class="crow"><label for="grid">Grid tariff, $/MWh</label><output id="grid-out">65</output><input type="range" id="grid" min="40" max="120" step="1" value="65"></div>
       <div class="crow"><label for="mo">Months saved vs queue</label><output id="mo-out">20</output><input type="range" id="mo" min="0" max="36" step="1" value="20"></div>
       <div class="crow"><label for="rev">Compute revenue, $M/MW·yr</label><output id="rev-out">20</output><input type="range" id="rev" min="2" max="30" step="1" value="20"></div>
+      <div class="crow"><label for="margin">Incremental contribution margin, %</label><output id="margin-out">20</output><input type="range" id="margin" min="0" max="100" step="1" value="20"></div>
     </div>
-    <p class="calc-src">Where the defaults come from: heat rate and 8,760 hr/yr utilization — <a href="https://records.tceq.texas.gov/cs/idcplg?IdcService=TCEQ_EXTERNAL_SEARCH_GET_FILE&dID=8600163&Rendition=Web" target="_blank" rel="noopener">TCEQ reg. 177263 technical review</a> (Crusoe Abilene); gas price — <a href="https://www.eia.gov/dnav/ng/hist/rngwhhdD.htm" target="_blank" rel="noopener">EIA Henry Hub daily spot</a>; grid tariff band — <a href="https://www.eia.gov/electricity/monthly/epm_table_grapher.php?t=epmt_5_6_a" target="_blank" rel="noopener">EIA industrial average by state</a>. Capex and O&amp;M are model assumptions, not sourced facts — that's why they're sliders. Every output is arithmetic on your inputs.</p>
+    <p class="calc-src">All presets are illustrative assumptions, not measured facility economics or live market prices. The <a href="https://records.tceq.texas.gov/cs/idcplg?IdcService=TCEQ_EXTERNAL_SEARCH_GET_FILE&dID=8600163&Rendition=Web" target="_blank" rel="noopener">Abilene permit</a> provides equipment context; it does not establish every slider value. Gas and grid inputs can be checked against <a href="https://www.eia.gov/dnav/ng/hist/rngwhhdD.htm" target="_blank" rel="noopener">EIA gas data</a> and <a href="https://www.eia.gov/electricity/monthly/epm_table_grapher.php?t=epmt_5_6_a" target="_blank" rel="noopener">state industrial averages</a>. Earlier-operation value uses revenue × your incremental contribution margin. Include all costs other than the separately modeled power premium in that margin to avoid double counting. Results exclude discounting, taxes and any costs you have not included.</p>
     <div class="legend">
       <span><span class="dot" style="background:#c9971c;border-radius:3px"></span>Fuel</span>
       <span><span class="dot" style="background:#1f5fa8;border-radius:3px"></span>Capex</span>
@@ -34,7 +35,7 @@
     <div class="metric-row">
       <div class="metric"><div class="l">BTM premium</div><div class="v" id="premium"></div></div>
       <div class="metric"><div class="l">10-yr power premium, per MW</div><div class="v" id="prem10"></div></div>
-      <div class="metric"><div class="l">Value of time saved, per MW</div><div class="v" id="timeval" style="color:var(--green)"></div></div>
+      <div class="metric"><div class="l">Earlier contribution, per MW</div><div class="v" id="timeval" style="color:var(--green)"></div></div>
     </div>
     <div id="verdict"></div>
   </div>

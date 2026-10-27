@@ -8,7 +8,7 @@ export const GET = () => json({
   attribution: "Behind the Watt, behindthewatt.com",
   documentation: "https://behindthewatt.com/data/",
   openapi: "https://behindthewatt.com/api/v1/openapi.json",
-  updated_from: "The as_of field in summary.json is the canonical dataset date.",
+  updated_from: "summary.as_of is the export date, not a blanket reverification date. Dated record_reviewed events describe the scope checked.",
   datasets: {
     facilities: "/api/v1/facilities.json",
     announcements: "/api/v1/announcements.json",
@@ -18,7 +18,7 @@ export const GET = () => json({
     fleet_csv: "/api/v1/fleet.csv",
   },
   semantics: {
-    facilities: "BTW-verified facilities and field-level source receipts.",
+    facilities: "Published equipment cohorts and field-level receipts. Capacity may be permitted or historically observed; it is not live delivered power.",
     announcements: "Third-party reported pipeline; not equivalent to verified operating capacity.",
     null_values: "Unknown or not yet verified. Never infer zero from null.",
   },

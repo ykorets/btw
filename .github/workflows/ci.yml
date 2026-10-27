@@ -82,6 +82,8 @@ jobs:
         run: PYTHONPATH=engine/src python -m btw_engine.compat --data _mirror/data
       - run: npm ci
         working-directory: site
+      - run: npm test
+        working-directory: site
       - run: npm run check
         working-directory: site
         env:

@@ -28,19 +28,21 @@ const mirror = await loadMirror();
   <Hero
     announcedGw={mirror.announcements.summary.reported_gw}
     announcedProjects={mirror.announcements.summary.projects}
+    summary={mirror.summary}
+    facilityCount={mirror.facilities.facilities.length}
   />
   {mirror.announcements.summary.projects > 0 && <AnnouncedCapacity data={mirror.announcements} />}
-  <LatestFilings />
+  <LatestFilings events={mirror.events.events} />
   <FacilityMap />
-  <FleetTracker />
-  <TimeToPower />
+  <FleetTracker facilities={mirror.facilities.facilities} events={mirror.events.events} />
+  <TimeToPower facilities={mirror.facilities.facilities} />
   <CostCalculator />
   <Audience />
-  <Methodology />
+  <Methodology coverage={mirror.coverage} />
   <OpenDataManifesto />
   <Definitions />
   <Research />
   <Newsletter />
   <SiteFooter />
-  <HomeRuntime />
+  <HomeRuntime facilities={mirror.facilities.facilities} />
 </BaseLayout>
