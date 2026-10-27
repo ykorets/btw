@@ -1,0 +1,36 @@
+---
+import TopicLayout from "../layouts/TopicLayout.astro";
+import CostCalculator from "../components/home/CostCalculator.astro";
+import { costModel } from "../lib/facts";
+const assumptions = {capex: 1600, heatRate: 9500, gas: 4, om: 10, capacityFactor: .9, grid: 65, months: 20, revenue: 20, margin: .2};
+const base = costModel(assumptions);
+const gasPrices = [2, 4, 6, 8];
+const factors = [.6, .75, .9];
+---
+<TopicLayout title="Behind-the-Meter Power Cost Calculator | Behind the Watt" description="Calculate gas generation cost per MWh against a grid tariff. Adjust fuel, heat rate, capex and utilization; share scenarios and inspect the formula." path="/power-cost-calculator/" heading="Behind-the-meter power cost calculator" deck="Estimate gas generation cost per MWh, compare it with a grid tariff and test the value of starting earlier. Every input is an editable assumption." kind="calculator">
+  <CostCalculator />
+  <section class="topic-section wrap">
+    <h2>What does gas generation cost per MWh?</h2>
+    <p>At the default illustrative assumptions, the model returns <strong>${base.btm.toFixed(1)}/MWh</strong>: $38.0 fuel, ${base.capital.toFixed(1)} annualized capital and $10.0 O&M. That is ${base.premium.toFixed(1)}/MWh above the selected $65 grid tariff. These numbers are an example, not a market quote, a facility estimate or a live energy price.</p>
+    <p>The model is a screening tool for an analyst, developer or supplier comparing alternatives. It does not establish project feasibility, bankable LCOE, reliable capacity or investment return. Compare costs at the same delivery point and use your contracted tariff and delivered gas price.</p>
+    <h3>Revisit or share your assumptions</h3><p>Change the controls, then use “Link to this scenario” below the results. The link includes all nine inputs and opens this calculator with those values. Bookmark it or copy its address.</p>
+  </section>
+  <section class="topic-section wrap">
+    <h2>Sensitivity: gas price and utilization</h2>
+    <p>Fuel price and capacity factor can change the comparison without changing the equipment. This table holds capex at $1,600/kW, heat rate at 9,500 Btu/kWh, O&M at $10/MWh and capital recovery at 15 years / 10%. It uses the same calculation as the interactive tool.</p>
+    <div class="topic-table" tabindex="0" role="region" aria-label="Gas generation cost sensitivity"><table><caption>Illustrative generation cost, $/MWh · columns are assumed capacity factors</caption><thead><tr><th scope="col">Gas, $/MMBtu</th>{factors.map(cf => <th scope="col">{Math.round(cf * 100)}% utilization</th>)}</tr></thead><tbody>{gasPrices.map(gas => <tr><th scope="row">${gas.toFixed(2)}</th>{factors.map(cf => <td>${costModel({...assumptions, gas, capacityFactor: cf}).btm.toFixed(1)}</td>)}</tr>)}</tbody></table></div>
+    <p>At this heat rate, another $1/MMBtu of gas adds $9.50/MWh to fuel cost. Lower utilization spreads the same annualized capital across fewer generated MWh. Utilization is not a guarantee of availability; it is an assumption about output over the modeled year.</p>
+  </section>
+  <section class="topic-section wrap">
+    <h2>The formula, with units</h2>
+    <div class="topic-formula">Fuel ($/MWh) = heat rate (Btu/kWh) ÷ 1,000 × gas ($/MMBtu)<br />CRF = r × (1 + r)<sup>n</sup> ÷ ((1 + r)<sup>n</sup> − 1)<br />Capital ($/MWh) = capex ($/kW) × 1,000 × CRF ÷ (8,760 × capacity factor)<br />Generation cost = fuel + capital + O&M<br />r = 10%; n = 15 years; capacity factor is a fraction</div>
+    <p>EIA defines <a href="https://www.eia.gov/tools/faqs/faq.php?id=107&amp;t=3">heat rate</a> as energy input per kWh generated. Match the fuel heating-value basis and gross/net output basis to your heat-rate input. The 1,000 conversion above accounts for kWh/MWh and Btu/MMBtu.</p>
+    <h3>Power premium and earlier operation</h3>
+    <p>The signed BTM premium is modeled generation cost minus grid tariff. The ten-year additional power-cost figure uses the positive part of that difference × 8,760 × capacity factor × 10, per MW. If generation is cheaper, additional cost is zero; the signed per-MWh result still shows the saving.</p>
+    <p>Earlier contribution per MW = months saved ÷ 12 × assumed annual compute revenue per MW × incremental contribution margin. Include all incremental costs except the separately modeled power premium in that margin. At zero margin or zero months saved, earlier contribution is zero. This is a separate, undiscounted scenario amount, not a payback calculation.</p>
+    <h3>Costs and constraints to add before a project decision</h3>
+    <ul><li>Gas transport, delivery pressure, firm service and price basis; fuel infrastructure and connection costs.</li><li>Engineering, installation, electrical distribution, cooling, commissioning and construction finance if absent from capex.</li><li>Fixed service costs, major overhauls, redundancy and spare capacity if absent from O&M or capital assumptions.</li><li>Permitting, emissions controls, operating restrictions, derating, outages and auxiliary loads.</li><li>Demand charges, standby charges, escalation, taxes, residual value and discounting for the full comparison.</li></ul>
+    <p>The calculator does not estimate those items separately. Verify whether each is already in your inputs before adding it again. For project context, read the <a href="/equipment/lm2500-titan-350/">Abilene turbine permit breakdown</a> and the <a href="/guides/data-center-power-capacity/">capacity interpretation guide</a>.</p>
+    <h3>Input sources and reproducibility</h3><p class="topic-small">EIA's <a href="https://www.eia.gov/dnav/ng/hist/rngwhhdD.htm">Henry Hub series</a> is a benchmark, not your delivered gas contract. <a href="https://www.eia.gov/electricity/monthly/epm_table_grapher.php?t=epmt_5_6_a">State industrial electricity averages</a> are not a site tariff. Defaults are illustrative, not fetched prices. The <a href="https://github.com/ykorets/btw/blob/main/site/src/lib/facts.ts">model source</a> and <a href="https://github.com/ykorets/btw/blob/main/site/tests/scenario.test.ts">scenario checks</a> are public.</p>
+  </section>
+</TopicLayout>

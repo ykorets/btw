@@ -1,0 +1,42 @@
+---
+import TopicLayout from "../../layouts/TopicLayout.astro";
+---
+<TopicLayout title="Data Center Power: Permitted vs Operating MW | BTW" description="Understand announced, nameplate, permitted, installed and delivered data center power. Reconcile conflicting MW claims with Abilene and Colossus examples." path="/guides/data-center-power-capacity/" heading="Data center power: permitted vs. operating capacity" deck="A project's MW figure needs a basis, a boundary and a date. Those three details often explain why two apparently conflicting numbers can both be valid.">
+  <section class="topic-section wrap">
+    <h2>Which capacity does the number describe?</h2>
+    <p><strong>Permitted capacity describes an authorization; operating capacity needs evidence of operation.</strong> Neither automatically tells you the power delivered to computing. Nameplate describes equipment capability under specified conditions. Announced capacity describes a plan. Actual generation is energy measured over time.</p>
+    <p>Before comparing two data-center power claims, write down the equipment or campus boundary, the project phase, the rating conditions and the source date. Do not turn an unverified value into zero, or an authorization into proof of today's output.</p>
+    <div class="topic-table" tabindex="0" role="region" aria-label="Power capacity definitions"><table><caption>Working distinctions for reading project evidence</caption><thead><tr><th scope="col">Term</th><th scope="col">Question it answers</th><th scope="col">What else you need</th></tr></thead><tbody>
+      <tr><td>Announced / planned MW</td><td>What scale has been proposed?</td><td>Phase, technology, timing and later project evidence.</td></tr>
+      <tr><td>Nameplate / site-rated MW</td><td>What equipment capability is specified, under which conditions?</td><td>Rating basis, temperature, auxiliaries and configuration.</td></tr>
+      <tr><td>Permitted equipment / MW</td><td>What does this authorization cover?</td><td>Issued version, conditions, hours and subsequent changes.</td></tr>
+      <tr><td>Installed / observed equipment</td><td>What hardware is documented as present?</td><td>Model identity, observation date and commissioning evidence.</td></tr>
+      <tr><td>Operating capacity</td><td>What equipment is supported as operating at a stated date?</td><td>Operating evidence and its scope; not necessarily full output.</td></tr>
+      <tr><td>Delivered power / net output</td><td>How much reaches the stated delivery boundary?</td><td>Metering or tested output, time, auxiliary demand and losses.</td></tr>
+      <tr><td>Firm capacity / redundancy</td><td>What load can the system support through specified failures?</td><td>Reliability design, contingencies, fuel and availability assumptions.</td></tr>
+    </tbody></table></div>
+    <p>EIA distinguishes <a href="https://www.eia.gov/tools/faqs/faq.php?id=101&amp;t=3">capacity, net generation and capacity factor</a>. MW is a rate of power; MWh is energy. A 1 MW generator at full output for one hour produces 1 MWh. The difference matters when a site has high rated capacity but limited running hours.</p>
+  </section>
+  <section class="topic-section wrap">
+    <h2>Abilene: site-rated equipment is not IT load</h2>
+    <p>The January 2025 <a href="https://records.tceq.texas.gov/cs/idcplg?IdcService=TCEQ_EXTERNAL_SEARCH_GET_FILE&amp;dID=8600163&amp;Rendition=Web">TCEQ 177263 technical review</a> specifies five LM2500 units at 34.1 MW and five Titan 350 units at 38 MW. The arithmetic is 5 × 34.1 + 5 × 38 = 360.5 MW. It is a permitted site-rated turbine cohort.</p>
+    <p>That total is not automatically the data center's IT load, the campus's full planned buildout, current metered generation or firm output with one turbine unavailable. Each is a different claim requiring its own boundary and evidence. The later O4721 operating permit is a regulatory milestone, not a meter reading.</p>
+    <p>Read the <a href="/equipment/lm2500-titan-350/">equipment comparison</a> for amendment details, the <a href="/facility/crusoe-stargate-abilene/">Abilene dossier</a> for receipts and the <a href="/states/texas/">Texas page</a> for the separate announcement layer.</p>
+  </section>
+  <section class="topic-section wrap">
+    <h2>Colossus 2: separate the 27-unit record from the 41-unit permit</h2>
+    <p>BTW's October 27 review preserves a historical, source-asserted 27-unit / 495 MW cohort for Colossus 2. The individual turbine model and per-unit MW are not published in that cohort. It would be misleading to manufacture an equipment rating by dividing the total and presenting the result as a verified model specification.</p>
+    <p>The <a href="https://opcgis.deq.state.ms.us/enOnline/get_doc.aspx?dt=finalp&amp;id=1834338">MDEQ final permit 0680-00119</a>, issued March 11, 2026, separately authorizes groups totaling 41 turbines. Its scope is not proof that 41 units are installed, operating or additional to the historic cohort.</p>
+    <p>Do not add “27 observed” and “41 permitted” into a 68-unit operating fleet. Establish whether a document covers replacement, expansion, overlapping equipment or a different phase first. The <a href="/facility/xai-colossus-2/">Colossus 2 evidence dossier</a> keeps the equipment cohort, authorization and court events separate. Current complete operating output remains unconfirmed.</p>
+  </section>
+  <section class="topic-section wrap">
+    <h2>A five-field check before comparing MW</h2>
+    <ol><li><strong>Value and unit.</strong> Is this MW of rated output, MWh of generation, IT MW or a site electrical connection?</li><li><strong>Basis.</strong> Announced, permitted, reported, observed, operating or metered? Record the source's actual wording.</li><li><strong>Boundary.</strong> Which legal entity, site, phase, units and delivery point? Are backup and primary generation separated?</li><li><strong>Date.</strong> Distinguish the event date, document date, observation date, review date and export date.</li><li><strong>Receipt.</strong> Keep a source URL, document identity, relevant excerpt and uncertainty. Seek later versions before calling a discrepancy an error.</li></ol>
+    <div class="topic-formula">Useful comparison = value + unit + evidence basis + boundary + date + source</div>
+    <h3>Why a permit date is not a time-to-power benchmark</h3>
+    <p>An original filing, an amendment filing and an issue date are different starting points. An operator's “live” announcement may establish operation by a report date without establishing the exact first day of generation. BTW does not calculate a permit-to-first-power interval unless both endpoints have receipts supporting those exact fields.</p>
+    <h3>How to use the data in a model</h3>
+    <p>Retain unknowns as unknowns. Keep separate fields for capacity basis, verification state and source date. Use the structured <a href="/api/v1/facilities.json">facility records</a> and <a href="/data/">data guide</a> instead of treating a headline total as a complete project model. Only then test economics in the <a href="/power-cost-calculator/">cost calculator</a>, using a consistent gross/net and fuel basis.</p>
+    <p class="topic-small">Examples reflect the October 27, 2026 primary-record review, not a measurement of current output. EIA definitions were checked the same day. This guide explains evidence interpretation; it does not assess legal compliance or engineering adequacy of either facility.</p>
+  </section>
+</TopicLayout>

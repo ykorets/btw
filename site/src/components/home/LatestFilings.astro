@@ -7,3 +7,9 @@ const latest = events.filter((event: any) => event.source_url).slice(0, 8);
 <p class="sub">Document events use the document date. A record review is dated when BTW checked the source and describes only the scope reviewed.</p>
 <ul class="feed">{latest.map((e: any) => <li><span class="d">{dateLabel(e.date)}</span><span>{e.headline}</span><a class="doc" href={e.source_url} target="_blank" rel="noopener">{e.type.replaceAll("_", " ")} ↗</a></li>)}</ul>
 </div></section>
+<style>
+  @media(max-width:480px){
+    .feed li{display:grid;grid-template-columns:86px minmax(0,1fr);gap:6px 12px}
+    .feed a.doc{grid-column:2;margin-left:0;justify-self:start}
+  }
+</style>

@@ -1,11 +1,12 @@
+---
+import { topics } from "../../lib/topics";
+---
 <section id="research">
   <div class="wrap">
-    <div class="kicker">Research</div>
-    <h2>Research queue</h2>
+    <h2>Explore data center power</h2>
+    <p class="sub">Project records, equipment evidence and a transparent cost model for your next research question.</p>
     <div class="research">
-      <article class="post"><span class="d">Research in progress</span><h3>Time-to-power: verifying the start and end dates</h3><p>The industry says "months, not years." The permit record says something more interesting.</p></article>
-      <article class="post"><span class="d">Research in progress</span><h3>What a megawatt-hour really costs behind the meter: an open model</h3><p>Heat rates from permits, gas from the hubs, capex from the record. Reconstructing the numbers nobody publishes.</p></article>
-      <article class="post"><span class="d">Research in progress</span><h3>Announced and documented capacity: reconciling coverage</h3><p>Comparing like-for-like projects, dates and capacity definitions before drawing conclusions.</p></article>
+      {topics.map(t => <a class="post" href={t.path}><h3>{t.title}</h3><p>{t.description}</p></a>)}
     </div>
   </div>
 </section>

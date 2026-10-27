@@ -1,0 +1,37 @@
+---
+import TopicLayout from "../../layouts/TopicLayout.astro";
+// Historical January 2025 permit cohorts: editorial examples stay pinned to the cited record.
+const units = [
+  {model: "LM2500", unit_count: 5, mw_each: 34.1, total: 170.5},
+  {model: "Titan 350", unit_count: 5, mw_each: 38, total: 190},
+];
+const permit = "https://records.tceq.texas.gov/cs/idcplg?IdcService=TCEQ_EXTERNAL_SEARCH_GET_FILE&dID=8600163&Rendition=Web";
+---
+<TopicLayout title="LM2500 & Titan 350 Data Center Turbines | Behind the Watt" description="LM2500 and Titan 350 turbines at Abilene: permitted counts, site-rated MW, the 177263 amendment and what those figures establish." path="/equipment/lm2500-titan-350/" heading="LM2500 and Titan 350 turbines at Abilene" deck="One documented data-center application, read at the equipment level. The useful comparison is the site-rated permit record and what changed between filings.">
+  <section class="topic-section wrap">
+    <h2>What does the Abilene record specify?</h2>
+    <p>The TCEQ technical review for registration 177263 identifies two simple-cycle turbine cohorts serving the Longhorn Data Center in Abilene, Texas. The January 2025 modification specifies five GE LM2500 units at 34.1 MW each and five Titan 350 units at 38 MW each. The combined permitted site-rated capacity is 360.5 MW.</p>
+    <div class="topic-table" tabindex="0" role="region" aria-label="Abilene permitted turbine comparison"><table><caption><a href={permit}>TCEQ technical review · modification received January 11, 2025; approved January 22, 2025</a></caption><thead><tr><th scope="col">Model in the record</th><th scope="col">Units</th><th scope="col">Site-rated MW each</th><th scope="col">Cohort MW</th><th scope="col">Evidence basis</th></tr></thead><tbody>
+      {units.map((u: any) => <tr><td>{u.model}</td><td>{u.unit_count}</td><td>{u.mw_each}</td><td>{u.total.toLocaleString("en-US", {maximumFractionDigits: 1})}</td><td>Permitted<small>Source-asserted rating, not metered output</small></td></tr>)}
+    </tbody></table></div>
+    <p>The review says the generation is for onsite data-center and computing use. This page is a case study of that record, not a comprehensive list of LM2500 or Titan 350 installations.</p>
+  </section>
+  <section class="topic-section wrap">
+    <div class="topic-two"><div><h2>Read the amendment as a change</h2>
+      <p>The modification reduces each model's count from six to five. It increases the Titan 350 site rating to 38 MW per unit, reduces the LM2500 site rating to 34.1 MW per unit and increases LM2500 annual permitted operation from 5,880 to 8,760 hours.</p>
+      <p>Those changes matter for comparing old project descriptions with the issued record. Keeping the earlier six-plus-six configuration alongside the later five-plus-five configuration as if both were current would double count equipment.</p>
+      <p>The structured BTW record publishes 8,760 permitted hours for LM2500; Titan 350 hours remain unpopulated in that field. An unpopulated field is not zero authorized hours. Consult the full authorization for conditions beyond this summary.</p>
+    </div><aside class="topic-note"><h3>Site rating is the comparison boundary</h3><p>These MW are the site ratings in this permit review. They are not a universal OEM rating, a guaranteed net output, available IT load or an efficiency comparison between models.</p><p><a href="/guides/data-center-power-capacity/">Compare capacity on the same basis</a></p></aside></div>
+  </section>
+  <section class="topic-section wrap">
+    <h2>What the permit cannot tell you</h2>
+    <ul><li><strong>Current delivery.</strong> A unit's permitted rating does not establish whether it is installed, running, derated or delivering that output at the time you read this.</li><li><strong>Fuel economics.</strong> A model name and MW rating do not establish project heat rate, delivered gas cost, installed capital cost or a service contract.</li><li><strong>Resilience.</strong> Ten permitted turbines do not by themselves establish firm computing capacity, redundancy architecture, gas reliability or maintenance availability.</li><li><strong>Procurement availability.</strong> Equipment identification does not prove an unawarded order, an available installation slot or an open supplier contract.</li></ul>
+    <p>EIA explains that generation capacity depends on specified conditions, while actual generation measures energy over time. Its discussion of <a href="https://www.eia.gov/tools/faqs/faq.php?id=101&amp;t=3">capacity, seasonal conditions and net generation</a> explains why a site record and a product brochure need not show interchangeable numbers.</p>
+  </section>
+  <section class="topic-section wrap">
+    <h2>A practical equipment research checklist</h2>
+    <ol><li>Match the facility, applicant, model variant, phase and date before combining records.</li><li>Record unit count, per-unit rating, rating conditions, fuel and permitted hours separately.</li><li>Look for later amendments and the operating permit; preserve the previous version as history.</li><li>Seek current commissioning or operating evidence before changing the basis to operating or delivered.</li><li>Request project-specific heat rate and installed-cost assumptions before making an economic comparison.</li></ol>
+    <p>For a transparent sensitivity exercise, use the <a href="/power-cost-calculator/">behind-the-meter power cost calculator</a>. Its presets are illustrative scenarios, not LM2500 or Titan 350 quotations.</p>
+    <h3>Sources and related records</h3><ul class="topic-source-list"><li><a href={permit}>TCEQ 177263 modification technical review</a>: source for counts, site ratings, stated changes and onsite purpose; checked October 27, 2026.</li><li><a href="/facility/crusoe-stargate-abilene/">Abilene evidence dossier</a>: full published equipment, permit and source receipts, including O4721 issued January 16, 2026.</li><li><a href="/states/texas/">Texas BTM project research</a>: separate reviewed dossier and historical announcement layers.</li></ul>
+  </section>
+</TopicLayout>

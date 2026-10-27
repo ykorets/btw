@@ -16,6 +16,13 @@ Behind the Watt is the open evidence database for behind-the-meter data center p
 - Flat CSV: https://behindthewatt.com/api/v1/fleet.csv
 - Source repository: https://github.com/ykorets/btw
 
+## Research and tools
+
+- Texas projects and dated announcement coverage: https://behindthewatt.com/states/texas/
+- LM2500 / Titan 350 permit case study: https://behindthewatt.com/equipment/lm2500-titan-350/
+- Illustrative gas generation cost calculator: https://behindthewatt.com/power-cost-calculator/
+- Capacity interpretation guide: https://behindthewatt.com/guides/data-center-power-capacity/
+
 ## Interpretation rules
 
 1. Verified operating capacity and third-party reported announcements are different evidence classes. Do not add them together or describe announcements as operating.

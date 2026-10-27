@@ -55,32 +55,3 @@ Promise.all([d3.json("https://cdn.jsdelivr.net/npm/us-atlas@3/states-10m.json"),
 }).catch(()=>{document.getElementById("map-info").textContent="Map background unavailable. Facility records are available in the table below.";});
 
 </script>
-<script>
-import { costModel } from "../../lib/facts";
-const $ = (id: string) => document.getElementById(id) as HTMLInputElement;
-const ids = ["capex", "hr", "gas", "om", "cf", "grid", "mo", "rev", "margin"];
-function calc() {
-  const input = Object.fromEntries(ids.map(id => [id, Number($(id).value)]));
-  for (const id of ids) $(id + "-out").textContent = id === "gas" ? input[id].toFixed(2) : input[id].toLocaleString("en-US");
-  const result = costModel({capex: input.capex, heatRate: input.hr, gas: input.gas, om: input.om,
-    capacityFactor: input.cf / 100, grid: input.grid, months: input.mo, revenue: input.rev, margin: input.margin / 100});
-  const max = Math.max(result.btm, input.grid) * 1.05;
-  for (const [id, value] of [["fuel", result.fuel], ["capex", result.capital], ["om", input.om], ["grid", input.grid]] as const) {
-    $("seg-" + id).style.width = value / max * 100 + "%";
-  }
-  $("btm-total").textContent = `$${Math.round(result.btm)}/MWh (${Math.round(result.fuel)} fuel + ${Math.round(result.capital)} capex + ${input.om} O&M)`;
-  $("grid-total").textContent = `$${input.grid}/MWh`;
-  $("premium").textContent = `${result.premium < 0 ? "−" : "+"}$${Math.abs(result.premium).toFixed(1)}/MWh`;
-  $("prem10").textContent = `$${result.premium10.toFixed(2)}M`;
-  $("timeval").textContent = `$${result.contribution.toFixed(2)}M`;
-  $("verdict").textContent = result.premium <= 0
-    ? "The modeled generation cost is below the selected grid tariff. Reliability, fuel delivery, redundancy and other project costs still need evaluation."
-    : `At these assumptions, ten years of additional power cost total $${result.premium10.toFixed(2)}M per MW. Earlier operation contributes $${result.contribution.toFixed(2)}M per MW at the selected margin. These are undiscounted scenario values, not a project return or payback calculation.`;
-}
-ids.forEach(id => $(id).addEventListener("input", calc));
-document.querySelectorAll<HTMLButtonElement>(".preset[data-preset]").forEach(button => button.addEventListener("click", () => {
-  button.dataset.preset!.split(",").map(Number).forEach((value, index) => { $(ids[index]).value = String(value); });
-  calc();
-}));
-calc();
-</script>

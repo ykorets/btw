@@ -1,6 +1,8 @@
 import type { APIRoute } from "astro";
 import { loadMirror } from "../lib/mirror";
 
+import { topics } from "../lib/topics";
+
 export const prerender = true;
 
 export const GET: APIRoute = async () => {
@@ -8,6 +10,7 @@ export const GET: APIRoute = async () => {
   const urls = [
     "https://behindthewatt.com/",
     "https://behindthewatt.com/data/",
+    ...topics.map(t => `https://behindthewatt.com${t.path}`),
     ...mirror.facilities.facilities.map(
       (facility: Record<string, any>) =>
         `https://behindthewatt.com/facility/${facility.slug}/`,
