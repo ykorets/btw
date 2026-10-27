@@ -1,0 +1,43 @@
+---
+import BaseLayout from "./BaseLayout.astro";
+import SiteHeader from "../components/home/SiteHeader.astro";
+import SiteFooter from "../components/home/SiteFooter.astro";
+import { topics } from "../lib/topics";
+import "../styles/topics.css";
+interface Props { title: string; description: string; path: string; heading: string; deck: string; kind?: "article" | "calculator" }
+const { title, description, path, heading, deck, kind = "article" } = Astro.props;
+const canonical = `https://behindthewatt.com${path}`;
+const author = { "@type": "Person", name: "Yaro Korets", url: "https://korets.net/" };
+const jsonLd = { "@context": "https://schema.org", "@graph": [
+  { "@type": "BreadcrumbList", itemListElement: [
+    { "@type": "ListItem", position: 1, name: "Behind the Watt", item: "https://behindthewatt.com/" },
+    { "@type": "ListItem", position: 2, name: heading, item: canonical },
+  ] },
+  kind === "calculator"
+    ? { "@type": "WebApplication", name: heading, url: canonical, description, applicationCategory: "BusinessApplication", operatingSystem: "Any", isAccessibleForFree: true, creator: author }
+    : { "@type": "Article", headline: heading, description, mainEntityOfPage: canonical, datePublished: "2026-10-27", dateModified: "2026-10-27", author, publisher: { "@type": "Organization", name: "Behind the Watt", url: "https://behindthewatt.com/" } },
+] };
+---
+<BaseLayout {title} {description} {canonical} ogType={kind === "article" ? "article" : "website"}>
+  <script is:inline type="application/ld+json" set:html={JSON.stringify(jsonLd)}></script>
+  <a class="topic-skip" href="#topic-content">Skip to content</a>
+  <SiteHeader />
+  <main class="topic-page" id="topic-content" tabindex="-1">
+    <header class="topic-intro wrap">
+      <nav class="topic-breadcrumb" aria-label="Breadcrumb"><a href="/">Behind the Watt</a><span aria-hidden="true">/</span><span>{topics.find(t => t.path === path)?.label}</span></nav>
+      <h1>{heading}</h1>
+      <p class="topic-deck">{deck}</p>
+      <p class="topic-byline">By <a href="https://korets.net/" rel="author">Yaro Korets</a> · Published <time datetime="2026-10-27">October 27, 2026</time> · Source dates are stated below</p>
+    </header>
+    <nav class="topic-switch wrap" aria-label="Explore power research">
+      {topics.map(t => <a href={t.path} aria-current={t.path === path ? "page" : undefined}>{t.label}</a>)}
+    </nav>
+    <slot />
+    <aside class="topic-next wrap" aria-label="Keep researching">
+      <div><h2>Keep the evidence close.</h2><p>Read the underlying facility records, use the open data, or receive published research updates.</p></div>
+      <div class="topic-actions"><a class="btn btn-primary" href="/#subscribe">Get research updates</a><a class="btn" href="/data/">Get the open data</a></div>
+      <p class="topic-small">Questions or corrections? <a href="https://github.com/ykorets/btw/issues/new">Open an issue</a> and include the project, field and source.</p>
+    </aside>
+  </main>
+  <SiteFooter />
+</BaseLayout>

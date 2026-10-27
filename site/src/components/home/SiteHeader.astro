@@ -12,12 +12,23 @@ const { backHref, backLabel = "Back" } = Astro.props;
       </nav>
     ) : (
       <nav class="nav-links">
-        <a href="/#tracker">Tracker</a>
+        <a href="/#tracker" class="hide-m">Tracker</a>
         <a href="/#announcements" class="hide-m">Announcements</a>
-        <a href="/#ttp" class="hide-m">Time to power</a>
-        <a href="/#calc" class="hide-m">Calculator</a>
+        <a href="/states/texas/" class="hide-m">Texas</a>
+        <a href="/power-cost-calculator/" class="hide-m">Calculator</a>
         <a href="/data/" class="btn">Take the data</a>
       </nav>
     )}
   </div>
 </header>
+
+<style>
+  .logo{white-space:nowrap;flex-shrink:0}
+  .nav-links .btn{white-space:nowrap}
+  @media(max-width:480px){
+    .nav{gap:8px;padding-left:16px;padding-right:16px}
+    .logo{font-size:12px!important;gap:3px}
+    .nav-links{font-size:12px;gap:8px}
+    .nav-links .btn{font-size:12px;padding:8px 10px}
+  }
+</style>

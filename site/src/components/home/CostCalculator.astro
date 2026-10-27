@@ -1,3 +1,8 @@
+---
+import CalculatorRuntime from "./CalculatorRuntime.astro";
+import { costModel } from "../../lib/facts";
+const initial = costModel({capex: 1600, heatRate: 9500, gas: 4, om: 10, capacityFactor: .9, grid: 65, months: 20, revenue: 20, margin: .2});
+---
 <section id="calc">
   <div class="wrap">
     <div class="kicker">The open cost model</div>
@@ -28,15 +33,23 @@
       <span><span class="dot" style="background:#8a897f;border-radius:3px"></span>O&M</span>
       <span><span class="dot" style="background:#157a54;border-radius:3px"></span>Grid tariff</span>
     </div>
-    <div class="bar-lbl"><span>Behind the meter</span><b id="btm-total" class="mono"></b></div>
+    <div class="bar-lbl"><span>Behind the meter</span><b id="btm-total" class="mono">${Math.round(initial.btm)}/MWh (38 fuel + {Math.round(initial.capital)} capex + 10 O&M)</b></div>
     <div class="cost-bar"><div id="seg-fuel" style="background:#c9971c"></div><div id="seg-capex" style="background:#1f5fa8"></div><div id="seg-om" style="background:#8a897f"></div></div>
-    <div class="bar-lbl"><span>Grid</span><b id="grid-total" class="mono"></b></div>
+    <div class="bar-lbl"><span>Grid</span><b id="grid-total" class="mono">$65/MWh</b></div>
     <div class="cost-bar"><div id="seg-grid" style="background:#157a54"></div></div>
     <div class="metric-row">
-      <div class="metric"><div class="l">BTM premium</div><div class="v" id="premium"></div></div>
-      <div class="metric"><div class="l">10-yr power premium, per MW</div><div class="v" id="prem10"></div></div>
-      <div class="metric"><div class="l">Earlier contribution, per MW</div><div class="v" id="timeval" style="color:var(--green)"></div></div>
+      <div class="metric"><div class="l">BTM premium</div><div class="v" id="premium">+${initial.premium.toFixed(1)}/MWh</div></div>
+      <div class="metric"><div class="l">10-yr power premium, per MW</div><div class="v" id="prem10">${initial.premium10.toFixed(2)}M</div></div>
+      <div class="metric"><div class="l">Earlier contribution, per MW</div><div class="v" id="timeval" style="color:var(--green)">${initial.contribution.toFixed(2)}M</div></div>
     </div>
-    <div id="verdict"></div>
+    <div id="verdict" aria-live="polite">Default illustrative assumptions: ${initial.btm.toFixed(1)}/MWh generation cost. Adjust the inputs to compare your scenario.</div>
+    <p class="scenario-link"><a id="scenario-link" href="/power-cost-calculator/#calc">Link to this scenario</a> · Bookmark or copy the link to revisit these assumptions.</p>
+    <noscript><p>JavaScript is needed to change assumptions. The default result above remains readable.</p></noscript>
   </div>
 </section>
+
+<CalculatorRuntime />
+<style>
+  #calc{scroll-margin-top:80px}
+  .scenario-link{margin-top:20px;font-size:14px}
+</style>
