@@ -17,8 +17,8 @@
       "offtaker": "OpenAI via Oracle",
       "status": "operating",
       "flags": [],
-      "first_permit_filed": "2024-08-01",
-      "first_power": "2025-09-01",
+      "first_permit_filed": "2024-08-15",
+      "first_power": null,
       "unit": [
         {
           "oem": "GE Vernova",
@@ -46,9 +46,18 @@
       "permit": [
         {
           "status": "issued",
+          "filed_at": null,
+          "authority": "TCEQ",
+          "issued_at": "2026-01-16",
+          "permit_no": "O4721",
+          "permit_type": "Federal Operating Permit",
+          "verification_state": "source_asserted"
+        },
+        {
+          "status": "issued",
           "filed_at": "2025-01-11",
           "authority": "TCEQ",
-          "issued_at": null,
+          "issued_at": "2025-01-22",
           "permit_no": "177263",
           "permit_type": "EGU Standard Permit registration",
           "verification_state": "corroborated"
@@ -57,10 +66,10 @@
       "sources": [
         {
           "url": "https://records.tceq.texas.gov/cs/idcplg?IdcService=TCEQ_EXTERNAL_SEARCH_GET_FILE&dID=8600163&Rendition=Web",
-          "archive_url": "https://evidence.behindthewatt.com/docs/13bd44e0d6070bd8d1c616d4832c162dd7ee13fbe2e509e32e853248b3957176.pdf",
+          "archive_url": null,
           "sha256": "13bd44e0d6070bd8d1c616d4832c162dd7ee13fbe2e509e32e853248b3957176",
           "archived_at": "2026-07-11T17:30:33.909129+00:00",
-          "archive_status": "public",
+          "archive_status": "approved_pending_endpoint",
           "doc_genre": "tceq_standard_permit_review",
           "facts": [
             "facility.status",
@@ -93,10 +102,10 @@
         },
         {
           "url": "https://records.tceq.texas.gov/cs/idcplg?IdcService=TCEQ_EXTERNAL_SEARCH_GET_FILE&Rendition=Web&dID=8114425",
-          "archive_url": "https://evidence.behindthewatt.com/docs/0c801ce20883f0048985505a27021c4ccbdab2bd6476ddd610c44561c94e3ba1.pdf",
+          "archive_url": null,
           "sha256": "0c801ce20883f0048985505a27021c4ccbdab2bd6476ddd610c44561c94e3ba1",
           "archived_at": "2026-07-14T16:54:11.062056+00:00",
-          "archive_status": "public",
+          "archive_status": "approved_pending_endpoint",
           "doc_genre": "tceq_standard_permit_final_action",
           "facts": [
             "permit.permit_no",
@@ -105,6 +114,37 @@
             "permit.verification_state"
           ],
           "quote": "Standard Permit Registration Number:  177263",
+          "page": 1
+        },
+        {
+          "url": "https://www.tceq.texas.gov/assets/public/permitting/air/publicnotice/37589sop.pdf",
+          "archive_url": null,
+          "sha256": "908e869b003eae12ac20db300a0959f473d4ba5f862ae1d359bb38a1e148cc0f",
+          "archived_at": "2026-10-27T20:48:39.895693+00:00",
+          "archive_status": "approved_pending_endpoint",
+          "doc_genre": "tceq_title_v_permit",
+          "facts": [
+            "permit.permit_no",
+            "permit.permit_type",
+            "permit.status",
+            "permit.issued_at",
+            "permit.authority",
+            "permit.verification_state"
+          ],
+          "quote": "Permit No:  O4721",
+          "page": 1
+        },
+        {
+          "url": "https://records.tceq.texas.gov/cs/idcplg?IdcService=TCEQ_EXTERNAL_SEARCH_GET_FILE&Rendition=Web&dID=8143786",
+          "archive_url": null,
+          "sha256": "d137070b957b1a356aba850bac2b863989ab035e62201f8f7196f044fc8eb805",
+          "archived_at": "2026-10-27T20:48:38.596535+00:00",
+          "archive_status": "approved_pending_endpoint",
+          "doc_genre": "tceq_standard_permit_review",
+          "facts": [
+            "facility.first_permit_filed"
+          ],
+          "quote": "Project Received DateAugust 15, 2024",
           "page": 1
         }
       ]
@@ -127,7 +167,7 @@
         "unpermitted_operation"
       ],
       "first_permit_filed": "2025-01-31",
-      "first_power": "2024-07-01",
+      "first_power": null,
       "unit": [
         {
           "oem": "Solar Turbines",
@@ -167,10 +207,10 @@
         },
         {
           "url": "https://cdn.arstechnica.net/wp-content/uploads/2025/07/NAACP-and-YGGs-xAI-Air-Permit-Appeal-7-15-2025.pdf",
-          "archive_url": "https://evidence.behindthewatt.com/docs/ab75444eb75f82d1d14a18db75bf689df091ca2c8f4ca34782f6120f617fef40.pdf",
+          "archive_url": null,
           "sha256": "ab75444eb75f82d1d14a18db75bf689df091ca2c8f4ca34782f6120f617fef40",
           "archived_at": "2026-07-11T17:30:35.364622+00:00",
-          "archive_status": "public",
+          "archive_status": "approved_pending_endpoint",
           "doc_genre": "appeal_filing",
           "facts": [
             "facility.status",
@@ -265,10 +305,10 @@
         },
         {
           "url": "https://opcgis.deq.state.ms.us/ensearchonline/get_doc.aspx?dt=dpermit&id=1825411",
-          "archive_url": "https://evidence.behindthewatt.com/docs/e96ef09159edf43aa35d2d48b8f457958c928c1a222afb65515dee62b70a320f.pdf",
+          "archive_url": null,
           "sha256": "e96ef09159edf43aa35d2d48b8f457958c928c1a222afb65515dee62b70a320f",
           "archived_at": "2026-07-11T23:18:03.159445+00:00",
-          "archive_status": "public",
+          "archive_status": "approved_pending_endpoint",
           "doc_genre": "permit",
           "facts": [
             "facility.status",
@@ -281,10 +321,10 @@
         },
         {
           "url": "https://storage.courtlistener.com/recap/gov.uscourts.msnd.52261/gov.uscourts.msnd.52261.52.0_2.pdf",
-          "archive_url": "https://evidence.behindthewatt.com/docs/b6692335ccef7ffa855246a6ac2fdba0adc086f37ae17b7a3c32b1563236c757.pdf",
+          "archive_url": null,
           "sha256": "b6692335ccef7ffa855246a6ac2fdba0adc086f37ae17b7a3c32b1563236c757",
           "archived_at": "2026-07-12T20:45:46.728723+00:00",
-          "archive_status": "public",
+          "archive_status": "approved_pending_endpoint",
           "doc_genre": "court_filing",
           "facts": [
             "unit.total_mw",
@@ -312,6 +352,20 @@
             "permit.issued_at"
           ],
           "quote": "Air - Air-Construction PSD 0680-00119 03/11/2026",
+          "page": 1
+        },
+        {
+          "url": "https://opcgis.deq.state.ms.us/enOnline/get_doc.aspx?dt=finalp&id=1834338",
+          "archive_url": null,
+          "sha256": "62734b21f553899dfc3abb82bd8b2ef3de34357b29bb09522e24d0f9ba155fe4",
+          "archived_at": "2026-10-27T20:48:41.441329+00:00",
+          "archive_status": "approved_pending_endpoint",
+          "doc_genre": "mdeq_psd_permit",
+          "facts": [
+            "permit.permit_no",
+            "permit.issued_at"
+          ],
+          "quote": "Permit No.: 0680-00119",
           "page": 1
         }
       ]

@@ -1,8 +1,10 @@
 {
-  "as_of": "2026-07-16",
+  "as_of": "2026-10-27",
   "operating_gw": 1.1,
   "operating_facilities": 3,
   "facilities_tracked": 3,
+  "date_semantics": "as_of is the export date; record_reviewed events state the scope and date of primary-record checks",
+  "capacity_semantics": "documented equipment cohorts at sites historically classified operating; not live generation or a complete national fleet",
   "method": "sum(coalesce(total_mw, unit_count*mw_each)) over facilities with status=operating; basis and derivation are retained per unit cohort",
   "license": "CC BY 4.0",
   "cite_as": "Behind the Watt, behindthewatt.com, CC BY 4.0"

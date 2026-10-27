@@ -3,6 +3,34 @@
   "cite_as": "Behind the Watt, behindthewatt.com, CC BY 4.0",
   "events": [
     {
+      "date": "2026-10-27",
+      "type": "record_reviewed",
+      "headline": "Checked Shelby County public notices and its October 6, 2026 notice; that notice contains no CTC/xAI update. The published 15-unit, 247.5 MW cohort remains a historical reported configuration; current installed count and delivered power were not established by this check.",
+      "source_url": "https://www.shelbytnhealth.com/DocumentCenter/View/7965",
+      "facility": "xai-colossus-1"
+    },
+    {
+      "date": "2026-10-27",
+      "type": "record_reviewed",
+      "headline": "Reviewed final MDEQ permit 0680-00119, issued March 11, 2026, and the current registry. The permit lists 41 turbines in three groups (17, 16 and 8). The separate 27-unit, 495 MW cohort comes from a historical court filing; it is not a current full-site operating total.",
+      "source_url": "https://opcgis.deq.state.ms.us/enOnline/get_doc.aspx?dt=finalp&id=1834338",
+      "facility": "xai-colossus-2"
+    },
+    {
+      "date": "2026-10-27",
+      "type": "record_reviewed",
+      "headline": "Reviewed TCEQ records: original registration 177263 application received August 15, 2024; amendment issued January 22, 2025; Federal Operating Permit O4721 issued January 16, 2026. The 360.5 MW equipment cohort is a permit-based figure, not verified current output. Exact first-power day remains unverified.",
+      "source_url": "https://www.tceq.texas.gov/assets/public/permitting/air/publicnotice/37589sop.pdf",
+      "facility": "crusoe-stargate-abilene"
+    },
+    {
+      "date": "2026-10-19",
+      "type": "court_order",
+      "headline": "District court Doc 135 allows the United States to intervene but rejects unilateral dismissal of NAACP v. xAI/MZX Tech. The order addresses intervention and dismissal, not whether the defendants violated the Clean Air Act or how many turbines are operating.",
+      "source_url": "https://storage.courtlistener.com/recap/gov.uscourts.msnd.52261/gov.uscourts.msnd.52261.135.0.pdf",
+      "facility": "xai-colossus-2"
+    },
+    {
       "date": "2026-07-13",
       "type": "permit_filed",
       "headline": "MDEQ notices Air-Construction PSD for Entergy's Traceview Advanced Power Station \u2014 754 MW CCGT in Ridgeland, third dedicated gas plant for AWS's Madison County data centers (notice ends 07/14)",
@@ -64,6 +92,20 @@
       "headline": "Satellite (Vantor WV02, 0.3 m): ~35-40 major modules on site; four graded expansion pads consistent with 41-unit permit envelope.",
       "source_url": null,
       "facility": "xai-colossus-2"
+    },
+    {
+      "date": "2025-09-30",
+      "type": "operator_report",
+      "headline": "Crusoe reported that the first Abilene phase was running on Oracle Cloud Infrastructure and that its first two buildings had been energized within a year. This establishes operation by the report date, not an exact first day of BTM generation.",
+      "source_url": "https://www.crusoe.ai/resources/newsroom/crusoe-announces-flagship-abilene-data-center-is-live",
+      "facility": "crusoe-stargate-abilene"
+    },
+    {
+      "date": "2024-08-15",
+      "type": "permit_filed",
+      "headline": "TCEQ original technical review records August 15, 2024 as the project received date for registration 177263. This corrects the legacy August 1 date; January 11, 2025 relates to the later modification application.",
+      "source_url": "https://records.tceq.texas.gov/cs/idcplg?IdcService=TCEQ_EXTERNAL_SEARCH_GET_FILE&Rendition=Web&dID=8143786",
+      "facility": "crusoe-stargate-abilene"
     }
   ]
 }
