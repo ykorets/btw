@@ -6,6 +6,7 @@ interface Props {
   title: string;
   description: string;
   canonical?: string;
+  noindex?: boolean;
   ogType?: "website" | "article";
 }
 
@@ -14,6 +15,7 @@ const {
   description,
   canonical = "https://behindthewatt.com/",
   ogType = "website",
+  noindex = false,
 } = Astro.props;
 ---
 <!doctype html>
@@ -24,6 +26,7 @@ const {
     <meta name="viewport" content="width=device-width" />
     <title>{title}</title>
     <meta name="description" content={description} />
+    {noindex && <meta name="robots" content="noindex, follow" />}
     <link rel="canonical" href={canonical} />
     <link rel="alternate" type="text/plain" href="/llms.txt" title="Instructions for AI agents" />
     <link rel="service-desc" type="application/vnd.oai.openapi+json" href="/api/v1/openapi.json" title="Behind the Watt OpenAPI" />
