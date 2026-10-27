@@ -1,4 +1,6 @@
-interface Env {
+import { pilotInquiry, pilotHeaders } from "./pilot.ts";
+
+export interface Env {
   SITE_ORIGIN: string;
   RESEND_FROM: string;
   RESEND_API_KEY: string;
@@ -723,6 +725,14 @@ async function approve(request: Request, env: Env): Promise<Response> {
 export default {
   async fetch(request: Request, env: Env): Promise<Response> {
     const url = new URL(request.url);
+    if (url.pathname === "/pilot-inquiry") {
+      if (request.method === "OPTIONS") {
+        if (request.headers.get("origin") !== env.SITE_ORIGIN) return new Response(null, {status:403});
+        return new Response(null, {status:204, headers:pilotHeaders(env.SITE_ORIGIN)});
+      }
+      if (request.method === "POST") return pilotInquiry(request, env);
+      return new Response("Method not allowed", {status:405, headers:{...pilotHeaders(env.SITE_ORIGIN), Allow:"POST, OPTIONS"}});
+    }
     if (request.method === "OPTIONS" && url.pathname === "/subscribe") {
       const origin = request.headers.get("origin");
       if (origin && origin !== env.SITE_ORIGIN) return new Response(null, { status: 403 });

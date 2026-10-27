@@ -1,18 +1,27 @@
 ---
-// Google Analytics 4 (gtag.js)
-// Property: "Behind the Watt" · Stream: behindthewatt.com
-// Loads only in production builds so local/dev traffic isn't tracked.
 const GA_ID = "G-HNDJ4VRW5G";
 const enabled = import.meta.env.PROD;
 ---
 {enabled && (
-  <>
-    <script is:inline async src={`https://www.googletagmanager.com/gtag/js?id=${GA_ID}`}></script>
-    <script is:inline define:vars={{ GA_ID }}>
+  <script is:inline define:vars={{ GA_ID }}>
+    const publicHost = ["behindthewatt.com", "www.behindthewatt.com"].includes(location.hostname);
+    let analyticsOff = false;
+    try { analyticsOff = localStorage.getItem("btw_analytics") === "off"; } catch {}
+    if (publicHost && !analyticsOff) {
       window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
-      gtag('config', GA_ID);
-    </script>
-  </>
+      window.gtag = function(){ window.dataLayer.push(arguments); };
+      window.gtag('js', new Date());
+      window.gtag('config', GA_ID);
+      const tag = document.createElement('script');
+      tag.async = true;
+      tag.src = 'https://www.googletagmanager.com/gtag/js?id=' + GA_ID;
+      document.head.appendChild(tag);
+    } else { window['ga-disable-' + GA_ID] = true; }
+  </script>
 )}
+<script>
+  import { track } from "../lib/analytics";
+  document.querySelectorAll<HTMLAnchorElement>("a[data-pilot-cta]").forEach(link => {
+    link.addEventListener("click", () => track("pilot_cta_click", {placement:link.dataset.pilotCta || "page"}));
+  });
+</script>

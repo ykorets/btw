@@ -1,0 +1,31 @@
+---
+import TopicLayout from "../layouts/TopicLayout.astro";
+---
+<TopicLayout title="Privacy and Pilot Inquiries | Behind the Watt" description="How Behind the Watt handles pilot inquiries, private email delivery, newsletter subscriptions and website analytics, with a contact for privacy requests." path="/privacy/" heading="Privacy and pilot inquiries" deck="This notice explains what happens when you use the pilot form and how website analytics are handled." label="Privacy notice">
+  <section class="topic-section wrap">
+    <h2>Who handles an inquiry?</h2><p>Behind the Watt is maintained by Yaro Korets. Contact <a href="mailto:yaroslav.korets@gmail.com">yaroslav.korets@gmail.com</a> with a question about your inquiry or personal details.</p>
+    <h2>What the pilot form collects</h2><p>The form asks for your name, email, company, optional role, projects or states of interest, and research question. It also includes a request reference and the page path. These details are used to review the requested work and reply to you. Please do not submit credentials, confidential files or sensitive client information.</p>
+    <p>The form is processed by the existing Cloudflare Worker and sent through Resend to the private owner inbox. It is not published in the open dataset, used to create a newsletter contact or sent as an automatic reply to the address you enter. Cloudflare processes connection data to serve and protect the request; the intake limiter uses hashed identifiers.</p>
+    <h2>Retention and requests</h2><p>Inquiry messages and delivery records remain in the private inbox and email provider records for handling the request and maintaining the correspondence. This form does not promise automatic deletion on a fixed schedule. You can contact Yaro to request access, correction or deletion of your inquiry details; applicable record-keeping obligations may affect what can be removed.</p>
+    <h2>Newsletter choices are separate</h2><p>A pilot inquiry does not subscribe you. The newsletter has a separate email-confirmation step and an unsubscribe option in its messages.</p>
+    <h2>Website analytics</h2><p>BTW uses Google Analytics to understand visits and actions such as opening the pilot offer and completing an accepted inquiry. The inquiry's name, email, company, project text and research question are not sent as analytics event parameters. Analytics and email service providers may process data outside your location.</p>
+    <p>You can turn off future Google Analytics collection from this browser below. The choice is stored locally on this browser; it does not delete previously collected data or change other browsers. Browser privacy controls and blockers may also prevent collection.</p>
+    <button id="analytics-choice" class="btn" type="button">Turn off analytics on this browser</button><p id="analytics-status" class="topic-small" role="status"></p>
+  </section>
+</TopicLayout>
+<script>
+  const button = document.querySelector<HTMLButtonElement>("#analytics-choice");
+  const status = document.querySelector<HTMLElement>("#analytics-status");
+  function render() {
+    if (!button || !status) return;
+    try { const off = localStorage.getItem("btw_analytics") === "off";
+      button.textContent = off ? "Turn on analytics on this browser" : "Turn off analytics on this browser";
+      status.textContent = off ? "Analytics is off on this browser. Reload other BTW tabs to apply this choice there." : "Analytics is enabled in this browser’s BTW preference. Browser privacy controls may still block it.";
+    } catch { status.textContent = "Your browser does not allow this preference to be saved. Use your browser's privacy controls."; }
+  }
+  button?.addEventListener("click", () => {
+    try { localStorage.setItem("btw_analytics", localStorage.getItem("btw_analytics") === "off" ? "on" : "off"); location.reload(); }
+    catch { if (status) status.textContent = "The preference could not be saved. Use your browser's privacy controls."; }
+  });
+  render();
+</script>

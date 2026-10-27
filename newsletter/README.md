@@ -76,3 +76,29 @@ the unsubscribe state automatically before future Broadcasts.
 npm test
 npm run type-check
 ```
+
+## Scoped pilot inquiries
+
+`POST /pilot-inquiry` accepts bounded JSON or ordinary URL-encoded forms from
+`SITE_ORIGIN`. It validates required contact/scope fields and explicit inquiry
+consent, filters a honeypot, and applies the existing limiter to hashed,
+pilot-prefixed email and connection keys. No new binding is needed.
+
+Delivery uses the existing Resend sender and **only the configured EDITOR_EMAIL**;
+the submitted email is reply-to, never an automatic recipient. Plain-text content
+stays in the private owner inbox/provider records. No newsletter contact, campaign,
+subscriber send or database row is created. Fields never enter application logs or
+analytics event parameters.
+
+A JSON202 `received` response is returned only after Resend accepts the message
+and returns an email receipt. A timeout/provider error is `delivery_unconfirmed`,
+not success. The browser keeps the same UUID for an unchanged retry; the native
+HTML fallback derives a deterministic normalized-content/day key. Resend retains
+idempotency keys for24hours. Reconcile an unknown outcome in the owner inbox/provider
+before a new request or retry outside that window; this is not perpetual exactly-once
+delivery. A changed payload with an already-used provider key fails closed.
+
+Production acceptance requires one clearly labeled synthetic inquiry through the
+live form and an independent inbox receipt. Local tests mock every outbound call.
+The `btw_test=1` page parameter labels the successful browser analytics event as
+`pilot_inquiry_test`, keeping synthetic verification out of `generate_lead`.

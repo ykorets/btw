@@ -1,0 +1,24 @@
+.pilot-intro-actions{display:flex;flex-wrap:wrap;align-items:center;gap:14px 22px;margin-top:24px;font-size:14px}
+.pilot-offer{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(0,1fr);gap:40px}
+.pilot-offer .topic-actions{margin-top:24px}
+.pilot-offer .topic-note h2{font-family:var(--sans);font-size:19px;line-height:1.4;margin-bottom:12px}
+.pilot-request{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.4fr);gap:48px}
+#request{scroll-margin-top:84px}
+#pilot-inquiry label{display:block;font-size:14px;font-weight:500;margin:16px 0 7px}
+#pilot-inquiry label span{font-weight:400}
+#pilot-inquiry input:not([type=checkbox]),#pilot-inquiry textarea{display:block;width:100%;max-width:100%;padding:11px 12px;background:var(--card);color:var(--ink);border:1px solid var(--line-2);border-radius:8px;font:15px/1.5 var(--sans);caret-color:var(--green)}
+#pilot-inquiry textarea{resize:vertical;min-height:90px}
+#pilot-inquiry input::placeholder,#pilot-inquiry textarea::placeholder{color:#6b6a61;opacity:1}
+#pilot-inquiry .pilot-consent{display:flex;align-items:flex-start;gap:10px;font-weight:400;line-height:1.5}
+#pilot-inquiry input[type=checkbox]{margin-top:4px;width:17px;height:17px;flex-shrink:0;accent-color:var(--green)}
+.pilot-fields{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:0 18px}
+#pilot-inquiry .btn{margin-top:18px;min-height:44px}
+#pilot-inquiry .btn:disabled{opacity:.65;cursor:wait}
+.pilot-hp{position:absolute!important;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
+.pilot-status:not(:empty){background:var(--green-bg);padding:22px;margin-top:18px;color:#14543c;outline-offset:4px}
+.pilot-status:focus{outline:2px solid var(--green)}
+.memo-summary{font-size:19px;max-width:70ch}
+.memo-meta{display:flex;gap:12px 32px;flex-wrap:wrap;font-size:13px;color:var(--ink-2);margin-top:22px}
+.memo-meta dt{font-weight:600}.memo-meta dd{margin-top:4px}
+@media(max-width:760px){.pilot-offer,.pilot-request{grid-template-columns:minmax(0,1fr);gap:28px}.pilot-fields{grid-template-columns:minmax(0,1fr)}}
+@media print{header.site,.topic-switch,.topic-next,footer,.pilot-print-hide{display:none}.topic-intro{padding-top:0}.topic-section{break-inside:avoid;padding-top:20px;padding-bottom:20px}.topic-table{overflow:visible}.topic-table table{min-width:0}a{color:inherit}}
