@@ -1,0 +1,22 @@
+---
+import TopicLayout from "../../layouts/TopicLayout.astro";
+import { projects, projectPath, sourceFor } from "../../lib/research";
+export function getStaticPaths() { return projects.map(project => ({params:{slug:project.slug},props:{project}})); }
+const { project } = Astro.props;
+---
+<TopicLayout title={`${project.name}: Power Project Dossier | BTW`} description={project.summary} path={projectPath(project.slug)} heading={`${project.name}: power and evidence`} deck={project.summary} label="Texas project dossier">
+  <section class="topic-section wrap">
+    <p><a href="/states/texas/">Texas project research</a> · <a href="/changes/">Source-linked changes</a></p>
+    <div class="topic-two">
+      <div><h2>What is established?</h2><p>{project.developer} · {project.county} County, Texas</p><p><strong>{project.capacity}</strong></p><p>Evidence basis: {project.basis}. Sources checked <time datetime={project.reviewed}>{project.reviewed}</time>.</p></div>
+      <aside class="topic-note reported"><h3>Research coverage</h3><p>This dossier separates regulator records from company reports. It adds no MW to BTW's reviewed operating fleet. Unknown output and delivery dates remain unknown.</p></aside>
+    </div>
+    <div class="topic-table" role="region" tabindex="0" aria-label={`${project.name} evidence table`}><table><caption>Project identity, phase and capacity boundaries</caption><thead><tr><th scope="col">Field</th><th scope="col">Source-linked finding</th><th scope="col">Evidence</th></tr></thead><tbody>
+      {project.facts.map(fact => <tr><td>{fact.field}</td><td>{fact.value}</td><td><a href={sourceFor(project,fact.source).url}>{sourceFor(project,fact.source).title}</a></td></tr>)}
+    </tbody></table></div>
+  </section>
+  <section class="topic-section wrap"><h2>How to interpret the record</h2>{project.interpretation.map(p => <p>{p}</p>)}</section>
+  <section class="topic-section wrap"><div class="topic-two"><div><h2>What remains unknown?</h2><ul>{project.unknowns.map(p => <li>{p}</li>)}</ul></div><div><h2>What to check next</h2><ol>{project.next.map(p => <li>{p}</li>)}</ol></div></div><p>A documented project participant or equipment model is a research lead, not proof that procurement is open. <a href="/monitoring-pilot/">Scope a monitoring pilot</a> around the specific records and decisions you need.</p></section>
+  <section class="topic-section wrap"><h2>Sources and dates</h2><ul class="topic-source-list">{project.sources.map(source => <li><a href={source.url}>{source.title}</a> · {source.date || "Source date not stated in reviewed text"}<br/>{source.basis}</li>)}</ul><p class="topic-small">Reviewed sources are a dated selection, not a comprehensive search of every filing. Checking a page today does not make its older schedule or physical-status claims current. <a href="/#coverage">See automated source coverage</a>.</p></section>
+  <section class="topic-section wrap"><h2>Questions about this project</h2>{project.faq.map(item => <><h3>{item.q}</h3><p>{item.a}</p></>)}</section>
+</TopicLayout>

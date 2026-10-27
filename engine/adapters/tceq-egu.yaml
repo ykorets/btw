@@ -2,6 +2,8 @@
 # POSTs the public NSR search (ASCII output mode) for applications received
 # in the trailing window; every row becomes a candidate, keyword hits flagged.
 id: tceq-nsr-stdpmt
+status: replaced_by_tceq_permit_portal
+coverage_note: "Retired legacy endpoint; replaced by keyword-matched AIRNSR registry discovery at tceq-permit-portal. Historical candidates retained."
 kind: search
 adapter: tceq_nsr
 url: https://www2.tceq.texas.gov/airperm/index.cfm?fuseaction=airpermits.validate_search_criteria

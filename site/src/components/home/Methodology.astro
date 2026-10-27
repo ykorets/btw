@@ -7,6 +7,11 @@ function stale(source: any) {
  const days = Number(/([0-9]+)\s*days?/.exec(source.slo_interval || "")?.[1] || 7);
  return !source.last_hit_at || generated - Date.parse(source.last_hit_at) > days * 86400000;
 }
+function collectorState(source: any) {
+ if (source.collector_status?.startsWith("replaced_by_")) return "Retired · replacement noted below";
+ if (source.collector_status && source.collector_status !== "active") return "Historical / inactive collector";
+ return stale(source) ? "Overdue / unavailable" : "Within source interval";
+}
 ---
 <section id="method">
   <div class="wrap">
@@ -25,7 +30,7 @@ function stale(source: any) {
       "…reduce the count of <span class="hl">GE LM2500</span> simple-cycle turbines from six to five, reduce the site-rated power to <span class="hl">34.1 MW per turbine</span>, and increase the annual hours of operation from 5,880 to <span class="hl">8,760 hours per turbine</span>…"
       <div class="note">One paragraph of one filing: equipment, capacity, and utilization the developer never announced. This is why we read permits.</div>
     </div>
-    <div id="coverage" style="margin-top:28px"><h3>Source coverage · exported {coverage.generated}</h3><p class="src">A successful source sweep is a retrieval check, not a new verification of every facility fact.</p><div style="overflow-x:auto"><table><thead><tr><th>Source</th><th>Last successful sweep</th><th>Freshness at site build</th></tr></thead><tbody>{sources.map((source: any) => <tr><td><a href={source.url} target="_blank" rel="noopener">{source.id}</a></td><td>{source.last_hit_at ? dateLabel(source.last_hit_at) : "No successful sweep recorded"}</td><td>{stale(source) ? "Overdue / unavailable" : "Within source interval"}</td></tr>)}</tbody></table></div></div>
+    <div id="coverage" style="margin-top:28px"><h3>Source coverage · exported {coverage.generated}</h3><p class="src">A successful source sweep is a retrieval check, not a new verification of every facility fact. Registry snapshots and complete permit documents have different coverage.</p><div style="overflow-x:auto"><table><thead><tr><th>Source</th><th>Last successful sweep</th><th>Collector state at site build</th></tr></thead><tbody>{sources.map((source: any) => <tr><td><a href={source.url} target="_blank" rel="noopener">{source.id}</a>{source.coverage_note && <p class="src">{source.coverage_note}</p>}</td><td>{source.last_hit_at ? dateLabel(source.last_hit_at) : "No successful sweep recorded"}</td><td>{collectorState(source)}</td></tr>)}</tbody></table></div></div>
     <div class="sources-strip">
       <span>TCEQ</span><span>Ohio Power Siting Board</span><span>MDEQ</span><span>Shelby County Health Dept</span><span>EPA</span><span>FERC</span><span>EIA</span><span>Federal courts</span>
     </div>

@@ -1,0 +1,12 @@
+id: tceq-permit-portal
+kind: api
+adapter: tceq_portal
+url: https://permit-search.tceq.texas.gov/
+schedule: daily
+slo_interval_days: 3
+coverage_note: "Keyword-matched AIRNSR registry snapshots for data center and Fermi searches; all returned pages. Includes applications and issued records. Not every Texas project, permit document or operating measurement."
+# Public agency UI service; no credential or new paid service.
+# Keyword-matched AIRNSR registry snapshots, not every permit/document in Texas.
+params:
+  queries: ["data center", "Fermi"]
+  max_pages: 25

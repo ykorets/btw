@@ -1,5 +1,7 @@
 # TCEQ PSD pending applications — large sources (big-build islands file PSD).
 id: tceq-nsr-psd
+status: replaced_by_tceq_permit_portal
+coverage_note: "Retired legacy endpoint; replacement is registry-status discovery, not equivalent to the old pending-PSD project window."
 kind: search
 adapter: tceq_nsr
 url: https://www2.tceq.texas.gov/airperm/index.cfm?fuseaction=airpermits.validate_search_criteria

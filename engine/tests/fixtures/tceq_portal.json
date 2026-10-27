@@ -1,0 +1,59 @@
+{
+  "totalElements": 2,
+  "totalPages": 1,
+  "pageable": {
+    "pageNumber": 0,
+    "pageSize": 100,
+    "sort": {
+      "sorted": false,
+      "empty": true,
+      "unsorted": true
+    },
+    "offset": 0,
+    "paged": true,
+    "unpaged": false
+  },
+  "first": true,
+  "size": 100,
+  "content": [
+    {
+      "addnId": 522500122025213,
+      "aiPgmCd": "AIRNSR",
+      "aiIdTypName": "PERMIT",
+      "aiIdNumber": "181009",
+      "aiStatusCd": "ACTIVE    ",
+      "pspStatusCd": "ISSUED PERMIT",
+      "aiPermittedName": "FERMI AMERICA PROJECT MATADOR",
+      "aiIssueToName": "Fermi Equipment Holdco, LLC",
+      "reRegNumber": "RN112258678",
+      "reName": "FERMI AMERICA PROJECT MATADOR",
+      "reCnty": "CARSON",
+      "reCityName": "AMARILLO",
+      "aiIssueToBeginDt": "2026-06-08T00:00:00.000"
+    },
+    {
+      "addnId": 632486772025215,
+      "aiPgmCd": "AIRNSR",
+      "aiIdTypName": "PERMIT",
+      "aiIdNumber": "PSDTX1670",
+      "aiStatusCd": "ACTIVE    ",
+      "pspStatusCd": "ISSUED PERMIT",
+      "aiPermittedName": "FERMI AMERICA PROJECT MATADOR",
+      "aiIssueToName": "Fermi Equipment Holdco, LLC",
+      "reRegNumber": "RN112258678",
+      "reName": "FERMI AMERICA PROJECT MATADOR",
+      "reCnty": "CARSON",
+      "reCityName": "AMARILLO",
+      "aiIssueToBeginDt": "2026-02-25T00:00:00.000"
+    }
+  ],
+  "number": 0,
+  "sort": {
+    "sorted": false,
+    "empty": true,
+    "unsorted": true
+  },
+  "last": true,
+  "numberOfElements": 2,
+  "empty": false
+}
