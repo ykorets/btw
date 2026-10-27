@@ -10,6 +10,7 @@ Usage: python -m btw_engine.publish --out out/
 
 import argparse
 import csv
+import hashlib
 import json
 import os
 import sys
@@ -82,7 +83,35 @@ def fetch_provenance() -> list[dict]:
                       "document(url,r2_key,sha256,fetched_at,doc_genre))")
 
 
-def attach_sources(facilities: list[dict], prov: list[dict]) -> None:
+def available_public_archives(prov: list[dict]) -> set[str]:
+    """Approval is not proof that the public copy exists. Verify its bytes.
+
+    Retrieval failures never fabricate a public URL or prevent publication of
+    the original source. Private archive custody is unaffected.
+    """
+    manifest = load_manifest()
+    candidates = {}
+    for row in prov:
+        document = (row.get("claim") or {}).get("document") or {}
+        sha = document.get("sha256")
+        url = archive_url(sha, document.get("r2_key"), manifest=manifest)
+        if url:
+            candidates[sha] = url
+    available = set()
+    for sha, url in candidates.items():
+        try:
+            response = httpx.get(url, timeout=15, follow_redirects=True)
+            if response.status_code == 200 and hashlib.sha256(response.content).hexdigest() == sha:
+                available.add(sha)
+            else:
+                print(f"public archive pending: {sha[:12]} (HTTP {response.status_code} or hash mismatch)")
+        except httpx.HTTPError:
+            print(f"public archive pending: {sha[:12]} (retrieval unavailable)")
+    return available
+
+
+def attach_sources(facilities: list[dict], prov: list[dict],
+                   *, available_archives: set[str] | None = None) -> None:
     """Fold provenance rows into each facility as a deduped sources[] list.
 
     Every published number on the site must be inspectable: for each source
@@ -116,6 +145,8 @@ def attach_sources(facilities: list[dict], prov: list[dict]) -> None:
         if hit is None:
             archived_copy = archive_url(
                 sha256, doc.get("r2_key"), manifest=public_manifest)
+            if available_archives is not None and sha256 not in available_archives:
+                archived_copy = None
             hit = {
                 "url": url,
                 "archive_url": archived_copy,
@@ -314,7 +345,8 @@ def main():
     facilities, events, aggregates, announcements = fetch()
     provenance = fetch_provenance()
     assert_provenance(facilities, provenance, gate="PUBLISH TRUTH GATE")
-    attach_sources(facilities, provenance)
+    attach_sources(facilities, provenance,
+                   available_archives=available_public_archives(provenance))
     coverage = fetch_coverage()
     summary = build_summary(facilities, aggregates)
     write_files(args.out, facilities, events, summary, coverage, announcements)

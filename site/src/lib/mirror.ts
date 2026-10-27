@@ -157,11 +157,11 @@ export function buildFacilityView(
       ...source,
       label: genreLabels[source.doc_genre] || human(source.doc_genre || "Document"),
       factsLabel: (source.facts || []).map((fact: string) => human(fact.replaceAll(".", " "))).join(", "),
-      checksumLabel: source.sha256 ? `SHA-256 ${source.sha256}` : null,
+      checksumLabel: source.sha256 ? (/^[0-9a-f]{64}$/i.test(source.sha256) ? `SHA-256 ${source.sha256}` : `Legacy scene reference: ${source.sha256}`) : null,
       archiveStatusLabel: source.archive_url
         ? "Immutable BTW copy"
         : source.archive_status === "approved_pending_endpoint"
-          ? "Immutable copy approved; public endpoint pending"
+          ? "Archive publication pending; original source available"
         : "Preserved privately; redistribution review pending",
     })),
     satellite: {

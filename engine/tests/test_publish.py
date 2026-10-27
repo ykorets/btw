@@ -81,6 +81,30 @@ def test_events_json_carries_source_url(tmp_path):
     assert facs["facilities"][0]["slug"] == "crusoe-stargate-abilene"
 
 
+def test_unavailable_or_wrong_public_copy_never_becomes_a_receipt_link(monkeypatch):
+    import hashlib
+    import httpx
+
+    body = b"public government record"
+    sha = hashlib.sha256(body).hexdigest()
+    manifest = {sha: {"rights_basis": "public_record"}}
+    monkeypatch.setattr(publish, "load_manifest", lambda: manifest)
+    monkeypatch.setenv("BTW_ARCHIVE_BASE_URL", "https://evidence.example")
+    provenance = [{"fact_table": "unit", "fact_id": "unit-1", "fact_field": "unit_count",
+        "claim": {"document": {"sha256": sha, "r2_key": f"docs/{sha}.pdf",
+            "url": "https://agency.example/record.pdf"}}}]
+    for status, content, expected in [(404, b"missing", set()),
+                                      (200, b"wrong bytes", set()),
+                                      (200, body, {sha})]:
+        monkeypatch.setattr(publish.httpx, "get", lambda *a, **kw: httpx.Response(status, content=content))
+        assert publish.available_public_archives(provenance) == expected
+    facility = _facility()
+    publish.attach_sources([facility], provenance, available_archives=set())
+    assert facility["sources"][0]["archive_url"] is None
+    assert facility["sources"][0]["archive_status"] == "approved_pending_endpoint"
+    assert facility["sources"][0]["url"] == "https://agency.example/record.pdf"
+
+
 def test_announcements_are_separate_and_explicitly_unverified(tmp_path):
     announcements = [
         {"name": "Project A", "state": "TX", "operating_status": "Proposed",
