@@ -33,13 +33,13 @@
       "rights_basis": "public_record",
       "note": "MDEQ final PSD permit 0680-00119, issued 2026-03-11"
     },
-    "830f5516db24a5f1d625aa5b501d494a3c43371ffd288b2f58ba086e5a49b15c": {
-      "rights_basis": "public_record",
-      "note": "Federal court opinion and order, case 3:26-cv-74, Doc 135, 2026-10-19"
-    },
     "ddf93ddc8781a4c7d6f71233875811f7f30de6a510e365bdf28a410f1516eed4": {
       "rights_basis": "public_record",
       "note": "Shelby County public notice, 2026-10-06"
+    },
+    "7330ff3ae8e174bd683989633a7a804bf160c1674c0c0d4cce1a11abd9b6931e": {
+      "rights_basis": "public_record",
+      "note": "CourtListener copy of federal court Doc 135, case 3:26-cv-74, 2026-10-19; text matches the reviewed Earthjustice copy"
     }
   }
 }
