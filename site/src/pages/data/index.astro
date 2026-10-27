@@ -15,6 +15,8 @@ const endpoints = [
   { name: "Operating fleet", format: "CSV", href: "/api/v1/fleet.csv", detail: "Flat file for spreadsheets, analysis and quick imports." },
   { name: "Announcements", format: "JSON", href: "/api/v1/announcements.json", detail: "Third-party reported projects, kept separate from verified operating capacity." },
   { name: "Events", format: "JSON", href: "/api/v1/events.json", detail: "Dated filings, regulatory actions and other published events." },
+  { name: "Project changes", format: "JSON", href: "/api/v1/changes.json", detail: "Reviewed historical interpretations plus published events; event and review dates are distinct." },
+  { name: "Texas research dossiers", format: "JSON", href: "/api/v1/research-projects.json", detail: "Selected primary-source project records, separate from the reviewed operating fleet." },
   { name: "Coverage", format: "JSON", href: "/api/v1/coverage.json", detail: "What public sources the engine watches and when they were last checked." },
   { name: "API manifest", format: "JSON", href: "/api/v1/index.json", detail: "Machine-readable map of every stable v1 endpoint and its semantics." },
 ];

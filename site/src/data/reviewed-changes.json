@@ -1,0 +1,53 @@
+[
+  {
+    "id":"goodnight-construction-report-20260928",
+    "project":"Crusoe Armstrong County / Goodnight", "project_path":"/projects/crusoe-armstrong-goodnight/", "event_date":"2026-09-28", "reviewed_at":"2026-10-27", "kind":"Operator milestone",
+    "title":"Crusoe identifies Google's campus and its Goodnight wind connection",
+    "summary":"Crusoe reports construction underway after a June 2025 groundbreaking. Its release distinguishes operating Goodnight 1 from Goodnight 2 still under construction.",
+    "changes":[], "meaning":"Track the campus, wind phases and shared grid connection separately. The wind ratings do not establish continuous supply or current computing load.",
+    "unknown":"Current delivered power and final disposition of the related PUCT rehearing remain unestablished here.",
+    "next":"Check subsequent PUCT 59220 orders and wind-phase completion records.",
+    "sources":[{"title":"Crusoe announcement, September 28, 2026","url":"https://www.crusoe.ai/resources/newsroom/crusoe-developing-data-center-campus-in-armstrong-county-texas"}]
+  },
+  {
+    "id":"matador-tensorwave-lease-20260810",
+    "project":"Fermi Project Matador", "project_path":"/projects/fermi-project-matador/", "event_date":"2026-08-10", "reviewed_at":"2026-10-27", "kind":"Operator milestone",
+    "title":"Fermi announces its first binding customer lease",
+    "summary":"The TensorWave announcement defines 222 MW of total facility power for the first phase, with phased delivery beginning in the second half of 2027. Expansion rights beyond 650 MW are separate options.",
+    "changes":[], "meaning":"A customer phase is more specific than the 17 GW campus ambition. Keep the phase's power basis, delivery window and conditions together.",
+    "unknown":"The announcement does not establish fulfilment of financing and guaranty conditions, delivery or current operation.",
+    "next":"Track subsequent disclosures against the 222 MW phase and the stated conditions.",
+    "sources":[{"title":"Fermi investor announcement, August 10, 2026","url":"https://investor.fermiamerica.com/fermi-announces-binding-lease-agreement-with-tensorwave"}]
+  },
+  {
+    "id":"abilene-o4721-issued-20260116",
+    "project":"Crusoe Stargate Abilene / Longhorn", "project_path":"/facility/crusoe-stargate-abilene/", "event_date":"2026-01-16", "reviewed_at":"2026-10-27", "kind":"Regulator milestone",
+    "title":"Abilene's O4721 federal operating permit is issued",
+    "summary":"O4721 adds a dated federal operating-permit milestone to the Longhorn / Abilene DC 1 record. Keep it distinct from the earlier NSR registration and modification.",
+    "changes":[], "meaning":"Authorization progressed in the documentary record. Issuance does not measure the operating state of each unit or delivered IT power.",
+    "unknown":"Current output and the exact first day of BTM generation are not established by issuance.",
+    "next":"Seek dated commissioning and operating evidence for each equipment cohort.",
+    "sources":[{"title":"TCEQ O4721 issued permit","url":"https://www.tceq.texas.gov/assets/public/permitting/air/publicnotice/37589sop.pdf"}]
+  },
+  {
+    "id":"victoria-partnership-20251030",
+    "project":"Blue Energy / Crusoe Port of Victoria", "project_path":"/projects/blue-energy-crusoe-port-victoria/", "event_date":"2025-10-30", "reviewed_at":"2026-10-27", "kind":"Operator milestone",
+    "title":"A gas-to-nuclear concept is announced for the Victoria-area AI campus",
+    "summary":"Blue Energy and Crusoe announce a proposed pairing after the port's option-agreement report. Initial gas-bridge power as early as 2028 and nuclear generation by 2031 are developer targets.",
+    "changes":[], "meaning":"Track site control, gas generation and nuclear licensing as separate milestones. An option agreement is not a licensed power plant.",
+    "unknown":"Current option exercise, final site boundaries, permits and updated delivery dates remain unestablished in the reviewed sources.",
+    "next":"Look for port decisions and project-specific air and NRC records before upgrading the development status.",
+    "sources":[{"title":"Crusoe partnership announcement, October 30, 2025","url":"https://www.crusoe.ai/resources/newsroom/blue-energy-and-crusoe-partner-to-develop-nuclear-powered-ai-data-center"}]
+  },
+  {
+    "id":"abilene-permit-revision-20250122",
+    "project":"Crusoe Stargate Abilene / Longhorn", "project_path":"/facility/crusoe-stargate-abilene/", "event_date":"2025-01-22", "reviewed_at":"2026-10-27", "kind":"Permit revision · retrospective example",
+    "title":"Abilene changes the permitted turbine configuration and hours",
+    "summary":"The 177263 modification review describes fewer turbines and a longer LM2500 permitted-hours envelope. It was received January 11 and approved January 22, 2025; the original application dates to August 15, 2024.",
+    "changes":[{"field":"LM2500 count","before":"6","after":"5"},{"field":"Titan 350 count","before":"6","after":"5"},{"field":"LM2500 annual permitted hours per turbine","before":"5,880","after":"8,760"},{"field":"LM2500 site rating","before":"Reduction described; earlier rating not reproduced","after":"34.1 MW per turbine"},{"field":"Titan 350 site rating","before":"Increase described; earlier rating not reproduced","after":"38 MW per turbine"}],
+    "meaning":"Use the amended five-plus-five configuration for this permitted cohort: 5 × 34.1 + 5 × 38 = 360.5 MW. Preserve six-plus-six as history rather than adding both versions as separate equipment.",
+    "unknown":"Permitted hours are not actual run hours, and site-rated MW are not metered delivery to computing.",
+    "next":"Match subsequent filings to Abilene DC 1 / Longhorn and keep commissioning evidence separate from authorization.",
+    "sources":[{"title":"TCEQ 177263 modification technical review","url":"https://records.tceq.texas.gov/cs/idcplg?IdcService=TCEQ_EXTERNAL_SEARCH_GET_FILE&Rendition=Web&dID=8600163"},{"title":"Original registration technical review","url":"https://records.tceq.texas.gov/cs/idcplg?IdcService=TCEQ_EXTERNAL_SEARCH_GET_FILE&Rendition=Web&dID=8143786"}]
+  }
+]

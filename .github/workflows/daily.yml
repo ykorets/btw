@@ -1,7 +1,13 @@
 name: daily-intake
 on:
   schedule: [{cron: "20 11 * * *"}]   # 06:20 CT daily
-  workflow_dispatch: {}
+  workflow_dispatch:
+    inputs:
+      source:
+        description: "One collector only (no normalization, review PR or notification)"
+        type: choice
+        options: [all, tceq-permit-portal, opsb-dockets]
+        default: all
 permissions:
   contents: write
   pull-requests: write
@@ -19,8 +25,15 @@ jobs:
           SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
           HEARTBEAT_URL: ${{ secrets.HEARTBEAT_URL }}
           COURTLISTENER_TOKEN: ${{ secrets.COURTLISTENER_TOKEN }}
-        run: PYTHONPATH=engine/src python -m btw_engine.watch
+          SOURCE_ID: ${{ inputs.source || 'all' }}
+        run: |
+          if [ "$SOURCE_ID" = all ]; then
+            PYTHONPATH=engine/src python -m btw_engine.watch
+          else
+            PYTHONPATH=engine/src python -m btw_engine.watch --source "$SOURCE_ID"
+          fi
       - name: Normalize claims into provenance + staged facts
+        if: inputs.source == '' || inputs.source == 'all'
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
@@ -29,6 +42,7 @@ jobs:
           R2_SECRET: ${{ secrets.R2_SECRET }}
         run: PYTHONPATH=engine/src python -m btw_engine.normalize
       - name: Open review PR
+        if: inputs.source == '' || inputs.source == 'all'
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
@@ -36,13 +50,13 @@ jobs:
           AUTOMERGE: "false"
         run: PYTHONPATH=engine/src python -m btw_engine.review --open
       - name: SLO staleness check
-        if: always()
+        if: always() && (inputs.source == '' || inputs.source == 'all')
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
         run: PYTHONPATH=engine/src python -m btw_engine.watch --slo
       - name: Telegram report (ok or alert)
-        if: always()
+        if: always() && (inputs.source == '' || inputs.source == 'all')
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}

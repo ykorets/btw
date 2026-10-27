@@ -14,9 +14,11 @@ import hashlib
 import json
 import os
 import sys
+from pathlib import Path
 from datetime import date
 
 import httpx
+import yaml
 
 from btw_engine.truth import assert_provenance
 from btw_engine.public_archive import archive_url, load_manifest
@@ -182,7 +184,14 @@ def fetch_coverage() -> list[dict]:
                   select="id,kind,adapter,url,schedule,slo_interval,"
                          "last_hit_at,created_at",
                   order="id")
+    configs = {}
+    for path in (Path(__file__).resolve().parents[2] / "adapters").glob("*.yaml"):
+        cfg = yaml.safe_load(path.read_text())
+        configs[cfg["id"]] = cfg
     for s in sources:
+        cfg = configs.get(s["id"], {})
+        s["collector_status"] = cfg.get("status", "active" if cfg else "unconfigured")
+        s["coverage_note"] = cfg.get("coverage_note")
         r = httpx.get(f"{BASE}/candidate",
                       headers={**HEADERS, "Prefer": "count=exact",
                                "Range": "0-0"},

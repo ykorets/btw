@@ -1,4 +1,5 @@
 export const topics = [
+  { path: "/changes/", label: "Project changes", title: "What changed in data center power?", description: "Dated project milestones, an Abilene before-and-after example and the next records to check." },
   { path: "/states/texas/", label: "Texas projects", title: "Texas behind-the-meter data center projects", description: "Abilene's source-linked power record and a clearly dated Texas announcement inventory." },
   { path: "/equipment/lm2500-titan-350/", label: "LM2500 & Titan 350", title: "LM2500 and Titan 350 data center turbines", description: "Read the Abilene permit: unit counts, site ratings, changes and limits of the evidence." },
   { path: "/power-cost-calculator/", label: "Power cost calculator", title: "Behind-the-meter power cost calculator", description: "Compare gas generation with a grid tariff. Change assumptions and share a reproducible scenario." },

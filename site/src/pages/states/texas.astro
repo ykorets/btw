@@ -2,6 +2,7 @@
 import TopicLayout from "../../layouts/TopicLayout.astro";
 import { loadMirror } from "../../lib/mirror";
 import { capacityLabel, dateLabel } from "../../lib/facts";
+import { projects as researchProjects, projectPath } from "../../lib/research";
 const mirror = await loadMirror();
 const facilities = mirror.facilities.facilities.filter((f: any) => f.state === "TX");
 const projects = mirror.announcements.announcements.filter((p: any) => p.state === "TX").sort((a: any, b: any) => (b.reported_capacity_mw ?? -1) - (a.reported_capacity_mw ?? -1));
@@ -13,7 +14,7 @@ const inventory = projects[0]?.source?.url;
   <section class="topic-section wrap">
     <div class="topic-two">
       <div><h2>What is documented in Texas?</h2>
-        <p>BTW currently publishes {facilities.length} source-linked Texas facility dossier: Crusoe Stargate Abilene, identified in the air record as Longhorn Data Center, operated by Abilene DC 1, LLC. The January 2025 permit review specifies 360.5 MW on a permitted, site-rated basis. That figure describes equipment in the record; current metered delivery to computing is not established.</p>
+        <p>Start with the reviewed Abilene equipment dossier and {researchProjects.length} additional project research dossiers below. Crusoe Stargate Abilene is identified in the air record as Longhorn Data Center, operated by Abilene DC 1, LLC. Its January 2025 permit review specifies 360.5 MW on a permitted, site-rated basis. Current metered delivery to computing is not established.</p>
         <p>The broader inventory below contains {projects.length} Texas entries with {(total / 1000).toFixed(1)} GW of reported capacity from a third-party snapshot dated April 30, 2026. It is a research starting list. The snapshot's project statuses and expected dates have not been reverified here.</p>
       </div>
       <aside class="topic-note"><h3>Two evidence layers</h3><p>The reviewed facility dossier and the dated announcement inventory have different coverage, dates and capacity definitions. Do not add them together or use their ratio as a completion rate.</p><p><a href="/guides/data-center-power-capacity/">How to read different MW claims</a></p></aside>
@@ -23,6 +24,12 @@ const inventory = projects[0]?.source?.url;
         {facilities.map((f: any) => <tr><td><a href={`/facility/${f.slug}/`}>{f.name}</a><small>{f.county} County · {f.developer}</small></td><td>{capacityLabel(f)} MW<small>Permitted site ratings</small></td><td>TCEQ 177263 and O4721<small>No current output measurement published</small></td></tr>)}
       </tbody></table>
     </div>
+  </section>
+  <section class="topic-section wrap">
+    <h2>Three more Texas projects, with different power boundaries</h2>
+    <p>These selected primary-source dossiers distinguish regulator evidence, developer reports and open questions. They are separate research coverage and add no MW to the reviewed facility fleet or historical inventory.</p>
+    <div class="topic-table" tabindex="0" role="region" aria-label="Additional Texas project research"><table><caption>Sources checked October 27, 2026 · selected coverage, not a statewide census</caption><thead><tr><th scope="col">Project</th><th scope="col">Capacity boundary</th><th scope="col">Evidence basis</th></tr></thead><tbody>{researchProjects.map(project => <tr><td><a href={projectPath(project.slug)}>{project.name}</a><small>{project.county}</small></td><td>{project.capacity}</td><td>{project.basis}</td></tr>)}</tbody></table></div>
+    <p><a href="/changes/">Follow the source-linked change log</a>, including Abilene's permit revision, or <a href="/api/v1/research-projects.json">download the research records</a>.</p>
   </section>
   <section class="topic-section wrap">
     <h2>Abilene: a permit trail you can follow</h2>

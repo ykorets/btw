@@ -29,6 +29,8 @@ import random
 import re
 import sys
 import time
+from html.parser import HTMLParser
+from urllib.parse import parse_qs, urlparse
 
 import httpx
 import yaml
@@ -119,9 +121,12 @@ def run_tceq_nsr(cfg: dict) -> list[dict]:
     r = httpx.post(cfg["url"], data=form, headers=BROWSER_HEADERS,
                    timeout=90, follow_redirects=True)
     r.raise_for_status()
+    parsed = parse_tceq_ascii(r.text)
+    if not parsed:
+        raise RuntimeError("TCEQ legacy NSR: no recognized rows; do not record a successful sweep")
     kws = [k.lower() for k in cfg.get("keywords", [])]
     out = []
-    for row in parse_tceq_ascii(r.text):
+    for row in parsed:
         blob = " ".join(row.values()).lower()
         row["kw_hit"] = any(k in blob for k in kws)
         out.append({
@@ -134,22 +139,124 @@ def run_tceq_nsr(cfg: dict) -> list[dict]:
     return out
 
 
+# Public anonymous-session contract shipped by the agency's Permit Search UI.
+# Registry snapshots are review candidates, never approved generation facts.
+TCEQ_PORTAL_API = "https://permit-search.tceq.texas.gov/psp-webservices"
+TCEQ_PORTAL_FIELDS = (
+    "addnId", "aiPgmCd", "aiIdTypName", "aiIdNumber", "aiStatusCd",
+    "pspStatusCd", "aiPermittedName", "aiIssueToName", "reRegNumber",
+    "reName", "reCnty", "reCityName", "aiIssueToBeginDt",
+)
+
+
+def tceq_portal_candidates(rows: list[dict]) -> list[dict]:
+    out = {}
+    for row in rows:
+        if row.get("aiPgmCd") != "AIRNSR":
+            continue
+        if not row.get("addnId") or not row.get("aiIdNumber"):
+            raise ValueError("TCEQ portal: incomplete registry identity")
+        snapshot = {k: row.get(k) for k in TCEQ_PORTAL_FIELDS}
+        digest = hashlib.sha256(json.dumps(snapshot, sort_keys=True).encode()).hexdigest()[:16]
+        key = f"portal:{row['addnId']}:{digest}"
+        out[key] = {
+            "external_id": key,
+            "url": f"https://permit-search.tceq.texas.gov/?addnId={row['addnId']}",
+            "title": f"{row['aiPermittedName']} — {row['aiIdNumber']} ({row.get('pspStatusCd', 'unknown')})",
+            "payload": {"registry_snapshot": snapshot, "kw_hit": True,
+                        "evidence_basis": "registry_status_not_operating_capacity"},
+        }
+    return list(out.values())
+
+
+def run_tceq_portal(cfg: dict) -> list[dict]:
+    params = cfg.get("params", {})
+    rows = []
+    with httpx.Client(timeout=60, headers={"AppName": "psp-frontend"}) as client:
+        token = client.get(TCEQ_PORTAL_API + "/v1/token", params={"appName": "psp-frontend"})
+        token.raise_for_status()
+        client.headers["Authorization"] = "Bearer " + token.text.strip('"')
+        for keyword in params["queries"]:
+            expected_total, collected = None, 0
+            for page in range(int(params.get("max_pages", 25))):
+                response = client.post(TCEQ_PORTAL_API + "/v1/search/permitsWithPages", json={
+                    "keyword": keyword, "normalizedAddress": "", "radius": None,
+                    "latitude": None, "longitude": None,
+                    "permitStatus": ["NEW APPLICATION", "ISSUED PERMIT", "RENEWAL/AMENDMENT"],
+                    "mediaPrograms": [{"mediaCd": "AIR", "programDesc": ["Air New Source"]}],
+                    "pageable": {"paged": True, "pageNumber": page, "pageSize": 100},
+                })
+                response.raise_for_status()
+                data = response.json()
+                if (not isinstance(data, dict) or not isinstance(data.get("content"), list)
+                        or not isinstance(data.get("last"), bool)
+                        or data.get("number") != page
+                        or not isinstance(data.get("totalElements"), int)):
+                    raise ValueError("TCEQ portal: unrecognized pagination response")
+                if not data["content"] and data["totalElements"] != 0:
+                    raise ValueError("TCEQ portal: unexpectedly empty page")
+                if expected_total is None:
+                    expected_total = data["totalElements"]
+                elif expected_total != data["totalElements"]:
+                    raise RuntimeError("TCEQ portal: result count changed during pagination; retry next sweep")
+                collected += len(data["content"])
+                rows.extend(data["content"])
+                if data["last"]:
+                    if collected != expected_total:
+                        raise RuntimeError("TCEQ portal: incomplete result count")
+                    break
+            else:
+                raise RuntimeError("TCEQ portal: page limit reached; incomplete sweep")
+    return tceq_portal_candidates(rows)
+
+
 # --------------------------------------------------------------- OPSB case --
 
-_OPSB_ROW = re.compile(
-    r'href="(DocumentRecord\.aspx\?DocID=([0-9a-fA-F-]+))">'
-    r"(\d{2}/\d{2}/\d{4})</a></td><td>(.*?)</td>", re.S)
+class _DocketRows(HTMLParser):
+    def __init__(self):
+        super().__init__(convert_charrefs=True)
+        self.rows, self.cells, self.cell, self.href = [], [], None, None
+
+    def handle_starttag(self, tag, attrs):
+        if tag == "tr":
+            self.cells, self.href = [], None
+        elif tag == "td":
+            self.cell = []
+        elif tag == "a" and self.cell is not None:
+            href = dict(attrs).get("href", "")
+            parsed = urlparse(href)
+            if (parsed.path.lower().endswith("documentrecord.aspx")
+                    and (not parsed.netloc or parsed.netloc == "dis.puc.state.oh.us")):
+                self.href = href
+
+    def handle_data(self, data):
+        if self.cell is not None:
+            self.cell.append(data)
+
+    def handle_endtag(self, tag):
+        if tag == "td" and self.cell is not None:
+            self.cells.append(re.sub(r"\s+", " ", "".join(self.cell)).strip())
+            self.cell = None
+        elif tag == "tr" and self.href and len(self.cells) >= 2:
+            self.rows.append((self.href, self.cells[:]))
 
 
 def parse_opsb_case_html(html: str, case_no: str) -> list[dict]:
-    """Parse the filings grid on CaseRecord.aspx (first page = newest 15)."""
+    """Read the agency's View All docket grid, independent of HTML spacing."""
+    if re.search(r"Request Rejected|requested URL was rejected|captcha|access denied", html, re.I):
+        raise RuntimeError(f"OPSB {case_no}: public docket access blocked; no successful sweep")
+    parser = _DocketRows()
+    parser.feed(html)
     out = []
-    for m in _OPSB_ROW.finditer(html):
-        rel_url, doc_id, filed, summary = m.groups()
-        summary = re.sub(r"\s+", " ", re.sub(r"<[^>]+>", "", summary)).strip()
+    for rel_url, cells in parser.rows:
+        qs = {k.lower(): v for k, v in parse_qs(urlparse(rel_url).query).items()}
+        doc_id = qs.get("docid", [""])[0]
+        filed, summary = cells[:2]
+        if not re.fullmatch(r"[0-9a-fA-F-]{36}", doc_id) or not re.fullmatch(r"\d{2}/\d{2}/\d{4}", filed):
+            raise ValueError(f"OPSB {case_no}: unrecognized filing identity/date")
         out.append({
             "external_id": doc_id,
-            "url": "https://dis.puc.state.oh.us/" + rel_url,
+            "url": "https://dis.puc.state.oh.us/DocumentRecord.aspx?DocID=" + doc_id,
             "title": f"{case_no} {filed}: {summary[:160]}",
             "payload": {"case_no": case_no, "filed": filed,
                         "summary": summary},
@@ -160,7 +267,7 @@ def parse_opsb_case_html(html: str, case_no: str) -> list[dict]:
 def run_opsb_case(cfg: dict) -> list[dict]:
     out = []
     for case_no in cfg.get("params", {}).get("cases", []):
-        r = httpx.get(cfg["url"], params={"CaseNo": case_no},
+        r = httpx.get(cfg["url"], params={"CaseNo": case_no, "link": "DIVA"},
                       headers=BROWSER_HEADERS, timeout=60,
                       follow_redirects=True)
         r.raise_for_status()
@@ -610,6 +717,7 @@ def run_gas_ebb(cfg: dict) -> list[dict]:
 
 ADAPTERS = {
     "tceq_nsr": run_tceq_nsr,
+    "tceq_portal": run_tceq_portal,
     "opsb_case": run_opsb_case,
     "pagehash": run_pagehash,
     "echo_counters": run_echo_counters,
@@ -713,6 +821,9 @@ def main() -> None:
     if args.slo:
         sys.exit(slo_check())
 
+    if args.source and not any(c["id"] == args.source for c in load_sources()):
+        ap.error("source is unknown or retired")
+
     failures = 0
     for cfg in load_sources():
         if args.source and cfg["id"] != args.source:
@@ -742,8 +853,10 @@ def main() -> None:
     # alarm (grace window, then red). A run with zero successes still fails.
     if not args.dry_run and failures:
         print(f"{failures} source(s) failed (SLO check is the alarm)")
-    if not args.dry_run:
+    if not args.dry_run and not args.source:
         heartbeat()
+    if args.source and failures:
+        sys.exit(1)
 
 
 if __name__ == "__main__":

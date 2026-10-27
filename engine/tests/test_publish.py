@@ -245,3 +245,18 @@ def test_reported_basis_requires_quantitative_cohort_claim():
     violations = provenance_violations([facility], receipts)
 
     assert any("basis" in item for item in violations)
+
+
+def test_coverage_retains_history_and_distinguishes_replaced_collectors(monkeypatch):
+    import httpx
+    rows = [{'id':'tceq-nsr-stdpmt','last_hit_at':'2026-10-16T00:00:00Z'},
+            {'id':'tceq-permit-portal','last_hit_at':'2026-10-27T00:00:00Z'}]
+    monkeypatch.setattr(publish,'get',lambda *args,**kwargs:rows)
+    monkeypatch.setattr(publish.httpx,'get',lambda *args,**kwargs:httpx.Response(
+        200,headers={'content-range':'0-0/3'},request=httpx.Request('GET','https://example.test')))
+    coverage=publish.fetch_coverage()
+    assert coverage[0]['collector_status']=='replaced_by_tceq_permit_portal'
+    assert coverage[0]['last_hit_at']=='2026-10-16T00:00:00Z'
+    assert coverage[1]['collector_status']=='active'
+    assert 'Not every Texas project' in coverage[1]['coverage_note']
+    assert all(row['candidates']==3 for row in coverage)

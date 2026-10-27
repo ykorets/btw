@@ -1,0 +1,95 @@
+[
+  {
+    "slug": "fermi-project-matador",
+    "name": "Fermi Project Matador",
+    "county": "Carson",
+    "developer": "Fermi America / Fermi Inc.",
+    "summary": "A private-grid campus with a roughly 6,000 MW gas-generation permit scope, a larger 17 GW development ambition and a separately defined first customer lease.",
+    "reviewed": "2026-10-27",
+    "basis": "Regulator technical review and registry; operator commercial reports",
+    "capacity": "~6,000 MW permitted project scope; 17 GW planned campus",
+    "sources": [
+      {"id":"review","title":"TCEQ construction-permit technical review, project 396274","date":"2026-02-25","url":"https://records.tceq.texas.gov/cs/idcplg?IdcService=GET_FILE&allowInterrupt=1&dDocName=8281238&dID=9562398","basis":"Regulator technical review · pp. 1, 4–7, 9"},
+      {"id":"registry","title":"TCEQ Permit Search: permit 181009","date":null,"url":"https://permit-search.tceq.texas.gov/?addnId=522500122025213","basis":"Live registry snapshot checked October 27, 2026"},
+      {"id":"lease","title":"Fermi announces TensorWave lease","date":"2026-08-10","url":"https://investor.fermiamerica.com/fermi-announces-binding-lease-agreement-with-tensorwave","basis":"Operator investor announcement; contractual conditions remain"},
+      {"id":"equipment","title":"Fermi reports arrival of three GE Vernova 6B turbines","date":null,"url":"https://fermiamerica.com/three-ge-vernova-6b-gas-turbines-arrive-at-project-matador/","basis":"Operator equipment report; source page has no explicit date in the reviewed text"}
+    ],
+    "facts": [
+      {"field":"Legal applicant and identity","value":"Fermi Equipment Holdco, LLC; RN112258678; Carson County","source":"review"},
+      {"field":"Air authorization scope","value":"181009 / PSDTX1670 / GHGPSDTX254; approximately 6,000 MW nominal project generation","source":"review"},
+      {"field":"Turbines in the technical review","value":"90 Siemens SGT-800 combustion turbines, three GE Frame 6001/6B combustion turbines and 15 steam turbines","source":"review"},
+      {"field":"Use of generated electricity","value":"Onsite hyperscale computing; technical review says no sale to the local utility distribution system","source":"review"},
+      {"field":"First customer phase, as announced","value":"222 MW total facility power for TensorWave; phased delivery beginning in the second half of 2027","source":"lease"},
+      {"field":"Equipment arrival, as reported","value":"Three GE Vernova 6B turbines arrived at the campus; operation is not established by arrival","source":"equipment"}
+    ],
+    "interpretation": [
+      "Matador is a project where the capacity boundary matters. The roughly 6,000 MW gas project in the TCEQ review and the operator's 17 GW campus plan describe different scopes. Neither is a measurement of electricity currently delivered to computing.",
+      "The review describes ninety 56 MW gross-nominal SGT-800 combustion turbines and three 45 MW gross-nominal GE 6B turbines, with steam generation in the combined-cycle configuration. Adding combustion-turbine ratings alone will not reproduce the whole-plant nominal figure. Keep the review's plant boundary with its number.",
+      "Fermi's first customer announcement gives a more specific commercial boundary: 222 MW of total facility power, with delivery beginning in the second half of 2027. Expansion rights beyond 650 MW are options. The announcement also states guaranty and financing conditions; these details matter when qualifying a delivery schedule."
+    ],
+    "unknowns": ["Current net generation and delivered IT power", "Commissioning and acceptance dates for each turbine block", "Fulfilment of the lease's financing and guaranty conditions", "Final scope and issuance of the separately listed East Campus applications"],
+    "next": ["Track permit numbers and RN112258678 together; do not merge East Campus applications with issued authorizations.", "Look for commissioning or operating records after equipment-delivery reports.", "Compare future customer updates against the 222 MW phase and stated delivery conditions."],
+    "faq": [{"q":"Is Matador operating at 17 GW?","a":"The reviewed sources do not establish that. The 17 GW figure is the operator's development plan; the TCEQ review has a smaller gas-generation project scope."},{"q":"Does arrival of a turbine establish available power?","a":"No. The operator's arrival report is equipment evidence. Installation, commissioning and operation require separate records."}]
+  },
+  {
+    "slug": "crusoe-armstrong-goodnight",
+    "name": "Crusoe Armstrong County / Goodnight",
+    "county": "Armstrong",
+    "developer": "Crusoe; campus for Google",
+    "summary": "A campus under construction beside Goodnight wind generation, with a documented co-location and net-metering trail. Wind-farm ratings and data-center load must be kept separate.",
+    "reviewed": "2026-10-27",
+    "basis": "Operator construction report, PUCT applicant filing and TCEQ registry",
+    "capacity": "265.5 MW Goodnight 1 wind rating; campus output unknown",
+    "sources": [
+      {"id":"campus","title":"Crusoe: Armstrong County campus for Google","date":"2026-09-28","url":"https://www.crusoe.ai/resources/newsroom/crusoe-developing-data-center-campus-in-armstrong-county-texas","basis":"Operator announcement; construction and wind connection as reported"},
+      {"id":"puc","title":"PUCT docket 59220, item 73: motion for rehearing","date":"2026-08-18","url":"https://interchange.puc.texas.gov/Documents/59220_73_1675222.PDF","basis":"Applicants' regulatory filing, not a final ruling on the motion"},
+      {"id":"registry","title":"TCEQ: Goodnight Data Center application 182880","date":null,"url":"https://permit-search.tceq.texas.gov/?addnId=285456222026030","basis":"Live registry: new application, checked October 27, 2026"}
+    ],
+    "facts": [
+      {"field":"Campus and customer","value":"Crusoe identifies itself as developer of Google's Armstrong County campus","source":"campus"},
+      {"field":"Construction milestone","value":"Groundbreaking in June 2025; construction underway in the September 28, 2026 report","source":"campus"},
+      {"field":"Adjacent wind, as reported","value":"Goodnight 1: 265.5 MW and operational; Goodnight 2: 265.5 MW and under construction","source":"campus"},
+      {"field":"Metering proceeding","value":"PUCT 59220: applicants sought rehearing of conditions on the expanded co-located arrangement","source":"puc"},
+      {"field":"Different second-phase rating in the filing","value":"August motion describes Crusoe Two and Goodnight 2 at 260 MW each; this differs from the later wind announcement's 265.5 MW","source":"puc"},
+      {"field":"Air-registry identity","value":"Goodnight Data Center; RN112229901; 182880 listed as a new application","source":"registry"}
+    ],
+    "interpretation": [
+      "Goodnight is a co-location and metering case. Crusoe reports a direct wind connection and a campus being built for Google. The wind-farm nameplate is not a measurement of firm supply to the campus, and it is not the same quantity as IT load.",
+      "The PUCT filing makes the grid relationship material: multiple loads and wind facilities are discussed behind a shared point of interconnection. A motion for rehearing argues the applicants' position. It cannot establish that the requested changes were granted or that the same conditions remain current after subsequent orders.",
+      "There is also a useful source discrepancy to preserve. The August filing describes the second wind facility at 260 MW; Crusoe's September announcement uses 265.5 MW. BTW retains both with their source dates and definitions. It does not silently choose a rating or sum wind capacity into an operating data-center total."
+    ],
+    "unknowns": ["Current campus IT load and metered generation delivered to it", "Final disposition of the August rehearing request and any later operating conditions", "Reason for the second-phase 260 / 265.5 MW difference", "Generation equipment and operating status associated with application 182880"],
+    "next": ["Read subsequent PUCT 59220 orders before treating the applicants' requested terms as effective.", "Track Goodnight by RN112229901 and keep each air authorization and project phase distinct.", "Seek completion and metering evidence for Goodnight 2 before describing the announced wind connection as fully operating."],
+    "faq": [{"q":"Does 265.5 MW mean Google receives that much continuous power?","a":"No. It is the reported rating of Goodnight 1 wind generation. Delivered power and computing load require separate evidence."},{"q":"Does a rehearing motion change the rules?","a":"The motion asks the regulator to act. Read the resulting order and any later proceedings to establish the applicable conditions."}]
+  },
+  {
+    "slug": "blue-energy-crusoe-port-victoria",
+    "name": "Blue Energy / Crusoe Port of Victoria",
+    "county": "Calhoun",
+    "developer": "Blue Energy and Crusoe",
+    "summary": "A proposed gas-to-nuclear power and AI campus pairing. A port option agreement and a company partnership establish development milestones, with power delivery and nuclear dates still targets.",
+    "reviewed": "2026-10-27",
+    "basis": "Port authority announcement and developer partnership announcement",
+    "capacity": "Up to 1.5 GW proposed nuclear generation",
+    "sources": [
+      {"id":"port","title":"Port of Victoria: Blue Energy option agreement","date":"2025-10-14","url":"https://www.portofvictoria.com/news-and-media/p/item/65061/victoria-navigation-district-partners-with-blue-energy-to-advance-small-modular-nuclear-power-project","basis":"Public port authority: option for feasibility and due diligence"},
+      {"id":"partnership","title":"Blue Energy and Crusoe announce Port of Victoria project","date":"2025-10-30","url":"https://www.crusoe.ai/resources/newsroom/blue-energy-and-crusoe-partner-to-develop-nuclear-powered-ai-data-center","basis":"Developer announcement; explicitly corrected campus county"}
+    ],
+    "facts": [
+      {"field":"Land milestone","value":"Port authority announced an option to lease approximately 70 acres for feasibility and due diligence","source":"port"},
+      {"field":"Generation concept","value":"Potential nuclear facility of up to 1.5 GW","source":"port"},
+      {"field":"Computing campus","value":"Crusoe describes a separate 1,600-acre campus in Calhoun County","source":"partnership"},
+      {"field":"Initial power target","value":"Power as early as 2028 using a natural-gas bridge, as announced in October 2025","source":"partnership"},
+      {"field":"Nuclear target","value":"Expected transition to nuclear generation by 2031, as announced; authorization and operation not established here","source":"partnership"},
+      {"field":"Location correction","value":"Crusoe corrected an earlier draft from Victoria County to Calhoun County for the computing campus","source":"partnership"}
+    ],
+    "interpretation": [
+      "The port announcement documents an option agreement, which permits feasibility work and due diligence. It does not establish a completed lease, a nuclear construction authorization or an operating power station. The later partnership announcement adds a proposed computing use and a staged energy concept.",
+      "The land descriptions belong to different parts of the proposal: approximately 70 acres under the port option and a separately described 1,600-acre computing campus. Combining them as one documented parcel would lose that distinction. Likewise, the 1.5 GW nuclear concept is not a confirmed IT-load rating.",
+      "The gas bridge and nuclear transition should be tracked as separate phases, each with its own equipment, authorization and commissioning evidence. The 2028 and 2031 dates remain the developers' October 2025 targets in this dossier. No later completion or license is inferred from the continued availability of that announcement."
+    ],
+    "unknowns": ["Whether the port option has been exercised and the final land arrangements", "Exact generation-site and computing-site boundaries", "Current air and nuclear licensing milestones", "Committed equipment, financing and updated delivery schedule"],
+    "next": ["Look for port board decisions that distinguish option exercise from preliminary site studies.", "Identify the precise generation entity, location and permit or NRC docket before linking a regulatory record.", "Check for revised gas-bridge and nuclear schedules rather than rolling the original targets forward automatically."],
+    "faq": [{"q":"Is a 1.5 GW nuclear plant operating at Port of Victoria?","a":"The reviewed sources establish a proposed facility and development agreements. They do not establish a licensed, operating nuclear plant."},{"q":"Why does the dossier say Calhoun County?","a":"Crusoe explicitly corrected the computing-campus location to Calhoun County. The port's name and the separate generation-site option should not override that correction."}]
+  }
+]
