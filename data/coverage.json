@@ -1,7 +1,7 @@
 {
   "license": "CC BY 4.0",
   "cite_as": "Behind the Watt, behindthewatt.com, CC BY 4.0",
-  "generated": "2026-10-27",
+  "generated": "2026-10-28",
   "note": "registries watched by the engine; last_hit_at = last successful sweep",
   "sources": [
     {
@@ -141,11 +141,11 @@
       "url": "https://dis.puc.state.oh.us/CaseRecord.aspx",
       "schedule": "daily",
       "slo_interval": "30 days",
-      "last_hit_at": "2026-08-09T11:52:15.893456+00:00",
+      "last_hit_at": "2026-10-28T00:30:42.01567+00:00",
       "created_at": "2026-07-11T19:19:57.284848+00:00",
       "collector_status": "active",
-      "coverage_note": "Two named docket filing lists, agency View All. Last manual check October 27, 2026 encountered access rejection. No complete filing coverage while blocked; successful-sweep timestamp is not advanced on a block.",
-      "candidates": 29
+      "coverage_note": "Two named docket filing lists via the official anonymous browser search and View All. Every docket is checked against its advertised document count. Shared documents are deduplicated; collection is discovery, not review or proof of operation. Partial or blocked access never advances the successful-sweep timestamp.",
+      "candidates": 73
     },
     {
       "id": "shelby-health-air",
