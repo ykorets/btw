@@ -31,6 +31,13 @@
       "facility": "xai-colossus-2"
     },
     {
+      "date": "2026-08-03",
+      "type": "operating_status",
+      "headline": "Socrates South: OPSB September 17, 2026 table lists 200 MW gas generation operational from August 3, 2026. Capacity excludes battery storage; current output is unknown.",
+      "source_url": "https://dam.assets.ohio.gov/image/upload/puco.ohio.gov/empliibrary/files/OPA/Mapping/OPSB/Solar%20Facilities%20Map/Natural_Gas_Map_and_Stats.pdf#page=3",
+      "facility": null
+    },
+    {
       "date": "2026-07-13",
       "type": "permit_filed",
       "headline": "MDEQ notices Air-Construction PSD for Entergy's Traceview Advanced Power Station \u2014 754 MW CCGT in Ridgeland, third dedicated gas plant for AWS's Madison County data centers (notice ends 07/14)",
@@ -49,6 +56,13 @@
       "type": "permit_approved",
       "headline": "Williams STY approved with 36 conditions: 296 MW of turbines + 116 MW battery for Meta's campus.",
       "source_url": null,
+      "facility": null
+    },
+    {
+      "date": "2026-06-25",
+      "type": "source_correction",
+      "headline": "STY: OPSB September 17, 2026 table records June 25 approval, 250 MW gas generation and under-construction status. The June 26 announcement date and older uncited 296 MW turbine figure describe different reporting bases; a physical 46 MW reduction is not established.",
+      "source_url": "https://dam.assets.ohio.gov/image/upload/puco.ohio.gov/empliibrary/files/OPA/Mapping/OPSB/Solar%20Facilities%20Map/Natural_Gas_Map_and_Stats.pdf#page=3",
       "facility": null
     },
     {
