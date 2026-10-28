@@ -186,7 +186,6 @@ def capture(manifest: Path, *, limit: int | None = None,
                         print(f"UNAVAILABLE {doc_id}: {exc}", flush=True)
                         if failures >= 2:
                             raise RuntimeError("Two access failures; stop this session") from exc
-                    if 'document_page' in locals() and not document_page.is_closed():
                     if output:
                         (output / "index.json").write_text(json.dumps(results, ensure_ascii=False))
         finally:
