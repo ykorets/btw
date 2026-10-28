@@ -28,7 +28,7 @@ jobs:
         working-directory: engine
       - name: Install ordinary Chromium for OPSB
         if: inputs.source == '' || inputs.source == 'all' || inputs.source == 'opsb-dockets'
-        run: engine/.venv/bin/playwright install --with-deps chromium
+        run: engine/.venv/bin/playwright install --with-deps --no-shell chromium
       - name: Run watchers
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
@@ -38,7 +38,9 @@ jobs:
           SOURCE_ID: ${{ inputs.source || 'all' }}
         run: |
           if [ "$SOURCE_ID" = all ]; then
-            engine/.venv/bin/python -m btw_engine.watch
+            xvfb-run -a engine/.venv/bin/python -m btw_engine.watch
+          elif [ "$SOURCE_ID" = opsb-dockets ]; then
+            xvfb-run -a engine/.venv/bin/python -m btw_engine.watch --source "$SOURCE_ID"
           else
             engine/.venv/bin/python -m btw_engine.watch --source "$SOURCE_ID"
           fi
