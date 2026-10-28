@@ -1,0 +1,574 @@
+[
+  {
+    "external_id": "18a9efcd-434f-4fe9-9f86-a7faca899f06",
+    "url": "https://dis.puc.state.oh.us/DocumentRecord.aspx?DocID=18a9efcd-434f-4fe9-9f86-a7faca899f06",
+    "payload": {
+      "filed": "10/26/2026",
+      "case_no": "25-0185",
+      "summary": "Notice of Compliance with Condition No. 12 (2026 Q3) electronically filed by Megan S. Zemke on behalf of Herrnstein, Kara.",
+      "case_numbers": [
+        "25-0185"
+      ]
+    },
+    "found_at": "2026-10-28 00:29:33.493766+00"
+  },
+  {
+    "external_id": "619c20b0-0d41-4f41-b4a3-0cc7e207a0c0",
+    "url": "https://dis.puc.state.oh.us/DocumentRecord.aspx?DocID=619c20b0-0d41-4f41-b4a3-0cc7e207a0c0",
+    "payload": {
+      "filed": "10/26/2026",
+      "case_no": "26-0169",
+      "summary": "Notice of Compliance with Condition No. 15 (2026 Q3) electronically filed by Megan S. Zemke on behalf of Herrnstein, Kara.",
+      "case_numbers": [
+        "26-0169"
+      ]
+    },
+    "found_at": "2026-10-28 00:29:33.493766+00"
+  },
+  {
+    "external_id": "6067f0f3-6d27-4ec6-92d3-fd0a1361b7d4",
+    "url": "https://dis.puc.state.oh.us/DocumentRecord.aspx?DocID=6067f0f3-6d27-4ec6-92d3-fd0a1361b7d4",
+    "payload": {
+      "filed": "05/29/2025",
+      "case_no": "25-0185",
+      "summary": "Response to Requests and Comments from Licking County electronically filed by Teresa Orahood on behalf of Herrnstein, Kara.",
+      "case_numbers": [
+        "25-0185"
+      ]
+    },
+    "found_at": "2026-10-28 00:29:33.493766+00"
+  },
+  {
+    "external_id": "c75d546b-e693-4e31-ae57-64ae2a9078c0",
+    "url": "https://dis.puc.state.oh.us/DocumentRecord.aspx?DocID=c75d546b-e693-4e31-ae57-64ae2a9078c0",
+    "payload": {
+      "filed": "05/27/2025",
+      "case_no": "25-0185",
+      "summary": "Unopposed Petition of Intervention Out of Time electronically filed by Mr. Robert Dove on behalf of City of New Albany.",
+      "case_numbers": [
+        "25-0185"
+      ]
+    },
+    "found_at": "2026-10-28 00:29:33.493766+00"
+  },
+  {
+    "external_id": "39f0092c-d6f2-49f1-8b1b-1d28011325eb",
+    "url": "https://dis.puc.state.oh.us/DocumentRecord.aspx?DocID=39f0092c-d6f2-49f1-8b1b-1d28011325eb",
+    "payload": {
+      "filed": "05/09/2025",
+      "case_no": "25-0185",
+      "summary": "Response to Staff's Fifth Data Request Dated May 2, 2025 electronically filed by Teresa Orahood on behalf of Herrnstein, Kara.",
+      "case_numbers": [
+        "25-0185"
+      ]
+    },
+    "found_at": "2026-10-28 00:29:33.493766+00"
+  },
+  {
+    "external_id": "9493bcf1-a756-4faa-b1e8-4ecd95acfc7b",
+    "url": "https://dis.puc.state.oh.us/DocumentRecord.aspx?DocID=9493bcf1-a756-4faa-b1e8-4ecd95acfc7b",
+    "payload": {
+      "filed": "05/06/2025",
+      "case_no": "25-0185",
+      "summary": "Response to Ohio Power Siting Board Staff'sThird Data Request electronically filed by Teresa Orahood on behalf of Herrnstein, Kara.",
+      "case_numbers": [
+        "25-0185"
+      ]
+    },
+    "found_at": "2026-10-28 00:29:33.493766+00"
+  },
+  {
+    "external_id": "11690fb0-c174-4cdc-8785-1cb098bb360d",
+    "url": "https://dis.puc.state.oh.us/DocumentRecord.aspx?DocID=11690fb0-c174-4cdc-8785-1cb098bb360d",
+    "payload": {
+      "filed": "05/02/2025",
+      "case_no": "25-0185",
+      "summary": "Response to Staff's Fourth Data Request Dated April 28, 2025 electronically filed by Teresa Orahood on behalf of Herrnstein, Kara.",
+      "case_numbers": [
+        "25-0185"
+      ]
+    },
+    "found_at": "2026-10-28 00:29:33.493766+00"
+  },
+  {
+    "external_id": "8d86bd41-77bf-49fb-b56d-56b2029b98d8",
+    "url": "https://dis.puc.state.oh.us/DocumentRecord.aspx?DocID=8d86bd41-77bf-49fb-b56d-56b2029b98d8",
+    "payload": {
+      "filed": "05/01/2025",
+      "case_no": "25-0185",
+      "summary": "Response to Staff's First Data Request electronically filed by Teresa Orahood on behalf of Herrnstein, Kara.",
+      "case_numbers": [
+        "25-0185"
+      ]
+    },
+    "found_at": "2026-10-28 00:29:33.493766+00"
+  },
+  {
+    "external_id": "43becbdd-e005-41ce-a23c-e58f1cfe98f7",
+    "url": "https://dis.puc.state.oh.us/DocumentRecord.aspx?DocID=43becbdd-e005-41ce-a23c-e58f1cfe98f7",
+    "payload": {
+      "filed": "04/30/2025",
+      "case_no": "25-0185",
+      "summary": "Response to Staff's Third Data Request Dated April 7, 2025 electronically filed by Teresa Orahood on behalf of Kara Herrnstein.",
+      "case_numbers": [
+        "25-0185"
+      ]
+    },
+    "found_at": "2026-10-28 00:29:33.493766+00"
+  },
+  {
+    "external_id": "aa4f2c1f-8927-417f-b45d-3fe0fb51c07c",
+    "url": "https://dis.puc.state.oh.us/DocumentRecord.aspx?DocID=aa4f2c1f-8927-417f-b45d-3fe0fb51c07c",
+    "payload": {
+      "filed": "04/30/2025",
+      "case_no": "25-0185",
+      "summary": "Response to Staff's First Data Request Dated March 28, 2025 electronically filed by Teresa Orahood on behalf of Kara Herrnstein.",
+      "case_numbers": [
+        "25-0185"
+      ]
+    },
+    "found_at": "2026-10-28 00:29:33.493766+00"
+  },
+  {
+    "external_id": "f28a7b8c-58f1-44d7-8c77-70093c132a9a",
+    "url": "https://dis.puc.state.oh.us/DocumentRecord.aspx?DocID=f28a7b8c-58f1-44d7-8c77-70093c132a9a",
+    "payload": {
+      "filed": "04/30/2025",
+      "case_no": "25-0185",
+      "summary": "Response to Staff's Second Data Request Dated April 7, 2025 electronically filed by Teresa Orahood on behalf of Kara Herrnstein.",
+      "case_numbers": [
+        "25-0185"
+      ]
+    },
+    "found_at": "2026-10-28 00:29:33.493766+00"
+  },
+  {
+    "external_id": "a9ad8856-7b01-40e2-baf8-64754216f834",
+    "url": "https://dis.puc.state.oh.us/DocumentRecord.aspx?DocID=a9ad8856-7b01-40e2-baf8-64754216f834",
+    "payload": {
+      "filed": "03/31/2026",
+      "case_no": "26-0169",
+      "summary": "Notice of Proof of Service electronically filed by Megan S. Zemke on behalf of Herrnstein, Kara.",
+      "case_numbers": [
+        "26-0169"
+      ]
+    },
+    "found_at": "2026-10-28 00:29:33.493766+00"
+  },
+  {
+    "external_id": "2f6ab0d5-f3fb-4bd7-a41c-cf139e9d6560",
+    "url": "https://dis.puc.state.oh.us/DocumentRecord.aspx?DocID=2f6ab0d5-f3fb-4bd7-a41c-cf139e9d6560",
+    "payload": {
+      "filed": "03/28/2025",
+      "case_no": "25-0185",
+      "summary": "Supplement Notice to Letter of Notification - Permit-to-Install electronically filed by Teresa Orahood on behalf of Dylan F. Borchers.",
+      "case_numbers": [
+        "25-0185"
+      ]
+    },
+    "found_at": "2026-10-28 00:29:33.493766+00"
+  },
+  {
+    "external_id": "166edde8-b8eb-41ec-8faf-84e4c9f51049",
+    "url": "https://dis.puc.state.oh.us/DocumentRecord.aspx?DocID=166edde8-b8eb-41ec-8faf-84e4c9f51049",
+    "payload": {
+      "filed": "03/27/2026",
+      "case_no": "26-0169",
+      "summary": "Confidential Document Target: Confidential Letter of Notification regarding the STY Power Generation Facility. (46 pages)",
+      "case_numbers": [
+        "26-0169"
+      ]
+    },
+    "found_at": "2026-10-28 00:29:33.493766+00"
+  },
+  {
+    "external_id": "1707823e-8dc1-4328-8219-fce5c793c697",
+    "url": "https://dis.puc.state.oh.us/DocumentRecord.aspx?DocID=1707823e-8dc1-4328-8219-fce5c793c697",
+    "payload": {
+      "filed": "03/27/2026",
+      "case_no": "26-0169",
+      "summary": "Motion for Protective Order and Memorandum in Support electronically filed by Megan S. Zemke on behalf of Herrnstein, Kara.",
+      "case_numbers": [
+        "26-0169"
+      ]
+    },
+    "found_at": "2026-10-28 00:29:33.493766+00"
+  },
+  {
+    "external_id": "1d4101d5-626e-41a5-a872-8e535332b370",
+    "url": "https://dis.puc.state.oh.us/DocumentRecord.aspx?DocID=1d4101d5-626e-41a5-a872-8e535332b370",
+    "payload": {
+      "filed": "03/27/2026",
+      "case_no": "26-0169",
+      "summary": "Letter of Notification - Appendix A Figures electronically filed by Megan S. Zemke on behalf of Herrnstein, Kara.",
+      "case_numbers": [
+        "26-0169"
+      ]
+    },
+    "found_at": "2026-10-28 00:29:33.493766+00"
+  },
+  {
+    "external_id": "209838f0-d4b6-47c3-a0f3-6f468c36cdf4",
+    "url": "https://dis.puc.state.oh.us/DocumentRecord.aspx?DocID=209838f0-d4b6-47c3-a0f3-6f468c36cdf4",
+    "payload": {
+      "filed": "03/27/2026",
+      "case_no": "26-0169",
+      "summary": "Letter of Notification - Appendix I Preliminary Grading Plan electronically filed by Megan S. Zemke on behalf of Herrnstein, Kara.",
+      "case_numbers": [
+        "26-0169"
+      ]
+    },
+    "found_at": "2026-10-28 00:29:33.493766+00"
+  },
+  {
+    "external_id": "23ce2faa-ee71-4917-8b92-7075ddbfe73a",
+    "url": "https://dis.puc.state.oh.us/DocumentRecord.aspx?DocID=23ce2faa-ee71-4917-8b92-7075ddbfe73a",
+    "payload": {
+      "filed": "03/27/2026",
+      "case_no": "26-0169",
+      "summary": "Letter of Notification - Appendix H Preliminary Traffic Management Plan electronically filed by Megan S. Zemke on behalf of Herrnstein, Kara.",
+      "case_numbers": [
+        "26-0169"
+      ]
+    },
+    "found_at": "2026-10-28 00:29:33.493766+00"
+  },
+  {
+    "external_id": "2b335499-ef72-47b9-8053-bb2e5c7ea3e0",
+    "url": "https://dis.puc.state.oh.us/DocumentRecord.aspx?DocID=2b335499-ef72-47b9-8053-bb2e5c7ea3e0",
+    "payload": {
+      "filed": "03/27/2026",
+      "case_no": "26-0169",
+      "summary": "Letter of Notification - Appendix D Geotech Report electronically filed by Megan S. Zemke on behalf of Herrnstein, Kara.",
+      "case_numbers": [
+        "26-0169"
+      ]
+    },
+    "found_at": "2026-10-28 00:29:33.493766+00"
+  },
+  {
+    "external_id": "48b3221e-b4e4-4f39-b652-5936644cd7d3",
+    "url": "https://dis.puc.state.oh.us/DocumentRecord.aspx?DocID=48b3221e-b4e4-4f39-b652-5936644cd7d3",
+    "payload": {
+      "filed": "03/27/2026",
+      "case_no": "26-0169",
+      "summary": "Letter of Notification - Public Appendix E Cultural Resources electronically filed by Megan S. Zemke on behalf of Herrnstein, Kara.",
+      "case_numbers": [
+        "26-0169"
+      ]
+    },
+    "found_at": "2026-10-28 00:29:33.493766+00"
+  },
+  {
+    "external_id": "55af47e8-aae6-4b4e-af00-6969c9ad0776",
+    "url": "https://dis.puc.state.oh.us/DocumentRecord.aspx?DocID=55af47e8-aae6-4b4e-af00-6969c9ad0776",
+    "payload": {
+      "filed": "03/27/2026",
+      "case_no": "26-0169",
+      "summary": "Letter of Notification - Appendix B Preliminary Complaint Resolution Plan electronically filed by Megan S. Zemke on behalf of Herrnstein, Kara.",
+      "case_numbers": [
+        "26-0169"
+      ]
+    },
+    "found_at": "2026-10-28 00:29:33.493766+00"
+  },
+  {
+    "external_id": "84f2d51c-8ebe-4cc1-b23b-f66bcbdf3ae4",
+    "url": "https://dis.puc.state.oh.us/DocumentRecord.aspx?DocID=84f2d51c-8ebe-4cc1-b23b-f66bcbdf3ae4",
+    "payload": {
+      "filed": "03/27/2026",
+      "case_no": "26-0169",
+      "summary": "Confidential Document Target: Confidential Letter of Notification Appendix E - Cultural Resources Report.(104 pages)",
+      "case_numbers": [
+        "26-0169"
+      ]
+    },
+    "found_at": "2026-10-28 00:29:33.493766+00"
+  },
+  {
+    "external_id": "89291065-9aba-4f37-8d53-751c160c3e65",
+    "url": "https://dis.puc.state.oh.us/DocumentRecord.aspx?DocID=89291065-9aba-4f37-8d53-751c160c3e65",
+    "payload": {
+      "filed": "03/27/2026",
+      "case_no": "26-0169",
+      "summary": "Letter of Notification - Appendix G FAA Prescreen electronically filed by Megan S. Zemke on behalf of Herrnstein, Kara, KARA.",
+      "case_numbers": [
+        "26-0169"
+      ]
+    },
+    "found_at": "2026-10-28 00:29:33.493766+00"
+  },
+  {
+    "external_id": "b76a9c91-a52d-4704-8a0a-ad1182ef6e5a",
+    "url": "https://dis.puc.state.oh.us/DocumentRecord.aspx?DocID=b76a9c91-a52d-4704-8a0a-ad1182ef6e5a",
+    "payload": {
+      "filed": "03/27/2026",
+      "case_no": "26-0169",
+      "summary": "Letter of Notification - Appendix F Ecological Survey Report electronically filed by Megan S. Zemke on behalf of Herrnstein, Kara.",
+      "case_numbers": [
+        "26-0169"
+      ]
+    },
+    "found_at": "2026-10-28 00:29:33.493766+00"
+  },
+  {
+    "external_id": "cfb481c4-5495-4cf0-a573-ac1fa4fe20a3",
+    "url": "https://dis.puc.state.oh.us/DocumentRecord.aspx?DocID=cfb481c4-5495-4cf0-a573-ac1fa4fe20a3",
+    "payload": {
+      "filed": "03/27/2026",
+      "case_no": "26-0169",
+      "summary": "Letter of Notification - Appendix C Sound Modeling Report electronically filed by Megan S. Zemke on behalf of Herrnstein, Kara.",
+      "case_numbers": [
+        "26-0169"
+      ]
+    },
+    "found_at": "2026-10-28 00:29:33.493766+00"
+  },
+  {
+    "external_id": "f0b66cae-282f-42c9-8a37-ecf9863e33fb",
+    "url": "https://dis.puc.state.oh.us/DocumentRecord.aspx?DocID=f0b66cae-282f-42c9-8a37-ecf9863e33fb",
+    "payload": {
+      "filed": "03/27/2026",
+      "case_no": "26-0169",
+      "summary": "Affidavit of Nickolaus Munoz electronically filed by Megan S. Zemke on behalf of Herrnstein, Kara.",
+      "case_numbers": [
+        "26-0169"
+      ]
+    },
+    "found_at": "2026-10-28 00:29:33.493766+00"
+  },
+  {
+    "external_id": "4bc61bd4-0fdb-4266-9d1f-4ebb4d42aa97",
+    "url": "https://dis.puc.state.oh.us/DocumentRecord.aspx?DocID=4bc61bd4-0fdb-4266-9d1f-4ebb4d42aa97",
+    "payload": {
+      "filed": "03/19/2025",
+      "case_no": "25-0185",
+      "summary": "Notification of Appendix K - Stormwater Assessment electronically filed by Teresa Orahood on behalf of Herrnstein, Kara.",
+      "case_numbers": [
+        "25-0185"
+      ]
+    },
+    "found_at": "2026-10-28 00:29:33.493766+00"
+  },
+  {
+    "external_id": "222134d3-f1ea-4d1b-aa9a-25f90d8d1a22",
+    "url": "https://dis.puc.state.oh.us/DocumentRecord.aspx?DocID=222134d3-f1ea-4d1b-aa9a-25f90d8d1a22",
+    "payload": {
+      "filed": "03/13/2025",
+      "case_no": "25-0185",
+      "summary": "Proof of Pub of Notice of Proposed Major Utility Facility electronically filed by Teresa Orahood on behalf of Herrnstein, Kara.",
+      "case_numbers": [
+        "25-0185"
+      ]
+    },
+    "found_at": "2026-10-28 00:29:33.493766+00"
+  },
+  {
+    "external_id": "b1dfa9be-0b5c-4148-a0fb-49bf7311200a",
+    "url": "https://dis.puc.state.oh.us/DocumentRecord.aspx?DocID=b1dfa9be-0b5c-4148-a0fb-49bf7311200a",
+    "payload": {
+      "filed": "03/13/2025",
+      "case_no": "25-0185",
+      "summary": "Proof of Service of LON electronically filed by Teresa Orahood on behalf of Herrnstein, Kara.",
+      "case_numbers": [
+        "25-0185"
+      ]
+    },
+    "found_at": "2026-10-28 00:29:33.493766+00"
+  },
+  {
+    "external_id": "610bb40c-eb13-4c46-a763-b3a7dd49d5c8",
+    "url": "https://dis.puc.state.oh.us/DocumentRecord.aspx?DocID=610bb40c-eb13-4c46-a763-b3a7dd49d5c8",
+    "payload": {
+      "filed": "03/10/2026",
+      "case_no": "26-0169",
+      "summary": "In the Matter of the Pre-application Notification Letter for STY Power Generation Facility Project electronically filed by Megan S. Zemke on behalf of Herrnstein, Kara.",
+      "case_numbers": [
+        "26-0169"
+      ]
+    },
+    "found_at": "2026-10-28 00:29:33.493766+00"
+  },
+  {
+    "external_id": "01db115c-f3f3-483f-8a23-42f40a60040d",
+    "url": "https://dis.puc.state.oh.us/DocumentRecord.aspx?DocID=01db115c-f3f3-483f-8a23-42f40a60040d",
+    "payload": {
+      "filed": "03/07/2025",
+      "case_no": "25-0185",
+      "summary": "Letter of Notification Appendix B - Public Information Correspondence electronically filed by Teresa Orahood on behalf of Herrnstein, Kara.",
+      "case_numbers": [
+        "25-0185"
+      ]
+    },
+    "found_at": "2026-10-28 00:29:33.493766+00"
+  },
+  {
+    "external_id": "02931eb4-2280-4e8d-85dc-52bb48ed7885",
+    "url": "https://dis.puc.state.oh.us/DocumentRecord.aspx?DocID=02931eb4-2280-4e8d-85dc-52bb48ed7885",
+    "payload": {
+      "filed": "03/07/2025",
+      "case_no": "25-0185",
+      "summary": "Letter of Notification Appendix A - Figures electronically filed by Teresa Orahood on behalf of Herrnstein, Kara.",
+      "case_numbers": [
+        "25-0185"
+      ]
+    },
+    "found_at": "2026-10-28 00:29:33.493766+00"
+  },
+  {
+    "external_id": "1ed9afc9-79b4-4dfb-a5b8-90785a661fd7",
+    "url": "https://dis.puc.state.oh.us/DocumentRecord.aspx?DocID=1ed9afc9-79b4-4dfb-a5b8-90785a661fd7",
+    "payload": {
+      "filed": "03/07/2025",
+      "case_no": "25-0185",
+      "summary": "Letter of Notification Appendix E - Visibility Assessment electronically filed by Teresa Orahood on behalf of Herrnstein, Kara.",
+      "case_numbers": [
+        "25-0185"
+      ]
+    },
+    "found_at": "2026-10-28 00:29:33.493766+00"
+  },
+  {
+    "external_id": "2425de79-010c-4005-a45d-b6a5ea03e388",
+    "url": "https://dis.puc.state.oh.us/DocumentRecord.aspx?DocID=2425de79-010c-4005-a45d-b6a5ea03e388",
+    "payload": {
+      "filed": "03/07/2025",
+      "case_no": "25-0185",
+      "summary": "Confidential Document Target: Document Letter of Notification Narrative electronically filed by Teresa Orahood on behalf of Will-Power OH, LLC. (51 pages)",
+      "case_numbers": [
+        "25-0185"
+      ]
+    },
+    "found_at": "2026-10-28 00:29:33.493766+00"
+  },
+  {
+    "external_id": "253e668e-67cd-40dd-9e86-d1d49f922419",
+    "url": "https://dis.puc.state.oh.us/DocumentRecord.aspx?DocID=253e668e-67cd-40dd-9e86-d1d49f922419",
+    "payload": {
+      "filed": "03/07/2025",
+      "case_no": "25-0185",
+      "summary": "Letter of Notification Appendix J - Traffic Management Plan electronically filed by Teresa Orahood on behalf of Herrnstein, Kara.",
+      "case_numbers": [
+        "25-0185"
+      ]
+    },
+    "found_at": "2026-10-28 00:29:33.493766+00"
+  },
+  {
+    "external_id": "3a97b550-ee9b-4503-8134-17e662a141cd",
+    "url": "https://dis.puc.state.oh.us/DocumentRecord.aspx?DocID=3a97b550-ee9b-4503-8134-17e662a141cd",
+    "payload": {
+      "filed": "03/07/2025",
+      "case_no": "25-0185",
+      "summary": "Letter of Notification Appendix D - Geotechnical Engineering Report electronically filed by Teresa Orahood on behalf of Herrnstein, Kara.",
+      "case_numbers": [
+        "25-0185"
+      ]
+    },
+    "found_at": "2026-10-28 00:29:33.493766+00"
+  },
+  {
+    "external_id": "3d15c79f-d56c-45e8-9ff7-c58a18365ff5",
+    "url": "https://dis.puc.state.oh.us/DocumentRecord.aspx?DocID=3d15c79f-d56c-45e8-9ff7-c58a18365ff5",
+    "payload": {
+      "filed": "03/07/2025",
+      "case_no": "25-0185",
+      "summary": "Letter of Notification Appendix I - Surface Water electronically filed by Teresa Orahood on behalf of Herrnstein, Kara.",
+      "case_numbers": [
+        "25-0185"
+      ]
+    },
+    "found_at": "2026-10-28 00:29:33.493766+00"
+  },
+  {
+    "external_id": "4a7f3ab3-cb46-43a9-95ba-337a1479a90f",
+    "url": "https://dis.puc.state.oh.us/DocumentRecord.aspx?DocID=4a7f3ab3-cb46-43a9-95ba-337a1479a90f",
+    "payload": {
+      "filed": "03/07/2025",
+      "case_no": "25-0185",
+      "summary": "Letter of Notification Appendix H - Wildlife Habitat Study and Correspondence electronically filed by Teresa Orahood on behalf of Herrnstein, Kara.",
+      "case_numbers": [
+        "25-0185"
+      ]
+    },
+    "found_at": "2026-10-28 00:29:33.493766+00"
+  },
+  {
+    "external_id": "50f11030-7c3a-407e-944f-6ce39ebb8b1b",
+    "url": "https://dis.puc.state.oh.us/DocumentRecord.aspx?DocID=50f11030-7c3a-407e-944f-6ce39ebb8b1b",
+    "payload": {
+      "filed": "03/07/2025",
+      "case_no": "25-0185",
+      "summary": "Motion for Protective Order and Memorandum in Support electronically filed by Teresa Orahood on behalf of Herrnstein, Kara.",
+      "case_numbers": [
+        "25-0185"
+      ]
+    },
+    "found_at": "2026-10-28 00:29:33.493766+00"
+  },
+  {
+    "external_id": "60be9d56-e8f0-414d-bde4-88ae77693031",
+    "url": "https://dis.puc.state.oh.us/DocumentRecord.aspx?DocID=60be9d56-e8f0-414d-bde4-88ae77693031",
+    "payload": {
+      "filed": "03/07/2025",
+      "case_no": "25-0185",
+      "summary": "Letter of Notification Appendix C - Sound Study electronically filed by Teresa Orahood on behalf of Herrnstein, Kara.",
+      "case_numbers": [
+        "25-0185"
+      ]
+    },
+    "found_at": "2026-10-28 00:29:33.493766+00"
+  },
+  {
+    "external_id": "a66dba31-df99-4606-a022-6cfa4f94e33a",
+    "url": "https://dis.puc.state.oh.us/DocumentRecord.aspx?DocID=a66dba31-df99-4606-a022-6cfa4f94e33a",
+    "payload": {
+      "filed": "03/07/2025",
+      "case_no": "25-0185",
+      "summary": "Letter of Notification Appendix F - Complaint Resolution Plan electronically filed by Teresa Orahood on behalf of Herrnstein, Kara.",
+      "case_numbers": [
+        "25-0185"
+      ]
+    },
+    "found_at": "2026-10-28 00:29:33.493766+00"
+  },
+  {
+    "external_id": "d217d68c-41a5-4c85-af2b-90097234274e",
+    "url": "https://dis.puc.state.oh.us/DocumentRecord.aspx?DocID=d217d68c-41a5-4c85-af2b-90097234274e",
+    "payload": {
+      "filed": "03/07/2025",
+      "case_no": "25-0185",
+      "summary": "Letter of Notification Narrative - Public Version electronically filed by Teresa Orahood on behalf of Herrnstein, Kara.",
+      "case_numbers": [
+        "25-0185"
+      ]
+    },
+    "found_at": "2026-10-28 00:29:33.493766+00"
+  },
+  {
+    "external_id": "e51b0e27-2d41-4af5-bbfb-bcccccdad24d",
+    "url": "https://dis.puc.state.oh.us/DocumentRecord.aspx?DocID=e51b0e27-2d41-4af5-bbfb-bcccccdad24d",
+    "payload": {
+      "filed": "03/07/2025",
+      "case_no": "25-0185",
+      "summary": "Letter of Notification Appendix G - Cultural Resolution Plan electronically filed by Teresa Orahood on behalf of Herrnstein, Kara.",
+      "case_numbers": [
+        "25-0185"
+      ]
+    },
+    "found_at": "2026-10-28 00:29:33.493766+00"
+  },
+  {
+    "external_id": "2f178fed-7372-4661-994e-86c454bf3528",
+    "url": "https://dis.puc.state.oh.us/DocumentRecord.aspx?DocID=2f178fed-7372-4661-994e-86c454bf3528",
+    "payload": {
+      "filed": "03/03/2025",
+      "case_no": "25-0185",
+      "summary": "In the Matter of the Pre-Application Notification Letter electronically filed by Teresa Orahood on behalf of Dylan F. Borchers.",
+      "case_numbers": [
+        "25-0185"
+      ]
+    },
+    "found_at": "2026-10-28 00:29:33.493766+00"
+  }
+]
