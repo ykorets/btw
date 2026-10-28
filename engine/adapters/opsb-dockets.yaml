@@ -1,15 +1,16 @@
 # OPSB docket watcher — per-case filings via GET CaseRecord.aspx?CaseNo=N.
 # Public View All docket grid. Access rejection (including HTTP200 blocks) is
 # a failure, never a successful empty sweep. No proxy/challenge evasion.
-# Existing 30-day SLO retained; blocked coverage remains explicit.
+# Ordinary anonymous browser session through home/search/View All. No stealth.
 id: opsb-dockets
-coverage_note: "Two named docket filing lists, agency View All. Last manual check October 27, 2026 encountered access rejection. No complete filing coverage while blocked; successful-sweep timestamp is not advanced on a block."
+coverage_note: "Two named docket filing lists via the official anonymous browser search and View All. Every docket is checked against its advertised document count. Shared documents are deduplicated; collection is discovery, not review or proof of operation. Partial or blocked access never advances the successful-sweep timestamp."
 kind: listing
 adapter: opsb_case
 url: https://dis.puc.state.oh.us/CaseRecord.aspx
 schedule: daily
 slo_interval_days: 30
 params:
+  transport: browser
   cases:
     - "25-0185"   # Oregon/New Albany EL-BLN (genesis)
     - "26-0169"   # follow-on order docket (genesis)

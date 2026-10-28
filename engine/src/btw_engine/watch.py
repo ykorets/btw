@@ -237,8 +237,10 @@ class _DocketRows(HTMLParser):
         if tag == "td" and self.cell is not None:
             self.cells.append(re.sub(r"\s+", " ", "".join(self.cell)).strip())
             self.cell = None
-        elif tag == "tr" and self.href and len(self.cells) >= 2:
-            self.rows.append((self.href, self.cells[:]))
+        elif tag == "tr":
+            if self.href and len(self.cells) >= 2:
+                self.rows.append((self.href, self.cells[:]))
+            self.cells, self.cell, self.href = [], None, None
 
 
 def parse_opsb_case_html(html: str, case_no: str) -> list[dict]:
@@ -264,7 +266,70 @@ def parse_opsb_case_html(html: str, case_no: str) -> list[dict]:
     return out
 
 
+def validate_opsb_case(html: str, case_no: str, expected_count: int) -> list[dict]:
+    """A rendered View All must match the requested case and initial count."""
+    if not re.search(rf"\b{re.escape(case_no)}-EL-BLN\b", normalize_page_text(html)):
+        raise RuntimeError(f"OPSB {case_no}: wrong or missing case identity")
+    rows = parse_opsb_case_html(html, case_no)
+    if (expected_count <= 0 or len(rows) != expected_count
+            or len({r["external_id"] for r in rows}) != expected_count):
+        raise RuntimeError(f"OPSB {case_no}: incomplete docket: expected {expected_count}, parsed {len(rows)}")
+    return rows
+
+
+def run_opsb_browser(cfg: dict) -> list[dict]:
+    """Ordinary anonymous Chromium session through the agency's public UI.
+
+    No saved cookies, credentials, proxy, custom fingerprint or challenge solver.
+    DIS's normal JavaScript/session navigation runs in an ephemeral browser.
+    Interactive challenges and partial/changed grids fail closed.
+    """
+    from playwright.sync_api import sync_playwright
+
+    all_rows = {}
+    with sync_playwright() as runtime:
+        browser = runtime.chromium.launch()
+        try:
+            page = browser.new_page()
+            page.set_default_timeout(60_000)
+            for case_no in cfg.get("params", {}).get("cases", []):
+                if not re.fullmatch(r"\d{2}-\d{4}", case_no):
+                    raise ValueError("Invalid configured OPSB case number")
+                page.goto("https://dis.puc.state.oh.us/", wait_until="domcontentloaded")
+                page.locator("#txtCaseLookup").wait_for(state="visible")
+                page.locator("#txtCaseLookup").fill(case_no)
+                page.locator('#caselookupform input[type="image"]').click()
+                page.locator("#ContentPlaceHolderMaster_gvDocketInformation").wait_for(state="visible")
+                match = re.search(r"\d+\s*-\s*\d+\s+of\s+(\d+)\s+documents", page.locator("body").inner_text())
+                if not match:
+                    raise RuntimeError(f"OPSB {case_no}: missing advertised document count")
+                expected = int(match[1])
+                page.get_by_role("link", name="View All", exact=True).click()
+                page.wait_for_function("""count => document.querySelectorAll(
+                    '#ContentPlaceHolderMaster_gvDocketInformation a[href*="DocumentRecord.aspx"]'
+                    ).length === count""", arg=expected)
+                headings = " ".join(page.locator("h1").all_text_contents())
+                grid = page.locator("#ContentPlaceHolderMaster_gvDocketInformation").evaluate("table => table.outerHTML")
+                rows = validate_opsb_case(headings + "\n" + grid, case_no, expected)
+                for row in rows:
+                    key = row["external_id"]
+                    if key not in all_rows:
+                        row["payload"]["case_numbers"] = [case_no]
+                        all_rows[key] = row
+                    elif case_no not in all_rows[key]["payload"]["case_numbers"]:
+                        all_rows[key]["payload"]["case_numbers"].append(case_no)
+                latest = max(dt.datetime.strptime(r["payload"]["filed"], "%m/%d/%Y").date() for r in rows)
+                print(f"VERIFIED OPSB {case_no}: {len(rows)} documents; latest {latest}")
+        finally:
+            browser.close()
+    if not all_rows:
+        raise RuntimeError("OPSB: no configured docket documents")
+    return list(all_rows.values())
+
+
 def run_opsb_case(cfg: dict) -> list[dict]:
+    if cfg.get("params", {}).get("transport") == "browser":
+        return run_opsb_browser(cfg)
     out = []
     for case_no in cfg.get("params", {}).get("cases", []):
         r = httpx.get(cfg["url"], params={"CaseNo": case_no, "link": "DIVA"},
