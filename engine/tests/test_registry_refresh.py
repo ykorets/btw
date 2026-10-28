@@ -117,3 +117,10 @@ def test_opsb_zero_or_blocked_grid_cannot_advance_coverage():
         watch.validate_opsb_case('<h1>25-0185-EL-BLN</h1>','25-0185',0)
     with pytest.raises(RuntimeError,match='access blocked'):
         watch.validate_opsb_case('<h1>25-0185-EL-BLN</h1><p>Request Rejected</p>','25-0185',43)
+
+
+def test_opsb_nested_layout_rows_cannot_duplicate_the_last_document():
+    html=(FIX/'opsb_case_25-0185.html').read_text()
+    nested='<table><tr><td>'+html+'</td></tr></table>'
+    rows=watch.validate_opsb_case(nested,'25-0185',3)
+    assert len(rows)==len({row['external_id'] for row in rows})==3

@@ -237,8 +237,10 @@ class _DocketRows(HTMLParser):
         if tag == "td" and self.cell is not None:
             self.cells.append(re.sub(r"\s+", " ", "".join(self.cell)).strip())
             self.cell = None
-        elif tag == "tr" and self.href and len(self.cells) >= 2:
-            self.rows.append((self.href, self.cells[:]))
+        elif tag == "tr":
+            if self.href and len(self.cells) >= 2:
+                self.rows.append((self.href, self.cells[:]))
+            self.cells, self.cell, self.href = [], None, None
 
 
 def parse_opsb_case_html(html: str, case_no: str) -> list[dict]:
@@ -306,7 +308,9 @@ def run_opsb_browser(cfg: dict) -> list[dict]:
                 page.wait_for_function("""count => document.querySelectorAll(
                     '#ContentPlaceHolderMaster_gvDocketInformation a[href*="DocumentRecord.aspx"]'
                     ).length === count""", arg=expected)
-                rows = validate_opsb_case(page.content(), case_no, expected)
+                headings = " ".join(page.locator("h1").all_text_contents())
+                grid = page.locator("#ContentPlaceHolderMaster_gvDocketInformation").evaluate("table => table.outerHTML")
+                rows = validate_opsb_case(headings + "\n" + grid, case_no, expected)
                 for row in rows:
                     key = row["external_id"]
                     if key not in all_rows:
