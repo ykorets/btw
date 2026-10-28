@@ -15,6 +15,7 @@ export const GET = () => json({
     events: "/api/v1/events.json",
     changes: "/api/v1/changes.json",
     research_projects: "/api/v1/research-projects.json",
+    opsb_review: "/api/v1/opsb-review.json",
     summary: "/api/v1/summary.json",
     coverage: "/api/v1/coverage.json",
     fleet_csv: "/api/v1/fleet.csv",

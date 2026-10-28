@@ -2,7 +2,7 @@
 import TopicLayout from "../../layouts/TopicLayout.astro";
 import { loadMirror } from "../../lib/mirror";
 import { capacityLabel, dateLabel } from "../../lib/facts";
-import { projects as researchProjects, projectPath } from "../../lib/research";
+import { texasProjects as researchProjects, projectPath } from "../../lib/research";
 const mirror = await loadMirror();
 const facilities = mirror.facilities.facilities.filter((f: any) => f.state === "TX");
 const projects = mirror.announcements.announcements.filter((p: any) => p.state === "TX").sort((a: any, b: any) => (b.reported_capacity_mw ?? -1) - (a.reported_capacity_mw ?? -1));

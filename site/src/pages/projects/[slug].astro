@@ -4,11 +4,11 @@ import { projects, projectPath, sourceFor } from "../../lib/research";
 export function getStaticPaths() { return projects.map(project => ({params:{slug:project.slug},props:{project}})); }
 const { project } = Astro.props;
 ---
-<TopicLayout title={`${project.name}: Power Project Dossier | BTW`} description={project.summary} path={projectPath(project.slug)} heading={`${project.name}: power and evidence`} deck={project.summary} label="Texas project dossier">
+<TopicLayout title={`${project.name}: Power Project Dossier | BTW`} description={project.summary} path={projectPath(project.slug)} heading={`${project.name}: power and evidence`} deck={project.summary} label={`${project.state_name} project dossier`}>
   <section class="topic-section wrap">
-    <p><a href="/states/texas/">Texas project research</a> · <a href="/changes/">Source-linked changes</a></p>
+    <p>{project.state === "TX" ? <a href="/states/texas/">Texas project research</a> : <a href="/research/opsb-review-2026-10/">OPSB document review and limits</a>} · <a href="/changes/">Source-linked changes</a></p>
     <div class="topic-two">
-      <div><h2>What is established?</h2><p>{project.developer} · {project.county} County, Texas</p><p><strong>{project.capacity}</strong></p><p>Evidence basis: {project.basis}. Sources checked <time datetime={project.reviewed}>{project.reviewed}</time>.</p></div>
+      <div><h2>What is established?</h2><p>{project.developer} · {project.county} County, {project.state_name}</p><p><strong>{project.capacity}</strong></p><p>Evidence basis: {project.basis}. Sources checked <time datetime={project.reviewed}>{project.reviewed}</time>.</p></div>
       <aside class="topic-note reported"><h3>Research coverage</h3><p>This dossier separates regulator records from company reports. It adds no MW to BTW's reviewed operating fleet. Unknown output and delivery dates remain unknown.</p></aside>
     </div>
     <div class="topic-table" role="region" tabindex="0" aria-label={`${project.name} evidence table`}><table><caption>Project identity, phase and capacity boundaries</caption><thead><tr><th scope="col">Field</th><th scope="col">Source-linked finding</th><th scope="col">Evidence</th></tr></thead><tbody>

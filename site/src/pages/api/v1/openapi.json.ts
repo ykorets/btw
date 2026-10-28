@@ -30,6 +30,7 @@ export const GET = () => json({
     "/api/v1/announcements.json": dataset("Third party reported project pipeline"),
     "/api/v1/events.json": dataset("Chronological public events"),
     "/api/v1/changes.json": dataset("Reviewed change interpretations and published mirror events"),
+    "/api/v1/opsb-review.json": dataset("Exact 44 OPSB docket records and incomplete content-review state"),
     "/api/v1/research-projects.json": dataset("Selected primary source project research distinct from operating fleet"),
     "/api/v1/summary.json": dataset("Verified fleet summary and dataset date"),
     "/api/v1/coverage.json": dataset("Source monitoring coverage"),

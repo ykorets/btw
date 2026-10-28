@@ -12,6 +12,7 @@ export const GET: APIRoute = async () => {
     "https://behindthewatt.com/",
     "https://behindthewatt.com/data/",
     "https://behindthewatt.com/privacy/",
+    "https://behindthewatt.com/research/opsb-review-2026-10/",
     ...topics.map(t => `https://behindthewatt.com${t.path}`),
     ...projects.map(p => `https://behindthewatt.com${projectPath(p.slug)}`),
     ...mirror.facilities.facilities.map(

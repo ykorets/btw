@@ -1,7 +1,7 @@
 """Bounded public OPSB document capture, using an ordinary DIS session.
 
 PDF identity and page count must agree with the official record before any
-archive write. Confidential docket entries are metadata-only. No challenge
+local file write. Confidential docket entries are metadata-only. No challenge
 solver, custom browser fingerprint, proxy or retained authentication state.
 """
 import argparse
@@ -14,7 +14,6 @@ from urllib.parse import urljoin, urlparse
 
 from pypdf import PdfReader
 
-from btw_engine.fetch import BUCKET, s3, upsert_document
 
 BASE = "https://dis.puc.state.oh.us/"
 
@@ -28,34 +27,13 @@ def public_pdf(data: bytes, expected_pages: int) -> list[str]:
     return [page.extract_text() or "" for page in reader.pages]
 
 
-def archive_record(client, record: dict, data: bytes, texts: list[str]) -> dict:
-    """Only called after public_pdf; source custody stays in the private bucket."""
-    sha = hashlib.sha256(data).hexdigest()
-    key = f"docs/{sha}.pdf"
-    if not client.list_objects_v2(Bucket=BUCKET, Prefix=key).get("KeyCount", 0):
-        client.put_object(Bucket=BUCKET, Key=key, Body=data,
-                          ContentType="application/pdf",
-                          Metadata={"source-url": record["pdf_url"]})
-    upsert_document({"source_id": "opsb-dockets", "url": record["pdf_url"],
-                     "r2_key": key, "sha256": sha, "doc_genre": "opsb_filing",
-                     "pages": len(texts)})
-    result = {**record, "sha256": sha, "r2_key": key, "pages": texts,
-              "status": "archived_public_pdf"}
-    client.put_object(Bucket=BUCKET,
-                      Key=f"reviews/opsb-2026-10-27/{record['external_id']}.json",
-                      Body=json.dumps(result, ensure_ascii=False).encode(),
-                      ContentType="application/json")
-    return {k: v for k, v in result.items() if k != "pages"} | {"page_count": len(texts)}
-
-
-def capture(manifest: Path, *, archive: bool = False, limit: int | None = None,
+def capture(manifest: Path, *, limit: int | None = None,
             output: Path | None = None):
     from playwright.sync_api import sync_playwright
     records = json.loads(manifest.read_text())
     ids = [r["external_id"] for r in records]
     if len(set(ids)) != len(ids) or any(not re.fullmatch(r"[0-9a-f-]{36}", x) for x in ids):
         raise ValueError("Manifest must contain unique docket UUIDs")
-    client = s3() if archive else None
     if output:
         output.mkdir(parents=True, exist_ok=True)
     results = []
@@ -101,12 +79,9 @@ def capture(manifest: Path, *, archive: bool = False, limit: int | None = None,
                     data = response.body()
                     texts = public_pdf(data, int(count[1]))
                     current = {**record, "pdf_url": url, "record_text": text}
-                    if archive:
-                        result = archive_record(client, current, data, texts)
-                    else:
-                        result = {**current, "status": "verified_public_pdf",
-                                  "sha256": hashlib.sha256(data).hexdigest(),
-                                  "page_count": len(texts)}
+                    result = {**current, "status": "verified_public_pdf",
+                              "sha256": hashlib.sha256(data).hexdigest(),
+                              "page_count": len(texts)}
                     if output:
                         output.mkdir(parents=True, exist_ok=True)
                         (output / f"{doc_id}.pdf").write_bytes(data)
@@ -120,10 +95,6 @@ def capture(manifest: Path, *, archive: bool = False, limit: int | None = None,
                     print(f"UNAVAILABLE {doc_id}: {exc}", flush=True)
         finally:
             browser.close()
-    if archive:
-        client.put_object(Bucket=BUCKET, Key="reviews/opsb-2026-10-27/index.json",
-                          Body=json.dumps(results, ensure_ascii=False).encode(),
-                          ContentType="application/json")
     if output:
         (output / "index.json").write_text(json.dumps(results, ensure_ascii=False))
     if failures:
@@ -134,11 +105,10 @@ def capture(manifest: Path, *, archive: bool = False, limit: int | None = None,
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--manifest", type=Path, required=True)
-    ap.add_argument("--archive", action="store_true")
     ap.add_argument("--limit", type=int)
     ap.add_argument("--output", type=Path)
     args = ap.parse_args()
-    capture(args.manifest, archive=args.archive, limit=args.limit, output=args.output)
+    capture(args.manifest, limit=args.limit, output=args.output)
 
 
 if __name__ == "__main__":
