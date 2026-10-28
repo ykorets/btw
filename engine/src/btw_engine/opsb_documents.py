@@ -114,6 +114,9 @@ def capture(manifest: Path, *, limit: int | None = None,
                         print(f"RESTRICTED {doc_id}: metadata only", flush=True)
                         continue
                     try:
+                        first = page.locator("#ContentPlaceHolderMaster_FirstPage")
+                        if first.is_enabled():
+                            first.click()
                         for _ in range(4):
                             grid.wait_for(state="visible")
                             document_link = grid.locator(f'a[href*="{doc_id}"]')
@@ -125,6 +128,11 @@ def capture(manifest: Path, *, limit: int | None = None,
                         with context.expect_page() as opened:
                             document_link.click(button="middle")
                         document_page = opened.value
+                        document_page.bring_to_front()
+                        document_page.on("response", lambda response: print(
+                            f"FILE RESPONSE {response.status} "
+                            f"{response.headers.get('content-type', '')}", flush=True)
+                            if "/ViewImage.aspx" in response.url else None)
                         link = document_page.get_by_role("link", name="View Document", exact=True).first
                         link.wait_for(state="visible")
                         text = document_page.locator("body").inner_text()
@@ -139,7 +147,10 @@ def capture(manifest: Path, *, limit: int | None = None,
                         if urlparse(url).netloc != "dis.puc.state.oh.us" or urlparse(url).path != "/ViewImage.aspx":
                             raise ValueError("Document link is not an official DIS PDF")
                         local = output / f"{doc_id}.pdf" if output else None
-                        if local and local.exists():
+                        metadata_file = output / f"{doc_id}.json" if output else None
+                        cached = json.loads(metadata_file.read_text()) if metadata_file and metadata_file.exists() else {}
+                        if (local and local.exists() and cached.get("pdf_url") == url
+                                and cached.get("sha256") == hashlib.sha256(local.read_bytes()).hexdigest()):
                             data = local.read_bytes()
                         else:
                             # The HTML/302 responses before this download are expected.
@@ -164,7 +175,8 @@ def capture(manifest: Path, *, limit: int | None = None,
                         document_page.close()
                     except Exception as exc:
                         failures += 1
-                        print(f"STATE {page.url}: {page.locator('body').inner_text()[:400]}", flush=True)
+                        failed_page = document_page if 'document_page' in locals() and not document_page.is_closed() else page
+                        print(f"STATE {failed_page.url}: {failed_page.locator('body').inner_text()[:400]}", flush=True)
                         if output:
                             page.screenshot(path=str(output / "last-failure.png"))
                         results.append({**record, "status": "unavailable", "error": str(exc)})

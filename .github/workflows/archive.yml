@@ -55,7 +55,7 @@ jobs:
               --backfill engine/backfill/refresh_2026_10.yaml
           elif [ "$ARCHIVE_MANIFEST" = "opsb-public-2026-10" ]; then
             xvfb-run -a engine/.venv/bin/python -m btw_engine.opsb_documents \
-              --manifest engine/backfill/opsb_review_2026_10_27.json --archive
+              --manifest engine/backfill/opsb_public_2026_10_28.json --archive
           else
             engine/.venv/bin/python -m btw_engine.fetch \
               --backfill engine/backfill/genesis_docs.yaml
