@@ -100,7 +100,13 @@ def capture(manifest: Path, *, limit: int | None = None,
                 page.wait_for_timeout(10_000)
                 page.reload(wait_until="domcontentloaded")
                 page.locator("#txtCaseLookup").wait_for(state="visible", timeout=30_000)
+            grid_url = None
+            page.on("response", lambda response: print(
+                f"FILE RESPONSE {response.status} {response.headers.get('content-type', '')}",
+                flush=True) if "/ViewImage.aspx" in response.url else None)
             for case_no in cases:
+                if not page.locator("#txtCaseLookup").count():
+                    page.goto(grid_url or BASE, wait_until="domcontentloaded")
                 page.locator("#txtCaseLookup").fill(case_no)
                 page.locator('#caselookupform input[type="image"]').click()
                 grid = page.locator("#ContentPlaceHolderMaster_gvDocketInformation")
@@ -114,6 +120,9 @@ def capture(manifest: Path, *, limit: int | None = None,
                         print(f"RESTRICTED {doc_id}: metadata only", flush=True)
                         continue
                     try:
+                        if page.url != grid_url:
+                            page.goto(grid_url, wait_until="domcontentloaded")
+                        grid.wait_for(state="visible")
                         first = page.locator("#ContentPlaceHolderMaster_FirstPage")
                         if first.is_enabled():
                             first.click()
@@ -125,14 +134,9 @@ def capture(manifest: Path, *, limit: int | None = None,
                             page.locator("#ContentPlaceHolderMaster_NextPage").click()
                         else:
                             raise ValueError("Document missing from bounded public docket pages")
-                        with context.expect_page() as opened:
-                            document_link.click(button="middle")
-                        document_page = opened.value
-                        document_page.bring_to_front()
-                        document_page.on("response", lambda response: print(
-                            f"FILE RESPONSE {response.status} "
-                            f"{response.headers.get('content-type', '')}", flush=True)
-                            if "/ViewImage.aspx" in response.url else None)
+                        # Preserve the same public browsing session/tab used by DIS.
+                        document_link.click()
+                        document_page = page
                         link = document_page.get_by_role("link", name="View Document", exact=True).first
                         link.wait_for(state="visible")
                         text = document_page.locator("body").inner_text()
@@ -172,7 +176,6 @@ def capture(manifest: Path, *, limit: int | None = None,
                             archive_verified(current, data, texts)
                         results.append(current)
                         print(f"VERIFIED {doc_id}: {len(texts)} pages; sha256 {current['sha256']}", flush=True)
-                        document_page.close()
                     except Exception as exc:
                         failures += 1
                         failed_page = document_page if 'document_page' in locals() and not document_page.is_closed() else page
@@ -182,9 +185,8 @@ def capture(manifest: Path, *, limit: int | None = None,
                         results.append({**record, "status": "unavailable", "error": str(exc)})
                         print(f"UNAVAILABLE {doc_id}: {exc}", flush=True)
                         if failures >= 2:
-                            raise RuntimeError("Two consecutive access failures; stop this session") from exc
+                            raise RuntimeError("Two access failures; stop this session") from exc
                     if 'document_page' in locals() and not document_page.is_closed():
-                        document_page.close()
                     if output:
                         (output / "index.json").write_text(json.dumps(results, ensure_ascii=False))
         finally:
