@@ -2,10 +2,10 @@
   "reviewed_at": "2026-10-28",
   "cohort": "opsb_review_2026_10_27.json",
   "content_review_complete": false,
-  "public_files_read": 2,
-  "public_files_pending": 39,
+  "public_files_read": 3,
+  "public_files_pending": 38,
   "confidential_metadata_only": 3,
-  "publication_status": "Not published; two source reviews held for completion and guarded publication.",
+  "publication_status": "Not published; three source reviews held for completion and guarded publication.",
   "documents": [
     {
       "external_id": "18a9efcd-434f-4fe9-9f86-a7faca899f06",
@@ -70,6 +70,30 @@
           29
         ],
         "full_text_reviewed": true
+      }
+    },
+    {
+      "external_id": "619c20b0-0d41-4f41-b4a3-0cc7e207a0c0",
+      "url": "https://dis.puc.state.oh.us/DocumentRecord.aspx?DocID=619c20b0-0d41-4f41-b4a3-0cc7e207a0c0",
+      "payload": {
+        "filed": "10/26/2026",
+        "case_no": "26-0169",
+        "summary": "Notice of Compliance with Condition No. 15 (2026 Q3) electronically filed by Megan S. Zemke on behalf of Herrnstein, Kara.",
+        "case_numbers": [
+          "26-0169"
+        ]
+      },
+      "found_at": "2026-10-28 00:29:33.493766+00",
+      "pdf_url": "https://dis.puc.state.oh.us/ViewImage.aspx?CMID=A1001001A26J26B44930F04740",
+      "sha256": "970e45e3a60ebac5e5f1c2e2b0627c3c8b86f5d78c2c997e5ad704f8350a01f1",
+      "page_count": 2,
+      "status": "verified_public_pdf",
+      "reviewed_at": "2026-10-28",
+      "review_notes": {
+        "scope": "Applicant quarterly complaint-program report; not an independent regulator-wide finding",
+        "q3_2026_reported_complaints": 0,
+        "approval_date_in_letter": "2026-06-25",
+        "viewer_limit": "Chrome viewer showed only one page and truncated a material sentence; saved original contains two complete pages and matching receipt."
       }
     }
   ]
