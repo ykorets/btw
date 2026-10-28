@@ -1,0 +1,190 @@
+[
+  {
+    "slug": "socrates-south",
+    "name": "Socrates South",
+    "state": "OH",
+    "state_name": "Ohio",
+    "county": "Licking",
+    "developer": "Will-Power OH, LLC; Williams Companies",
+    "summary": "OPSB lists this 200 MW behind-the-meter gas project as operational from August 3, 2026. October compliance filing metadata is available, but the underlying report remains unreviewed.",
+    "reviewed": "2026-10-27",
+    "basis": "Official OPSB status table and approval announcement; docket filing metadata",
+    "capacity": "200 MW regulator-listed gas capacity; actual output unknown",
+    "sources": [
+      {
+        "id": "status",
+        "title": "OPSB Gas Generation & CHP Case Status, September 17, 2026",
+        "date": "2026-09-17",
+        "url": "https://dam.assets.ohio.gov/image/upload/puco.ohio.gov/empliibrary/files/OPA/Mapping/OPSB/Solar%20Facilities%20Map/Natural_Gas_Map_and_Stats.pdf#page=3",
+        "basis": "Official regulator status table, p. 3; map definitions on p. 1; privately archived SHA-256 6ccf2a3bbad31890742af1422b9111e35f9a2f93d0019b32e6f247ae41900031"
+      },
+      {
+        "id": "approval",
+        "title": "OPSB construction authorization announcement",
+        "date": "2025-06-09",
+        "url": "https://opsb.ohio.gov/news/opsb-approves-construction-of-licking-county-natural-gas-fired-power-plant",
+        "basis": "Official regulator announcement, separate from later operating-status evidence"
+      },
+      {
+        "id": "q3",
+        "title": "OPSB October 26 Condition 12 filing record",
+        "date": "2026-10-26",
+        "url": "https://dis.puc.state.oh.us/DocumentRecord.aspx?DocID=18a9efcd-434f-4fe9-9f86-a7faca899f06",
+        "basis": "Official docket metadata only; two-page source PDF unavailable for content review"
+      }
+    ],
+    "facts": [
+      {
+        "field": "Docket and site",
+        "value": "25-0185-EL-BLN; New Albany, Licking County, Ohio",
+        "source": "approval"
+      },
+      {
+        "field": "Regulator-listed operating milestone",
+        "value": "Operational date August 3, 2026; status table dated September 17, 2026",
+        "source": "status"
+      },
+      {
+        "field": "Generation capacity",
+        "value": "200 MW in the regulator’s gas-generation table; not measured delivered computing power",
+        "source": "status"
+      },
+      {
+        "field": "Customer and grid relationship",
+        "value": "Sidecat, LLC, an affiliate of Meta; behind-the-meter, with no physical connection to the electric power grid as described at authorization",
+        "source": "approval"
+      },
+      {
+        "field": "Battery boundary",
+        "value": "The regulator marks the project as co-located with battery storage. The gas-capacity figure excludes battery storage; the reviewed table does not give a battery rating",
+        "source": "status"
+      },
+      {
+        "field": "Latest discovered filing",
+        "value": "October 26, 2026: notice of compliance with Condition 12 (2026 Q3). This establishes a filing, not its complaint count or findings",
+        "source": "q3"
+      }
+    ],
+    "interpretation": [
+      "The material status update is the regulator’s operating listing, not the mere arrival of 44 docket rows in the collector. The September table gives an August 3 operational date for Socrates South. Retain both dates: the milestone and the date of the regulator’s snapshot.",
+      "The 200 MW figure is a gas-generation capacity boundary. The regulator explains that map nameplate capacity reflects approved units and amendments. Its operating classification does not mean that all 200 MW are currently delivered to computing, and storage is excluded from the gas rating.",
+      "The October 26 filing may contain useful operating or complaint information. Its title alone cannot establish whether there were complaints, whether conditions were met or whether equipment changed. Those findings remain pending source-file review."
+    ],
+    "unknowns": [
+      "Current metered output, delivered IT power and unit-by-unit availability",
+      "Equipment OEM, models and installed counts established by accessible reviewed source files",
+      "Battery rating and duration",
+      "Contents and outcome of the October 26 Q3 compliance report"
+    ],
+    "next": [
+      "Read the public October Q3 PDF when DIS file access is available.",
+      "Reconcile any commissioning notices against the regulator’s August 3 operating date.",
+      "Seek equipment-specific permits and operating records before adding a turbine cohort to the reviewed fleet."
+    ],
+    "faq": [
+      {
+        "q": "Is Socrates South operational?",
+        "a": "OPSB’s September 17, 2026 status table lists it as operational, with an August 3, 2026 operational date. Current output and availability remain unmeasured here."
+      },
+      {
+        "q": "Do the October filings establish zero complaints?",
+        "a": "No. BTW has verified the filing metadata, but has not read the underlying Q3 report."
+      }
+    ]
+  },
+  {
+    "slug": "socrates-the-younger",
+    "name": "Socrates the Younger (STY)",
+    "state": "OH",
+    "state_name": "Ohio",
+    "county": "Licking",
+    "developer": "Will-Power OH, LLC",
+    "summary": "OPSB’s September 2026 table lists STY as approved and under construction at 250 MW. The regulator separately describes 116 MW of battery storage. October compliance-report contents remain pending.",
+    "reviewed": "2026-10-27",
+    "basis": "Official OPSB status table and announcement; docket filing metadata",
+    "capacity": "250 MW regulator-listed gas generation + separate 116 MW BESS rating",
+    "sources": [
+      {
+        "id": "status",
+        "title": "OPSB Gas Generation & CHP Case Status, September 17, 2026",
+        "date": "2026-09-17",
+        "url": "https://dam.assets.ohio.gov/image/upload/puco.ohio.gov/empliibrary/files/OPA/Mapping/OPSB/Solar%20Facilities%20Map/Natural_Gas_Map_and_Stats.pdf#page=3",
+        "basis": "Official regulator status table, p. 3; map definitions on p. 1; privately archived SHA-256 6ccf2a3bbad31890742af1422b9111e35f9a2f93d0019b32e6f247ae41900031"
+      },
+      {
+        "id": "approval",
+        "title": "OPSB STY construction announcement",
+        "date": "2026-06-26",
+        "url": "https://opsb.ohio.gov/news/opsb-authorizes-construction-of-licking-county-power-plant-0626",
+        "basis": "Official regulator announcement: 250 MW gas, separate 116 MW battery, 36 conditions"
+      },
+      {
+        "id": "q3",
+        "title": "OPSB October 26 Condition 15 filing record",
+        "date": "2026-10-26",
+        "url": "https://dis.puc.state.oh.us/DocumentRecord.aspx?DocID=619c20b0-0d41-4f41-b4a3-0cc7e207a0c0",
+        "basis": "Official docket metadata only; source PDF unavailable for content review"
+      }
+    ],
+    "facts": [
+      {
+        "field": "Docket and location",
+        "value": "26-0169-EL-BLN; 109-acre site near Clover Valley Road and Harrison Road NW, New Albany, Licking County",
+        "source": "approval"
+      },
+      {
+        "field": "Status and approval date",
+        "value": "Approved June 25, 2026; under construction in OPSB’s September 17, 2026 table",
+        "source": "status"
+      },
+      {
+        "field": "Generation capacity",
+        "value": "250 MW gas-generation capacity in the official status table and announcement",
+        "source": "status"
+      },
+      {
+        "field": "Storage and conditions",
+        "value": "116 MW of battery energy storage; 36 construction and operating conditions. Storage duration is not stated in the reviewed announcement",
+        "source": "approval"
+      },
+      {
+        "field": "Customer and grid relationship",
+        "value": "Sidecat, LLC, a Meta affiliate; behind-the-meter with no physical connection to the electric power grid as described by OPSB",
+        "source": "approval"
+      },
+      {
+        "field": "Latest discovered filing",
+        "value": "October 26, 2026: notice of compliance with Condition 15 (2026 Q3). Report contents remain pending",
+        "source": "q3"
+      }
+    ],
+    "interpretation": [
+      "Use June 25 as the approval date shown in the regulator’s status table. June 26 is the publication date of its announcement. Keeping these dates separate prevents a news timestamp from becoming a permit-decision date.",
+      "BTW’s older uncited event archive used 296 MW of turbines. The accessible regulator sources use 250 MW for the gas facility. This dossier uses the regulator’s stated project boundary and preserves the discrepancy for reconciliation against the underlying technical filings. The reviewed evidence does not establish a 46 MW physical reduction.",
+      "The battery’s 116 MW power rating is separate from gas generation. It is not 116 MWh, does not establish duration and should not be added to gas capacity as continuously deliverable power.",
+      "A quarterly compliance filing can precede operation. The October notice does not itself override the dated under-construction classification or prove commissioning."
+    ],
+    "unknowns": [
+      "Reason for the older 296 MW turbine figure and its relationship to the 250 MW project rating",
+      "Current physical status after the regulator’s September snapshot",
+      "Equipment count, model and site-versus-nominal turbine ratings",
+      "Battery energy capacity in MWh and discharge duration",
+      "Contents and findings of the October Q3 compliance report"
+    ],
+    "next": [
+      "Read the public narrative, staff report and amendments to resolve the 296 / 250 MW boundary.",
+      "Check commissioning and in-service notices before changing the project to operating.",
+      "Read the Condition 15 report before describing complaints or compliance outcomes."
+    ],
+    "faq": [
+      {
+        "q": "Is STY a 366 MW continuously available power plant?",
+        "a": "The reviewed sources do not establish that. They describe 250 MW of gas generation and separate 116 MW battery power, without a storage-duration figure."
+      },
+      {
+        "q": "Did STY lose 46 MW?",
+        "a": "That is not established. An older BTW event used 296 MW without a source link. The current official sources describe a 250 MW project; the technical basis for the difference remains unresolved."
+      }
+    ]
+  }
+]

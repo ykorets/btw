@@ -1,0 +1,404 @@
+{
+  "reviewed_at": "2026-10-27",
+  "batch_first_seen_utc": "2026-10-28T00:29:00Z",
+  "scope": "Exact 44 newly collected docket records; metadata triage, not completed source-file review",
+  "content_review_complete": false,
+  "documents": [
+    {
+      "id": "18a9efcd-434f-4fe9-9f86-a7faca899f06",
+      "case": "25-0185-EL-BLN",
+      "filed": "2026-10-26",
+      "title": "Notice of Compliance with Condition No. 12 (2026 Q3) electronically filed by Megan S. Zemke on behalf of Herrnstein, Kara.",
+      "url": "https://dis.puc.state.oh.us/DocumentRecord.aspx?DocID=18a9efcd-434f-4fe9-9f86-a7faca899f06",
+      "category": "New quarterly compliance filing — contents pending",
+      "review_status": "metadata_triaged_content_pending"
+    },
+    {
+      "id": "619c20b0-0d41-4f41-b4a3-0cc7e207a0c0",
+      "case": "26-0169-EL-BLN",
+      "filed": "2026-10-26",
+      "title": "Notice of Compliance with Condition No. 15 (2026 Q3) electronically filed by Megan S. Zemke on behalf of Herrnstein, Kara.",
+      "url": "https://dis.puc.state.oh.us/DocumentRecord.aspx?DocID=619c20b0-0d41-4f41-b4a3-0cc7e207a0c0",
+      "category": "New quarterly compliance filing — contents pending",
+      "review_status": "metadata_triaged_content_pending"
+    },
+    {
+      "id": "6067f0f3-6d27-4ec6-92d3-fd0a1361b7d4",
+      "case": "25-0185-EL-BLN",
+      "filed": "2025-05-29",
+      "title": "Response to Requests and Comments from Licking County electronically filed by Teresa Orahood on behalf of Herrnstein, Kara.",
+      "url": "https://dis.puc.state.oh.us/DocumentRecord.aspx?DocID=6067f0f3-6d27-4ec6-92d3-fd0a1361b7d4",
+      "category": "Historical agency/local response — technical review pending",
+      "review_status": "metadata_triaged_content_pending"
+    },
+    {
+      "id": "c75d546b-e693-4e31-ae57-64ae2a9078c0",
+      "case": "25-0185-EL-BLN",
+      "filed": "2025-05-27",
+      "title": "Unopposed Petition of Intervention Out of Time electronically filed by Mr. Robert Dove on behalf of City of New Albany.",
+      "url": "https://dis.puc.state.oh.us/DocumentRecord.aspx?DocID=c75d546b-e693-4e31-ae57-64ae2a9078c0",
+      "category": "Historical procedural filing — contents pending",
+      "review_status": "metadata_triaged_content_pending"
+    },
+    {
+      "id": "39f0092c-d6f2-49f1-8b1b-1d28011325eb",
+      "case": "25-0185-EL-BLN",
+      "filed": "2025-05-09",
+      "title": "Response to Staff's Fifth Data Request Dated May 2, 2025 electronically filed by Teresa Orahood on behalf of Herrnstein, Kara.",
+      "url": "https://dis.puc.state.oh.us/DocumentRecord.aspx?DocID=39f0092c-d6f2-49f1-8b1b-1d28011325eb",
+      "category": "Historical agency/local response — technical review pending",
+      "review_status": "metadata_triaged_content_pending"
+    },
+    {
+      "id": "9493bcf1-a756-4faa-b1e8-4ecd95acfc7b",
+      "case": "25-0185-EL-BLN",
+      "filed": "2025-05-06",
+      "title": "Response to Ohio Power Siting Board Staff'sThird Data Request electronically filed by Teresa Orahood on behalf of Herrnstein, Kara.",
+      "url": "https://dis.puc.state.oh.us/DocumentRecord.aspx?DocID=9493bcf1-a756-4faa-b1e8-4ecd95acfc7b",
+      "category": "Historical agency/local response — technical review pending",
+      "review_status": "metadata_triaged_content_pending"
+    },
+    {
+      "id": "11690fb0-c174-4cdc-8785-1cb098bb360d",
+      "case": "25-0185-EL-BLN",
+      "filed": "2025-05-02",
+      "title": "Response to Staff's Fourth Data Request Dated April 28, 2025 electronically filed by Teresa Orahood on behalf of Herrnstein, Kara.",
+      "url": "https://dis.puc.state.oh.us/DocumentRecord.aspx?DocID=11690fb0-c174-4cdc-8785-1cb098bb360d",
+      "category": "Historical agency/local response — technical review pending",
+      "review_status": "metadata_triaged_content_pending"
+    },
+    {
+      "id": "8d86bd41-77bf-49fb-b56d-56b2029b98d8",
+      "case": "25-0185-EL-BLN",
+      "filed": "2025-05-01",
+      "title": "Response to Staff's First Data Request electronically filed by Teresa Orahood on behalf of Herrnstein, Kara.",
+      "url": "https://dis.puc.state.oh.us/DocumentRecord.aspx?DocID=8d86bd41-77bf-49fb-b56d-56b2029b98d8",
+      "category": "Historical agency/local response — technical review pending",
+      "review_status": "metadata_triaged_content_pending"
+    },
+    {
+      "id": "43becbdd-e005-41ce-a23c-e58f1cfe98f7",
+      "case": "25-0185-EL-BLN",
+      "filed": "2025-04-30",
+      "title": "Response to Staff's Third Data Request Dated April 7, 2025 electronically filed by Teresa Orahood on behalf of Kara Herrnstein.",
+      "url": "https://dis.puc.state.oh.us/DocumentRecord.aspx?DocID=43becbdd-e005-41ce-a23c-e58f1cfe98f7",
+      "category": "Historical agency/local response — technical review pending",
+      "review_status": "metadata_triaged_content_pending"
+    },
+    {
+      "id": "aa4f2c1f-8927-417f-b45d-3fe0fb51c07c",
+      "case": "25-0185-EL-BLN",
+      "filed": "2025-04-30",
+      "title": "Response to Staff's First Data Request Dated March 28, 2025 electronically filed by Teresa Orahood on behalf of Kara Herrnstein.",
+      "url": "https://dis.puc.state.oh.us/DocumentRecord.aspx?DocID=aa4f2c1f-8927-417f-b45d-3fe0fb51c07c",
+      "category": "Historical agency/local response — technical review pending",
+      "review_status": "metadata_triaged_content_pending"
+    },
+    {
+      "id": "f28a7b8c-58f1-44d7-8c77-70093c132a9a",
+      "case": "25-0185-EL-BLN",
+      "filed": "2025-04-30",
+      "title": "Response to Staff's Second Data Request Dated April 7, 2025 electronically filed by Teresa Orahood on behalf of Kara Herrnstein.",
+      "url": "https://dis.puc.state.oh.us/DocumentRecord.aspx?DocID=f28a7b8c-58f1-44d7-8c77-70093c132a9a",
+      "category": "Historical agency/local response — technical review pending",
+      "review_status": "metadata_triaged_content_pending"
+    },
+    {
+      "id": "a9ad8856-7b01-40e2-baf8-64754216f834",
+      "case": "26-0169-EL-BLN",
+      "filed": "2026-03-31",
+      "title": "Notice of Proof of Service electronically filed by Megan S. Zemke on behalf of Herrnstein, Kara.",
+      "url": "https://dis.puc.state.oh.us/DocumentRecord.aspx?DocID=a9ad8856-7b01-40e2-baf8-64754216f834",
+      "category": "Historical procedural filing — contents pending",
+      "review_status": "metadata_triaged_content_pending"
+    },
+    {
+      "id": "2f6ab0d5-f3fb-4bd7-a41c-cf139e9d6560",
+      "case": "25-0185-EL-BLN",
+      "filed": "2025-03-28",
+      "title": "Supplement Notice to Letter of Notification - Permit-to-Install electronically filed by Teresa Orahood on behalf of Dylan F. Borchers.",
+      "url": "https://dis.puc.state.oh.us/DocumentRecord.aspx?DocID=2f6ab0d5-f3fb-4bd7-a41c-cf139e9d6560",
+      "category": "Historical application or technical attachment — contents pending",
+      "review_status": "metadata_triaged_content_pending"
+    },
+    {
+      "id": "166edde8-b8eb-41ec-8faf-84e4c9f51049",
+      "case": "26-0169-EL-BLN",
+      "filed": "2026-03-27",
+      "title": "Confidential Document Target: Confidential Letter of Notification regarding the STY Power Generation Facility. (46 pages)",
+      "url": "https://dis.puc.state.oh.us/DocumentRecord.aspx?DocID=166edde8-b8eb-41ec-8faf-84e4c9f51049",
+      "category": "Confidential target — metadata only",
+      "review_status": "restricted_metadata_only"
+    },
+    {
+      "id": "1707823e-8dc1-4328-8219-fce5c793c697",
+      "case": "26-0169-EL-BLN",
+      "filed": "2026-03-27",
+      "title": "Motion for Protective Order and Memorandum in Support electronically filed by Megan S. Zemke on behalf of Herrnstein, Kara.",
+      "url": "https://dis.puc.state.oh.us/DocumentRecord.aspx?DocID=1707823e-8dc1-4328-8219-fce5c793c697",
+      "category": "Historical procedural filing — contents pending",
+      "review_status": "metadata_triaged_content_pending"
+    },
+    {
+      "id": "1d4101d5-626e-41a5-a872-8e535332b370",
+      "case": "26-0169-EL-BLN",
+      "filed": "2026-03-27",
+      "title": "Letter of Notification - Appendix A Figures electronically filed by Megan S. Zemke on behalf of Herrnstein, Kara.",
+      "url": "https://dis.puc.state.oh.us/DocumentRecord.aspx?DocID=1d4101d5-626e-41a5-a872-8e535332b370",
+      "category": "Historical application or technical attachment — contents pending",
+      "review_status": "metadata_triaged_content_pending"
+    },
+    {
+      "id": "209838f0-d4b6-47c3-a0f3-6f468c36cdf4",
+      "case": "26-0169-EL-BLN",
+      "filed": "2026-03-27",
+      "title": "Letter of Notification - Appendix I Preliminary Grading Plan electronically filed by Megan S. Zemke on behalf of Herrnstein, Kara.",
+      "url": "https://dis.puc.state.oh.us/DocumentRecord.aspx?DocID=209838f0-d4b6-47c3-a0f3-6f468c36cdf4",
+      "category": "Historical application or technical attachment — contents pending",
+      "review_status": "metadata_triaged_content_pending"
+    },
+    {
+      "id": "23ce2faa-ee71-4917-8b92-7075ddbfe73a",
+      "case": "26-0169-EL-BLN",
+      "filed": "2026-03-27",
+      "title": "Letter of Notification - Appendix H Preliminary Traffic Management Plan electronically filed by Megan S. Zemke on behalf of Herrnstein, Kara.",
+      "url": "https://dis.puc.state.oh.us/DocumentRecord.aspx?DocID=23ce2faa-ee71-4917-8b92-7075ddbfe73a",
+      "category": "Historical application or technical attachment — contents pending",
+      "review_status": "metadata_triaged_content_pending"
+    },
+    {
+      "id": "2b335499-ef72-47b9-8053-bb2e5c7ea3e0",
+      "case": "26-0169-EL-BLN",
+      "filed": "2026-03-27",
+      "title": "Letter of Notification - Appendix D Geotech Report electronically filed by Megan S. Zemke on behalf of Herrnstein, Kara.",
+      "url": "https://dis.puc.state.oh.us/DocumentRecord.aspx?DocID=2b335499-ef72-47b9-8053-bb2e5c7ea3e0",
+      "category": "Historical application or technical attachment — contents pending",
+      "review_status": "metadata_triaged_content_pending"
+    },
+    {
+      "id": "48b3221e-b4e4-4f39-b652-5936644cd7d3",
+      "case": "26-0169-EL-BLN",
+      "filed": "2026-03-27",
+      "title": "Letter of Notification - Public Appendix E Cultural Resources electronically filed by Megan S. Zemke on behalf of Herrnstein, Kara.",
+      "url": "https://dis.puc.state.oh.us/DocumentRecord.aspx?DocID=48b3221e-b4e4-4f39-b652-5936644cd7d3",
+      "category": "Historical application or technical attachment — contents pending",
+      "review_status": "metadata_triaged_content_pending"
+    },
+    {
+      "id": "55af47e8-aae6-4b4e-af00-6969c9ad0776",
+      "case": "26-0169-EL-BLN",
+      "filed": "2026-03-27",
+      "title": "Letter of Notification - Appendix B Preliminary Complaint Resolution Plan electronically filed by Megan S. Zemke on behalf of Herrnstein, Kara.",
+      "url": "https://dis.puc.state.oh.us/DocumentRecord.aspx?DocID=55af47e8-aae6-4b4e-af00-6969c9ad0776",
+      "category": "Historical application or technical attachment — contents pending",
+      "review_status": "metadata_triaged_content_pending"
+    },
+    {
+      "id": "84f2d51c-8ebe-4cc1-b23b-f66bcbdf3ae4",
+      "case": "26-0169-EL-BLN",
+      "filed": "2026-03-27",
+      "title": "Confidential Document Target: Confidential Letter of Notification Appendix E - Cultural Resources Report.(104 pages)",
+      "url": "https://dis.puc.state.oh.us/DocumentRecord.aspx?DocID=84f2d51c-8ebe-4cc1-b23b-f66bcbdf3ae4",
+      "category": "Confidential target — metadata only",
+      "review_status": "restricted_metadata_only"
+    },
+    {
+      "id": "89291065-9aba-4f37-8d53-751c160c3e65",
+      "case": "26-0169-EL-BLN",
+      "filed": "2026-03-27",
+      "title": "Letter of Notification - Appendix G FAA Prescreen electronically filed by Megan S. Zemke on behalf of Herrnstein, Kara, KARA.",
+      "url": "https://dis.puc.state.oh.us/DocumentRecord.aspx?DocID=89291065-9aba-4f37-8d53-751c160c3e65",
+      "category": "Historical application or technical attachment — contents pending",
+      "review_status": "metadata_triaged_content_pending"
+    },
+    {
+      "id": "b76a9c91-a52d-4704-8a0a-ad1182ef6e5a",
+      "case": "26-0169-EL-BLN",
+      "filed": "2026-03-27",
+      "title": "Letter of Notification - Appendix F Ecological Survey Report electronically filed by Megan S. Zemke on behalf of Herrnstein, Kara.",
+      "url": "https://dis.puc.state.oh.us/DocumentRecord.aspx?DocID=b76a9c91-a52d-4704-8a0a-ad1182ef6e5a",
+      "category": "Historical application or technical attachment — contents pending",
+      "review_status": "metadata_triaged_content_pending"
+    },
+    {
+      "id": "cfb481c4-5495-4cf0-a573-ac1fa4fe20a3",
+      "case": "26-0169-EL-BLN",
+      "filed": "2026-03-27",
+      "title": "Letter of Notification - Appendix C Sound Modeling Report electronically filed by Megan S. Zemke on behalf of Herrnstein, Kara.",
+      "url": "https://dis.puc.state.oh.us/DocumentRecord.aspx?DocID=cfb481c4-5495-4cf0-a573-ac1fa4fe20a3",
+      "category": "Historical application or technical attachment — contents pending",
+      "review_status": "metadata_triaged_content_pending"
+    },
+    {
+      "id": "f0b66cae-282f-42c9-8a37-ecf9863e33fb",
+      "case": "26-0169-EL-BLN",
+      "filed": "2026-03-27",
+      "title": "Affidavit of Nickolaus Munoz electronically filed by Megan S. Zemke on behalf of Herrnstein, Kara.",
+      "url": "https://dis.puc.state.oh.us/DocumentRecord.aspx?DocID=f0b66cae-282f-42c9-8a37-ecf9863e33fb",
+      "category": "Historical procedural filing — contents pending",
+      "review_status": "metadata_triaged_content_pending"
+    },
+    {
+      "id": "4bc61bd4-0fdb-4266-9d1f-4ebb4d42aa97",
+      "case": "25-0185-EL-BLN",
+      "filed": "2025-03-19",
+      "title": "Notification of Appendix K - Stormwater Assessment electronically filed by Teresa Orahood on behalf of Herrnstein, Kara.",
+      "url": "https://dis.puc.state.oh.us/DocumentRecord.aspx?DocID=4bc61bd4-0fdb-4266-9d1f-4ebb4d42aa97",
+      "category": "Historical application or technical attachment — contents pending",
+      "review_status": "metadata_triaged_content_pending"
+    },
+    {
+      "id": "222134d3-f1ea-4d1b-aa9a-25f90d8d1a22",
+      "case": "25-0185-EL-BLN",
+      "filed": "2025-03-13",
+      "title": "Proof of Pub of Notice of Proposed Major Utility Facility electronically filed by Teresa Orahood on behalf of Herrnstein, Kara.",
+      "url": "https://dis.puc.state.oh.us/DocumentRecord.aspx?DocID=222134d3-f1ea-4d1b-aa9a-25f90d8d1a22",
+      "category": "Historical procedural filing — contents pending",
+      "review_status": "metadata_triaged_content_pending"
+    },
+    {
+      "id": "b1dfa9be-0b5c-4148-a0fb-49bf7311200a",
+      "case": "25-0185-EL-BLN",
+      "filed": "2025-03-13",
+      "title": "Proof of Service of LON electronically filed by Teresa Orahood on behalf of Herrnstein, Kara.",
+      "url": "https://dis.puc.state.oh.us/DocumentRecord.aspx?DocID=b1dfa9be-0b5c-4148-a0fb-49bf7311200a",
+      "category": "Historical procedural filing — contents pending",
+      "review_status": "metadata_triaged_content_pending"
+    },
+    {
+      "id": "610bb40c-eb13-4c46-a763-b3a7dd49d5c8",
+      "case": "26-0169-EL-BLN",
+      "filed": "2026-03-10",
+      "title": "In the Matter of the Pre-application Notification Letter for STY Power Generation Facility Project electronically filed by Megan S. Zemke on behalf of Herrnstein, Kara.",
+      "url": "https://dis.puc.state.oh.us/DocumentRecord.aspx?DocID=610bb40c-eb13-4c46-a763-b3a7dd49d5c8",
+      "category": "Historical application or technical attachment — contents pending",
+      "review_status": "metadata_triaged_content_pending"
+    },
+    {
+      "id": "01db115c-f3f3-483f-8a23-42f40a60040d",
+      "case": "25-0185-EL-BLN",
+      "filed": "2025-03-07",
+      "title": "Letter of Notification Appendix B - Public Information Correspondence electronically filed by Teresa Orahood on behalf of Herrnstein, Kara.",
+      "url": "https://dis.puc.state.oh.us/DocumentRecord.aspx?DocID=01db115c-f3f3-483f-8a23-42f40a60040d",
+      "category": "Historical application or technical attachment — contents pending",
+      "review_status": "metadata_triaged_content_pending"
+    },
+    {
+      "id": "02931eb4-2280-4e8d-85dc-52bb48ed7885",
+      "case": "25-0185-EL-BLN",
+      "filed": "2025-03-07",
+      "title": "Letter of Notification Appendix A - Figures electronically filed by Teresa Orahood on behalf of Herrnstein, Kara.",
+      "url": "https://dis.puc.state.oh.us/DocumentRecord.aspx?DocID=02931eb4-2280-4e8d-85dc-52bb48ed7885",
+      "category": "Historical application or technical attachment — contents pending",
+      "review_status": "metadata_triaged_content_pending"
+    },
+    {
+      "id": "1ed9afc9-79b4-4dfb-a5b8-90785a661fd7",
+      "case": "25-0185-EL-BLN",
+      "filed": "2025-03-07",
+      "title": "Letter of Notification Appendix E - Visibility Assessment electronically filed by Teresa Orahood on behalf of Herrnstein, Kara.",
+      "url": "https://dis.puc.state.oh.us/DocumentRecord.aspx?DocID=1ed9afc9-79b4-4dfb-a5b8-90785a661fd7",
+      "category": "Historical application or technical attachment — contents pending",
+      "review_status": "metadata_triaged_content_pending"
+    },
+    {
+      "id": "2425de79-010c-4005-a45d-b6a5ea03e388",
+      "case": "25-0185-EL-BLN",
+      "filed": "2025-03-07",
+      "title": "Confidential Document Target: Document Letter of Notification Narrative electronically filed by Teresa Orahood on behalf of Will-Power OH, LLC. (51 pages)",
+      "url": "https://dis.puc.state.oh.us/DocumentRecord.aspx?DocID=2425de79-010c-4005-a45d-b6a5ea03e388",
+      "category": "Confidential target — metadata only",
+      "review_status": "restricted_metadata_only"
+    },
+    {
+      "id": "253e668e-67cd-40dd-9e86-d1d49f922419",
+      "case": "25-0185-EL-BLN",
+      "filed": "2025-03-07",
+      "title": "Letter of Notification Appendix J - Traffic Management Plan electronically filed by Teresa Orahood on behalf of Herrnstein, Kara.",
+      "url": "https://dis.puc.state.oh.us/DocumentRecord.aspx?DocID=253e668e-67cd-40dd-9e86-d1d49f922419",
+      "category": "Historical application or technical attachment — contents pending",
+      "review_status": "metadata_triaged_content_pending"
+    },
+    {
+      "id": "3a97b550-ee9b-4503-8134-17e662a141cd",
+      "case": "25-0185-EL-BLN",
+      "filed": "2025-03-07",
+      "title": "Letter of Notification Appendix D - Geotechnical Engineering Report electronically filed by Teresa Orahood on behalf of Herrnstein, Kara.",
+      "url": "https://dis.puc.state.oh.us/DocumentRecord.aspx?DocID=3a97b550-ee9b-4503-8134-17e662a141cd",
+      "category": "Historical application or technical attachment — contents pending",
+      "review_status": "metadata_triaged_content_pending"
+    },
+    {
+      "id": "3d15c79f-d56c-45e8-9ff7-c58a18365ff5",
+      "case": "25-0185-EL-BLN",
+      "filed": "2025-03-07",
+      "title": "Letter of Notification Appendix I - Surface Water electronically filed by Teresa Orahood on behalf of Herrnstein, Kara.",
+      "url": "https://dis.puc.state.oh.us/DocumentRecord.aspx?DocID=3d15c79f-d56c-45e8-9ff7-c58a18365ff5",
+      "category": "Historical application or technical attachment — contents pending",
+      "review_status": "metadata_triaged_content_pending"
+    },
+    {
+      "id": "4a7f3ab3-cb46-43a9-95ba-337a1479a90f",
+      "case": "25-0185-EL-BLN",
+      "filed": "2025-03-07",
+      "title": "Letter of Notification Appendix H - Wildlife Habitat Study and Correspondence electronically filed by Teresa Orahood on behalf of Herrnstein, Kara.",
+      "url": "https://dis.puc.state.oh.us/DocumentRecord.aspx?DocID=4a7f3ab3-cb46-43a9-95ba-337a1479a90f",
+      "category": "Historical application or technical attachment — contents pending",
+      "review_status": "metadata_triaged_content_pending"
+    },
+    {
+      "id": "50f11030-7c3a-407e-944f-6ce39ebb8b1b",
+      "case": "25-0185-EL-BLN",
+      "filed": "2025-03-07",
+      "title": "Motion for Protective Order and Memorandum in Support electronically filed by Teresa Orahood on behalf of Herrnstein, Kara.",
+      "url": "https://dis.puc.state.oh.us/DocumentRecord.aspx?DocID=50f11030-7c3a-407e-944f-6ce39ebb8b1b",
+      "category": "Historical procedural filing — contents pending",
+      "review_status": "metadata_triaged_content_pending"
+    },
+    {
+      "id": "60be9d56-e8f0-414d-bde4-88ae77693031",
+      "case": "25-0185-EL-BLN",
+      "filed": "2025-03-07",
+      "title": "Letter of Notification Appendix C - Sound Study electronically filed by Teresa Orahood on behalf of Herrnstein, Kara.",
+      "url": "https://dis.puc.state.oh.us/DocumentRecord.aspx?DocID=60be9d56-e8f0-414d-bde4-88ae77693031",
+      "category": "Historical application or technical attachment — contents pending",
+      "review_status": "metadata_triaged_content_pending"
+    },
+    {
+      "id": "a66dba31-df99-4606-a022-6cfa4f94e33a",
+      "case": "25-0185-EL-BLN",
+      "filed": "2025-03-07",
+      "title": "Letter of Notification Appendix F - Complaint Resolution Plan electronically filed by Teresa Orahood on behalf of Herrnstein, Kara.",
+      "url": "https://dis.puc.state.oh.us/DocumentRecord.aspx?DocID=a66dba31-df99-4606-a022-6cfa4f94e33a",
+      "category": "Historical application or technical attachment — contents pending",
+      "review_status": "metadata_triaged_content_pending"
+    },
+    {
+      "id": "d217d68c-41a5-4c85-af2b-90097234274e",
+      "case": "25-0185-EL-BLN",
+      "filed": "2025-03-07",
+      "title": "Letter of Notification Narrative - Public Version electronically filed by Teresa Orahood on behalf of Herrnstein, Kara.",
+      "url": "https://dis.puc.state.oh.us/DocumentRecord.aspx?DocID=d217d68c-41a5-4c85-af2b-90097234274e",
+      "category": "Historical application or technical attachment — contents pending",
+      "review_status": "metadata_triaged_content_pending"
+    },
+    {
+      "id": "e51b0e27-2d41-4af5-bbfb-bcccccdad24d",
+      "case": "25-0185-EL-BLN",
+      "filed": "2025-03-07",
+      "title": "Letter of Notification Appendix G - Cultural Resolution Plan electronically filed by Teresa Orahood on behalf of Herrnstein, Kara.",
+      "url": "https://dis.puc.state.oh.us/DocumentRecord.aspx?DocID=e51b0e27-2d41-4af5-bbfb-bcccccdad24d",
+      "category": "Historical application or technical attachment — contents pending",
+      "review_status": "metadata_triaged_content_pending"
+    },
+    {
+      "id": "2f178fed-7372-4661-994e-86c454bf3528",
+      "case": "25-0185-EL-BLN",
+      "filed": "2025-03-03",
+      "title": "In the Matter of the Pre-Application Notification Letter electronically filed by Teresa Orahood on behalf of Dylan F. Borchers.",
+      "url": "https://dis.puc.state.oh.us/DocumentRecord.aspx?DocID=2f178fed-7372-4661-994e-86c454bf3528",
+      "category": "Historical application or technical attachment — contents pending",
+      "review_status": "metadata_triaged_content_pending"
+    }
+  ]
+}

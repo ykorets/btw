@@ -1,6 +1,11 @@
 name: opsb-public-probe
 on:
-  workflow_dispatch: {}
+  workflow_dispatch:
+    inputs:
+      documents:
+        description: "Also qualify the two public October 26 PDFs; no archive or database writes"
+        type: boolean
+        default: false
 permissions:
   contents: read
 jobs:
@@ -23,3 +28,8 @@ jobs:
         run: engine/.venv/bin/playwright install --with-deps --no-shell chromium
       - name: Read both complete official dockets without production credentials
         run: xvfb-run -a engine/.venv/bin/python -m btw_engine.watch --source opsb-dockets --dry-run
+      - name: Verify the two new public PDFs without production credentials
+        if: inputs.documents
+        run: >-
+          xvfb-run -a engine/.venv/bin/python -m btw_engine.opsb_documents
+          --manifest engine/backfill/opsb_review_2026_10_27.json --limit 2
