@@ -91,7 +91,11 @@ def capture(manifest: Path, *, archive: bool = False, limit: int | None = None,
                     url = urljoin(page.url, link.get_attribute("href"))
                     if urlparse(url).netloc != "dis.puc.state.oh.us" or urlparse(url).path != "/ViewImage.aspx":
                         raise ValueError("Document link is not an official DIS PDF")
-                    response = page.context.request.get(url, timeout=180_000)
+                    # Follow the public control with Chromium's ordinary navigation
+                    # rather than an independent HTTP client with different transport.
+                    with page.expect_response(url, timeout=60_000) as pending:
+                        link.click()
+                    response = pending.value
                     if not response.ok:
                         raise ValueError(f"Document HTTP {response.status}")
                     data = response.body()
