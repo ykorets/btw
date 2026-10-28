@@ -18,7 +18,17 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with: {python-version: "3.12"}
-      - run: pip install httpx pyyaml rapidfuzz pypdf boto3
+      - uses: astral-sh/setup-uv@08807647e7069bb48b6ef5acd8ec9567f424441b
+        with:
+          version: "0.11.28"
+          enable-cache: true
+          cache-dependency-glob: "engine/uv.lock"
+      - name: Install locked collector runtime
+        run: uv sync --locked --extra dev
+        working-directory: engine
+      - name: Install ordinary Chromium for OPSB
+        if: inputs.source == '' || inputs.source == 'all' || inputs.source == 'opsb-dockets'
+        run: engine/.venv/bin/playwright install --with-deps chromium
       - name: Run watchers
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
@@ -28,9 +38,9 @@ jobs:
           SOURCE_ID: ${{ inputs.source || 'all' }}
         run: |
           if [ "$SOURCE_ID" = all ]; then
-            PYTHONPATH=engine/src python -m btw_engine.watch
+            engine/.venv/bin/python -m btw_engine.watch
           else
-            PYTHONPATH=engine/src python -m btw_engine.watch --source "$SOURCE_ID"
+            engine/.venv/bin/python -m btw_engine.watch --source "$SOURCE_ID"
           fi
       - name: Normalize claims into provenance + staged facts
         if: inputs.source == '' || inputs.source == 'all'
@@ -40,7 +50,7 @@ jobs:
           R2_ACCOUNT_ID: "5ee73f367499e0cda9acfbd5966274e5"
           R2_ACCESS_KEY: ${{ secrets.R2_ACCESS_KEY }}
           R2_SECRET: ${{ secrets.R2_SECRET }}
-        run: PYTHONPATH=engine/src python -m btw_engine.normalize
+        run: engine/.venv/bin/python -m btw_engine.normalize
       - name: Open review PR
         if: inputs.source == '' || inputs.source == 'all'
         env:
@@ -48,13 +58,13 @@ jobs:
           SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
           GITHUB_TOKEN: ${{ github.token }}
           AUTOMERGE: "false"
-        run: PYTHONPATH=engine/src python -m btw_engine.review --open
+        run: engine/.venv/bin/python -m btw_engine.review --open
       - name: SLO staleness check
         if: always() && (inputs.source == '' || inputs.source == 'all')
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
-        run: PYTHONPATH=engine/src python -m btw_engine.watch --slo
+        run: engine/.venv/bin/python -m btw_engine.watch --slo
       - name: Telegram report (ok or alert)
         if: always() && (inputs.source == '' || inputs.source == 'all')
         env:
@@ -64,4 +74,4 @@ jobs:
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
           JOB_STATUS: ${{ job.status }}
           RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
-        run: PYTHONPATH=engine/src python -m btw_engine.notify
+        run: engine/.venv/bin/python -m btw_engine.notify

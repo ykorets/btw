@@ -99,3 +99,21 @@ def test_failed_single_source_does_not_advance_success_timestamp(monkeypatch):
     with pytest.raises(SystemExit) as error:
         watch.main()
     assert error.value.code==1 and calls==[]
+
+
+def test_opsb_complete_view_must_match_identity_count_and_unique_ids():
+    html=(FIX/'opsb_case_25-0185.html').read_text()
+    assert len(watch.validate_opsb_case(html,'25-0185',3))==3
+    with pytest.raises(RuntimeError,match='case identity'):
+        watch.validate_opsb_case(html,'26-0169',3)
+    with pytest.raises(RuntimeError,match='incomplete docket'):
+        watch.validate_opsb_case(html,'25-0185',43)
+    with pytest.raises(RuntimeError,match='incomplete docket'):
+        watch.validate_opsb_case(html.replace('11f0c9aa-2c33-44b1-9e05-aaaa00000001','398508a4-ef98-440f-8d48-c629d2937816'),'25-0185',3)
+
+
+def test_opsb_zero_or_blocked_grid_cannot_advance_coverage():
+    with pytest.raises(RuntimeError,match='incomplete docket'):
+        watch.validate_opsb_case('<h1>25-0185-EL-BLN</h1>','25-0185',0)
+    with pytest.raises(RuntimeError,match='access blocked'):
+        watch.validate_opsb_case('<h1>25-0185-EL-BLN</h1><p>Request Rejected</p>','25-0185',43)

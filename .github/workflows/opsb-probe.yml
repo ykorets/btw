@@ -1,0 +1,25 @@
+name: opsb-public-probe
+on:
+  workflow_dispatch: {}
+permissions:
+  contents: read
+jobs:
+  public-dockets:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: "3.12"}
+      - uses: astral-sh/setup-uv@08807647e7069bb48b6ef5acd8ec9567f424441b
+        with:
+          version: "0.11.28"
+          enable-cache: true
+          cache-dependency-glob: engine/uv.lock
+      - name: Install locked collector runtime
+        run: uv sync --locked --extra dev
+        working-directory: engine
+      - name: Install ordinary Chromium
+        run: engine/.venv/bin/playwright install --with-deps chromium
+      - name: Read both complete official dockets without production credentials
+        run: engine/.venv/bin/python -m btw_engine.watch --source opsb-dockets --dry-run
