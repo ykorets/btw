@@ -46,3 +46,11 @@ def test_public_receipt_supports_unpadded_case_and_date():
 def test_restricted_targets_are_distinct_from_public_protective_motions():
     assert RESTRICTED.search("Confidential Document Target: Confidential Letter")
     assert not RESTRICTED.search("Public motion concerning confidential information")
+
+
+def test_public_browser_does_not_inherit_privileged_writer_credentials():
+    from btw_engine.opsb_documents import browser_environment
+    assert browser_environment({"PATH": "/bin", "DISPLAY": ":99",
+        "R2_SECRET": "test", "R2_ACCESS_KEY": "test",
+        "SUPABASE_SERVICE_KEY": "test", "ACTIONS_RUNTIME_TOKEN": "test",
+        "GITHUB_TOKEN": "test"}) == {"PATH": "/bin", "DISPLAY": ":99"}

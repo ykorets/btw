@@ -10,6 +10,7 @@ import datetime as dt
 import hashlib
 import io
 import json
+import os
 import re
 import tempfile
 from pathlib import Path
@@ -19,6 +20,12 @@ from pypdf import PdfReader
 
 BASE = "https://dis.puc.state.oh.us/"
 RESTRICTED = re.compile(r"^Confidential Document Target:", re.I)
+
+
+def browser_environment(environ: dict[str, str]) -> dict[str, str]:
+    """The public browser needs no archive/database/runner credentials."""
+    return {key: value for key, value in environ.items()
+            if not re.search(r"TOKEN|SECRET|PASSWORD|_KEY", key, re.I)}
 
 
 def public_pdf(data: bytes, expected_pages: int) -> list[str]:
@@ -86,7 +93,8 @@ def capture(manifest: Path, *, limit: int | None = None,
         (default / "Preferences").write_text(json.dumps({
             "plugins": {"always_open_pdf_externally": True}}))
         context = runtime.chromium.launch_persistent_context(
-            profile, headless=False, accept_downloads=True)
+            profile, headless=False, accept_downloads=True,
+            env=browser_environment(dict(os.environ)))
         try:
             page = context.new_page()
             page.set_default_timeout(60_000)
