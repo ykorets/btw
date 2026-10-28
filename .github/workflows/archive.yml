@@ -5,7 +5,7 @@ on:
       manifest:
         description: "Document batch when URL is blank"
         type: choice
-        options: [genesis, refresh-2026-10]
+        options: [genesis, refresh-2026-10, opsb-public-2026-10]
         default: genesis
       url:
         description: "Optional single public-record URL; blank runs the manifest"
@@ -19,6 +19,7 @@ on:
 jobs:
   archive:
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -29,8 +30,11 @@ jobs:
           enable-cache: true
           cache-dependency-glob: "engine/uv.lock"
       - name: Install the locked engine runtime
-        run: uv sync --locked
+        run: uv sync --locked --extra dev
         working-directory: engine
+      - name: Install ordinary Chromium for public OPSB PDFs
+        if: inputs.manifest == 'opsb-public-2026-10' && inputs.url == ''
+        run: engine/.venv/bin/playwright install --with-deps --no-shell chromium
       - name: Archive genesis documents to R2
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
@@ -49,6 +53,9 @@ jobs:
           elif [ "$ARCHIVE_MANIFEST" = "refresh-2026-10" ]; then
             engine/.venv/bin/python -m btw_engine.fetch \
               --backfill engine/backfill/refresh_2026_10.yaml
+          elif [ "$ARCHIVE_MANIFEST" = "opsb-public-2026-10" ]; then
+            xvfb-run -a engine/.venv/bin/python -m btw_engine.opsb_documents \
+              --manifest engine/backfill/opsb_public_2026_10_28.json --archive
           else
             engine/.venv/bin/python -m btw_engine.fetch \
               --backfill engine/backfill/genesis_docs.yaml
