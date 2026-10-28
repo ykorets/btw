@@ -288,7 +288,7 @@ def run_opsb_browser(cfg: dict) -> list[dict]:
 
     all_rows = {}
     with sync_playwright() as runtime:
-        browser = runtime.chromium.launch()
+        browser = runtime.chromium.launch(headless=False)
         try:
             page = browser.new_page()
             page.set_default_timeout(60_000)
@@ -319,7 +319,7 @@ def run_opsb_browser(cfg: dict) -> list[dict]:
                     elif case_no not in all_rows[key]["payload"]["case_numbers"]:
                         all_rows[key]["payload"]["case_numbers"].append(case_no)
                 latest = max(dt.datetime.strptime(r["payload"]["filed"], "%m/%d/%Y").date() for r in rows)
-                print(f"VERIFIED OPSB {case_no}: {len(rows)} documents; latest {latest}")
+                print(f"VERIFIED OPSB {case_no}: {len(rows)} documents; latest {latest}", flush=True)
         finally:
             browser.close()
     if not all_rows:

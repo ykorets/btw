@@ -20,6 +20,6 @@ jobs:
         run: uv sync --locked --extra dev
         working-directory: engine
       - name: Install ordinary Chromium
-        run: engine/.venv/bin/playwright install --with-deps chromium
+        run: engine/.venv/bin/playwright install --with-deps --no-shell chromium
       - name: Read both complete official dockets without production credentials
-        run: engine/.venv/bin/python -m btw_engine.watch --source opsb-dockets --dry-run
+        run: xvfb-run -a engine/.venv/bin/python -m btw_engine.watch --source opsb-dockets --dry-run
