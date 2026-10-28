@@ -112,6 +112,7 @@ def capture(manifest: Path, *, limit: int | None = None,
                 grid = page.locator("#ContentPlaceHolderMaster_gvDocketInformation")
                 grid.wait_for(state="visible")
                 grid_url = page.url
+                grid_page_index = 0
                 print(f"CASE {case_no}: ordinary paginated docket", flush=True)
                 for record in (r for r in selected if r["payload"]["case_no"] == case_no):
                     doc_id = record["external_id"]
@@ -120,18 +121,17 @@ def capture(manifest: Path, *, limit: int | None = None,
                         print(f"RESTRICTED {doc_id}: metadata only", flush=True)
                         continue
                     try:
-                        if page.url != grid_url:
+                        if page.url != grid_url or grid_page_index:
                             page.goto(grid_url, wait_until="domcontentloaded")
+                            grid_page_index = 0
                         grid.wait_for(state="visible")
-                        first = page.locator("#ContentPlaceHolderMaster_FirstPage")
-                        if first.is_enabled():
-                            first.click()
                         for _ in range(4):
                             grid.wait_for(state="visible")
                             document_link = grid.locator(f'a[href*="{doc_id}"]')
                             if document_link.count():
                                 break
                             page.locator("#ContentPlaceHolderMaster_NextPage").click()
+                            grid_page_index += 1
                         else:
                             raise ValueError("Document missing from bounded public docket pages")
                         # Preserve the same public browsing session/tab used by DIS.
