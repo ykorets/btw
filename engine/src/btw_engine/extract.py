@@ -19,7 +19,7 @@ pass; still contradicted → claim held at status 'extracted' for human review;
 checker silent on the passage → 'solo' (anchor already passed, stays
 validated). Verdicts land in claim.quorum (schema/005_claim_quorum.sql).
 
-Env: SUPABASE_URL, SUPABASE_SERVICE_KEY, R2_*, provider key(s) for the roles
+Env: BTW_API_URL, BTW_API_KEY, BTW_ACCESS_CLIENT_ID/SECRET, R2_*, provider key(s) for the roles
 used; optional BTW_EXTRACTOR_ROLE overrides the primary role. Usage:
   python -m btw_engine.extract --genres tceq_standard_permit_review,appeal_filing,advocacy_letter
   python -m btw_engine.extract --sha <sha256> --quorum
@@ -38,6 +38,7 @@ from pypdf import PdfReader
 from rapidfuzz import fuzz
 
 from btw_engine.fetch import s3, BUCKET
+from btw_engine import db
 
 EXTRACT_BASE_VERSION = "extract-v2"
 MATCH_THRESHOLD = 0.92
@@ -72,9 +73,8 @@ Hard rules:
 
 
 def _rest(method: str, path: str, **kw) -> httpx.Response:
-    base = os.environ["SUPABASE_URL"].rstrip("/") + "/rest/v1/" + path
-    key = os.environ["SUPABASE_SERVICE_KEY"]
-    headers = {"apikey": key, "Authorization": f"Bearer {key}"}
+    base = db.url(path)
+    headers = db.headers()
     headers.update(kw.pop("headers", {}))
     r = httpx.request(method, base, headers=headers, timeout=60, **kw)
     r.raise_for_status()

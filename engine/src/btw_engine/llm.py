@@ -4,7 +4,7 @@ Architecture M2.5, decisions D8/D9. Code asks for a *role*; engine/models.yaml
 decides which model serves it. Every call writes a row to llm_call (model,
 tokens, computed USD cost via LiteLLM's price table, purpose, document).
 
-Env: SUPABASE_URL, SUPABASE_SERVICE_KEY, plus provider keys
+Env: BTW_API_URL, BTW_API_KEY, BTW_ACCESS_CLIENT_ID/SECRET, plus provider keys
 (ANTHROPIC_API_KEY / GEMINI_API_KEY / OPENAI_API_KEY — only for roles used).
 
 CLI smoke test:
@@ -21,6 +21,7 @@ import warnings
 import httpx
 import litellm
 import yaml
+from btw_engine import db
 
 litellm.suppress_debug_info = True
 litellm.drop_params = True  # silently drop params a provider doesn't support
@@ -48,9 +49,8 @@ def provider_key_present(model: str) -> bool:
 def _ledger(row: dict) -> None:
     """Best-effort: a ledger outage must not kill the pipeline."""
     try:
-        base = os.environ["SUPABASE_URL"].rstrip("/") + "/rest/v1/llm_call"
-        key = os.environ["SUPABASE_SERVICE_KEY"]
-        httpx.post(base, headers={"apikey": key, "Authorization": f"Bearer {key}"},
+        base = db.url("llm_call")
+        httpx.post(base, headers=db.headers(),
                    json=[row], timeout=15).raise_for_status()
     except Exception as e:  # noqa: BLE001
         warnings.warn(f"llm_call ledger write failed: {e}", stacklevel=2)

@@ -1,10 +1,10 @@
 """btw_engine.publish — Postgres → mirror files (architecture §4.8, plan M1).
 
-Reads published facts via Supabase PostgREST (service key), writes the
+Reads published facts via the BTW data API (PostgREST, service role), writes the
 canonical file set. Fails hard if recomputed aggregates disagree with the
 stored aggregate row (consistency gate, architecture §2).
 
-Env: SUPABASE_URL, SUPABASE_SERVICE_KEY.
+Env: BTW_API_URL, BTW_API_KEY, BTW_ACCESS_CLIENT_ID/SECRET.
 Usage: python -m btw_engine.publish --out out/
 """
 
@@ -22,10 +22,10 @@ import yaml
 
 from btw_engine.truth import assert_provenance
 from btw_engine.public_archive import archive_url, load_manifest
+from btw_engine import db
 
-BASE = os.environ["SUPABASE_URL"].rstrip("/") + "/rest/v1"
-KEY = os.environ["SUPABASE_SERVICE_KEY"]
-HEADERS = {"apikey": KEY, "Authorization": f"Bearer {KEY}"}
+BASE = db.url()
+HEADERS = db.headers()
 
 CITE = "Behind the Watt, behindthewatt.com, CC BY 4.0"
 

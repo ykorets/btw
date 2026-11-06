@@ -22,12 +22,12 @@ import sys
 
 import httpx
 import yaml
+from btw_engine import db
 
 
 def _rest(path: str, params: dict) -> list[dict]:
-    base = os.environ["SUPABASE_URL"].rstrip("/") + "/rest/v1/" + path
-    key = os.environ["SUPABASE_SERVICE_KEY"]
-    r = httpx.get(base, headers={"apikey": key, "Authorization": f"Bearer {key}"},
+    base = db.url(path)
+    r = httpx.get(base, headers=db.headers(),
                   params=params, timeout=30)
     r.raise_for_status()
     return r.json()

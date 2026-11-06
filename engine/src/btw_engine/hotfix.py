@@ -10,7 +10,7 @@ Usage (also exposed as a workflow_dispatch with inputs):
       --headline "SCHD issues NOV over unpermitted units" \
       [--url https://evidence...]
 
-Env: SUPABASE_URL, SUPABASE_SERVICE_KEY, GITHUB_TOKEN, GITHUB_REPOSITORY.
+Env: BTW_API_URL, BTW_API_KEY, BTW_ACCESS_CLIENT_ID/SECRET, GITHUB_TOKEN, GITHUB_REPOSITORY.
 """
 
 import argparse

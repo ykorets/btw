@@ -6,7 +6,7 @@ opens the human-review PR. ``--promote`` reads those two values from the
 merged file and invokes one database transaction. It never enumerates or
 patches whichever rows happen to be staging at merge time.
 
-Env: SUPABASE_URL, SUPABASE_SERVICE_KEY; for --open also GITHUB_TOKEN and
+Env: BTW_API_URL, BTW_API_KEY, BTW_ACCESS_CLIENT_ID/SECRET; for --open also GITHUB_TOKEN and
 GITHUB_REPOSITORY.
 """
 
@@ -25,6 +25,7 @@ from pathlib import Path
 import httpx
 
 from btw_engine.truth import provenance_violations
+from btw_engine import db
 
 GH_API = "https://api.github.com"
 REVIEW_ID_RE = re.compile(r"^<!-- BTW_REVIEW_ID: ([0-9a-fA-F-]{36}) -->$", re.M)
@@ -32,9 +33,8 @@ MANIFEST_HASH_RE = re.compile(r"^<!-- BTW_MANIFEST_HASH: ([0-9a-f]{64}) -->$", r
 
 
 def _rest(method: str, path: str, **kw) -> httpx.Response:
-    base = os.environ["SUPABASE_URL"].rstrip("/") + "/rest/v1/" + path
-    key = os.environ["SUPABASE_SERVICE_KEY"]
-    headers = {"apikey": key, "Authorization": f"Bearer {key}"}
+    base = db.url(path)
+    headers = db.headers()
     headers.update(kw.pop("headers", {}))
     response = httpx.request(method, base, headers=headers, timeout=60, **kw)
     try:

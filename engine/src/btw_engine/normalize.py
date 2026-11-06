@@ -19,7 +19,7 @@ Deterministic only; nothing is invented:
 - Unresolved documents and unbound claims are reported, never guessed.
 
 Usage: python -m btw_engine.normalize [--dry-run]
-Env: SUPABASE_URL, SUPABASE_SERVICE_KEY; R2_* optional — without R2 access
+Env: BTW_API_URL, BTW_API_KEY, BTW_ACCESS_CLIENT_ID/SECRET; R2_* optional — without R2 access
 context binding is skipped and quote-token binding still works.
 """
 
@@ -30,6 +30,7 @@ from datetime import datetime
 
 import httpx
 from rapidfuzz import fuzz
+from btw_engine import db
 
 CONTEXT_RADIUS = 240          # chars around the located quote
 CONTEXT_LOCATE_THRESHOLD = 85  # partial_ratio_alignment score to trust locate
@@ -57,9 +58,8 @@ PERMIT_FIELD_COLS = {
 
 
 def _rest(method: str, path: str, **kw) -> httpx.Response:
-    base = os.environ["SUPABASE_URL"].rstrip("/") + "/rest/v1/" + path
-    key = os.environ["SUPABASE_SERVICE_KEY"]
-    headers = {"apikey": key, "Authorization": f"Bearer {key}"}
+    base = db.url(path)
+    headers = db.headers()
     headers.update(kw.pop("headers", {}))
     r = httpx.request(method, base, headers=headers, timeout=60, **kw)
     try:

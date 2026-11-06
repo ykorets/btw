@@ -3,7 +3,7 @@
 Architecture §4.3: the archive is immutable, deduped by content hash, and is
 the only read path downstream. Idempotent: same bytes → same key → skip.
 
-Env: SUPABASE_URL, SUPABASE_SERVICE_KEY, R2_ACCOUNT_ID, R2_ACCESS_KEY, R2_SECRET.
+Env: BTW_API_URL, BTW_API_KEY, BTW_ACCESS_CLIENT_ID/SECRET, R2_ACCOUNT_ID, R2_ACCESS_KEY, R2_SECRET.
 Usage:
   python -m btw_engine.fetch --url URL --source manual-genesis --genre permit
   python -m btw_engine.fetch --backfill engine/backfill/genesis_docs.yaml
@@ -17,6 +17,7 @@ import sys
 import boto3
 import httpx
 import yaml
+from btw_engine import db
 
 BUCKET = "btw-docs"
 UA = {"User-Agent": "btw-engine/0.1 (+https://behindthewatt.com; public-records archive)"}
@@ -41,15 +42,10 @@ def s3():
 
 
 def upsert_document(row: dict) -> None:
-    base = os.environ["SUPABASE_URL"].rstrip("/") + "/rest/v1/document"
-    key = os.environ["SUPABASE_SERVICE_KEY"]
+    base = db.url("document")
     r = httpx.post(
         base,
-        headers={
-            "apikey": key,
-            "Authorization": f"Bearer {key}",
-            "Prefer": "resolution=merge-duplicates",
-        },
+        headers=db.headers({"Prefer": "resolution=merge-duplicates"}),
         params={"on_conflict": "sha256"},
         json=[row],
         timeout=30,

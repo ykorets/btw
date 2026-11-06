@@ -66,8 +66,10 @@ jobs:
       - name: Build edition from the published record
         if: steps.edition.outputs.mode != 'validate'
         env:
-          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
-          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+          BTW_API_URL: https://data-api.behindthewatt.com
+          BTW_API_KEY: ${{ secrets.BTW_API_KEY }}
+          BTW_ACCESS_CLIENT_ID: ${{ secrets.BTW_ACCESS_CLIENT_ID }}
+          BTW_ACCESS_CLIENT_SECRET: ${{ secrets.BTW_ACCESS_CLIENT_SECRET }}
           DIGEST_TRIGGER_SECRET: ${{ secrets.DIGEST_TRIGGER_SECRET }}
           MODE: ${{ steps.edition.outputs.mode }}
           ISSUE_DATE: ${{ steps.edition.outputs.issue_date }}

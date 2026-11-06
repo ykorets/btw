@@ -9,7 +9,7 @@ usual fix list.
 Silent no-op when TELEGRAM_BOT_TOKEN / TELEGRAM_CHAT_ID are unset, so the
 pipeline works before the bot exists.
 
-Env: SUPABASE_URL, SUPABASE_SERVICE_KEY, TELEGRAM_BOT_TOKEN,
+Env: BTW_API_URL, BTW_API_KEY, BTW_ACCESS_CLIENT_ID/SECRET, TELEGRAM_BOT_TOKEN,
 TELEGRAM_CHAT_ID; optional RUN_URL, JOB_STATUS.
 Usage: python -m btw_engine.notify [--status success|failure] [--run-url U]
 """
@@ -18,14 +18,12 @@ import argparse
 import os
 
 import httpx
+from btw_engine import db
 
 
 def _rest(path: str, params: dict) -> list[dict]:
-    base = os.environ["SUPABASE_URL"].rstrip("/") + "/rest/v1/" + path
-    key = os.environ["SUPABASE_SERVICE_KEY"]
-    r = httpx.get(base, headers={"apikey": key,
-                                 "Authorization": f"Bearer {key}"},
-                  params=params, timeout=30)
+    base = db.url(path)
+    r = httpx.get(base, headers=db.headers(), params=params, timeout=30)
     r.raise_for_status()
     return r.json()
 
@@ -83,7 +81,7 @@ def failure_message(run_url: str) -> str:
             "1. Открой лог упавшего шага — обычно ответ источника изменился\n"
             "2. STALE в SLO-шаге = источник молчит дольше SLO; смотри "
             "engine/adapters/*.yaml\n"
-            "3. 401/403 к Supabase = проверь секреты SUPABASE_*\n"
+            "3. 401/403 к data API = проверь секреты BTW_API_KEY / BTW_ACCESS_*\n"
             "4. Re-run jobs после фикса; парсеры чинятся PR-ом в "
             "btw_engine/watch.py + фикстура")
 

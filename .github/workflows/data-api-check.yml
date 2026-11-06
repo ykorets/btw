@@ -1,0 +1,38 @@
+name: data-api-check
+# Read-only reachability check of the owned data API (Cloudflare Access + PostgREST).
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - .github/workflows/data-api-check.yml
+      - engine/src/btw_engine/db.py
+permissions:
+  contents: read
+jobs:
+  check:
+    if: github.event_name == 'workflow_dispatch' || github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    env:
+      BTW_API_URL: https://data-api.behindthewatt.com
+      BTW_API_KEY: ${{ secrets.BTW_API_KEY }}
+      BTW_ACCESS_CLIENT_ID: ${{ secrets.BTW_ACCESS_CLIENT_ID }}
+      BTW_ACCESS_CLIENT_SECRET: ${{ secrets.BTW_ACCESS_CLIENT_SECRET }}
+    steps:
+      - name: Without credentials the API must refuse
+        run: |
+          code=$(curl -s -o /dev/null -w '%{http_code}' "$BTW_API_URL/source?select=id&limit=1")
+          echo "anonymous: $code"; test "$code" = 403
+      - name: Access token without API key must not read data
+        run: |
+          body=$(curl -s -H "CF-Access-Client-Id: $BTW_ACCESS_CLIENT_ID" -H "CF-Access-Client-Secret: $BTW_ACCESS_CLIENT_SECRET" "$BTW_API_URL/source?select=id&limit=1")
+          echo "access-only body: $body"; test "$body" = "[]"
+      - name: Full credentials read the tables the engine uses
+        run: |
+          for t in source document candidate claim fact_provenance facility unit permit event announcement review llm_call; do
+            r=$(curl -s -D - -o /dev/null -H "Authorization: Bearer $BTW_API_KEY" \
+                -H "CF-Access-Client-Id: $BTW_ACCESS_CLIENT_ID" -H "CF-Access-Client-Secret: $BTW_ACCESS_CLIENT_SECRET" \
+                -H 'Prefer: count=exact' -H 'Range: 0-0' "$BTW_API_URL/$t?select=id")
+            status=$(echo "$r" | head -1 | awk '{print $2}'); range=$(echo "$r" | grep -i '^content-range' | tr -d '\r')
+            echo "$t $status $range"; case "$status" in 200|206) ;; *) exit 1;; esac
+          done
