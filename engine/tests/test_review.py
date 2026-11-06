@@ -4,8 +4,8 @@ import os
 
 import pytest
 
-os.environ.setdefault("SUPABASE_URL", "https://example.test")
-os.environ.setdefault("SUPABASE_SERVICE_KEY", "test-key")
+os.environ.setdefault("BTW_API_URL", "https://example.test")
+os.environ.setdefault("BTW_API_KEY", "test-key")
 
 from btw_engine import review  # noqa: E402
 

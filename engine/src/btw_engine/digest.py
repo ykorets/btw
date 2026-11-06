@@ -10,7 +10,7 @@ editor.  The Worker owns the Resend key, approval gate and delivery cursor.
 Nothing reaches the subscriber segment until the editor confirms with a POST
 action.  JSON, Markdown and HTML preview artifacts are written for audit.
 
-Env: SUPABASE_URL, SUPABASE_SERVICE_KEY; for --request-review also
+Env: BTW_API_URL, BTW_API_KEY, BTW_ACCESS_CLIENT_ID/SECRET; for --request-review also
 DIGEST_TRIGGER_SECRET.  Optional: NEWSLETTER_ENDPOINT.
 """
 

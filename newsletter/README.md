@@ -46,7 +46,7 @@ At 13:00 UTC every Monday, `.github/workflows/digest.yml`:
 1. validates the Resend Segment and KV binding;
 2. asks the Worker for the end of the last editor-approved edition so a missed
    or rejected run creates no gap;
-3. reads published changes from Supabase;
+3. reads published changes from the BTW data API (owned PostgreSQL);
 4. renders deterministic HTML, text and Markdown without an LLM;
 5. asks the Worker to create a Resend draft;
 6. emails the exact preview only to the configured editor;

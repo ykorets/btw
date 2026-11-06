@@ -15,7 +15,7 @@ Usage:
   python -m btw_engine.watch --dry-run       # print candidates, no DB writes
   python -m btw_engine.watch --slo           # staleness check; exit 1 if stale
 
-Env: SUPABASE_URL, SUPABASE_SERVICE_KEY; optional HEARTBEAT_URL,
+Env: BTW_API_URL, BTW_API_KEY, BTW_ACCESS_CLIENT_ID/SECRET; optional HEARTBEAT_URL,
 COURTLISTENER_TOKEN.
 """
 
@@ -34,6 +34,7 @@ from urllib.parse import parse_qs, urlparse
 
 import httpx
 import yaml
+from btw_engine import db
 
 ADAPTER_DIR = os.path.join(os.path.dirname(__file__), "..", "..", "adapters")
 
@@ -48,9 +49,8 @@ BROWSER_HEADERS = {
 
 
 def _rest(method: str, path: str, **kw) -> httpx.Response:
-    base = os.environ["SUPABASE_URL"].rstrip("/") + "/rest/v1/" + path
-    key = os.environ["SUPABASE_SERVICE_KEY"]
-    headers = {"apikey": key, "Authorization": f"Bearer {key}"}
+    base = db.url(path)
+    headers = db.headers()
     headers.update(kw.pop("headers", {}))
     r = httpx.request(method, base, headers=headers, timeout=60, **kw)
     r.raise_for_status()

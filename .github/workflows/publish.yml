@@ -27,8 +27,10 @@ jobs:
         working-directory: engine
       - name: Generate mirror files from Postgres
         env:
-          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
-          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+          BTW_API_URL: https://data-api.behindthewatt.com
+          BTW_API_KEY: ${{ secrets.BTW_API_KEY }}
+          BTW_ACCESS_CLIENT_ID: ${{ secrets.BTW_ACCESS_CLIENT_ID }}
+          BTW_ACCESS_CLIENT_SECRET: ${{ secrets.BTW_ACCESS_CLIENT_SECRET }}
           BTW_ARCHIVE_BASE_URL: ${{ vars.BTW_ARCHIVE_BASE_URL }}
           PUBLISH_SCOPE: ${{ inputs.scope || 'all' }}
         run: |
