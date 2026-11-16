@@ -30,7 +30,7 @@ const mirror = await loadMirror();
     announcedGw={mirror.announcements.summary.reported_gw}
     announcedProjects={mirror.announcements.summary.projects}
     summary={mirror.summary}
-    facilityCount={mirror.facilities.facilities.length}
+    facilityCount={mirror.summary.operating_facilities ?? mirror.facilities.facilities.length}
   />
   {mirror.announcements.summary.projects > 0 && <AnnouncedCapacity data={mirror.announcements} />}
   <LatestFilings events={mirror.events.events} />
