@@ -19,6 +19,10 @@ export async function loadMirrorJson(name: string): Promise<Json> {
   return load(name);
 }
 
+export async function loadMirrorJsonOptional(name: string, fallback: Json): Promise<Json> {
+  return loadOptional(name, fallback);
+}
+
 export async function loadMirrorText(name: string): Promise<string> {
   return readFile(path.join(dataRoot(), name), "utf8");
 }
@@ -32,7 +36,7 @@ async function loadOptional(name: string, fallback: Json): Promise<Json> {
 }
 
 export async function loadMirror() {
-  const [facilities, events, summary, coverage, announcements] = await Promise.all([
+  const [facilities, events, summary, coverage, announcements, filings] = await Promise.all([
     load("facilities.json"),
     load("events.json"),
     load("summary.json"),
@@ -41,8 +45,9 @@ export async function loadMirror() {
       summary: { projects: 0, projects_with_capacity: 0, reported_gw: null },
       announcements: [],
     }),
+    loadOptional("filings.json", { generated: null, filings: [] }),
   ]);
-  return { facilities, events, summary, coverage, announcements };
+  return { facilities, events, summary, coverage, announcements, filings };
 }
 
 function human(value: string): string {

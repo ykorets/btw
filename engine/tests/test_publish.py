@@ -260,3 +260,37 @@ def test_coverage_retains_history_and_distinguishes_replaced_collectors(monkeypa
     assert coverage[1]['collector_status']=='active'
     assert 'Not every Texas project' in coverage[1]['coverage_note']
     assert all(row['candidates']==3 for row in coverage)
+
+
+def test_build_filings_dedupes_registry_records_and_keeps_first_seen():
+    from btw_engine.publish import build_filings
+
+    def tceq(addn, status, found):
+        return {
+            "source_id": "tceq-permit-portal",
+            "external_id": f"portal:{addn}:{status}",
+            "url": f"https://permit-search.tceq.texas.gov/?addnId={addn}",
+            "title": f"STARWOOD DATA CENTER — 185938 ({status})",
+            "payload": {"kw_hit": True, "registry_snapshot": {
+                "addnId": addn, "aiPermittedName": "STARWOOD DATA CENTER",
+                "aiIdNumber": "185938", "pspStatusCd": status,
+                "reCnty": "WARD", "reCityName": None}},
+            "found_at": found,
+        }
+
+    rows = [
+        tceq("441601272026317", "ISSUED PERMIT", "2026-12-01T11:00:00Z"),
+        tceq("441601272026317", "NEW APPLICATION", "2026-11-15T11:00:00Z"),
+        {"source_id": "opsb-dockets", "external_id": "26-0001-EL-BGN",
+         "url": "https://dis.puc.state.oh.us/", "title": "Case 26-0001",
+         "payload": {"kw_hit": True}, "found_at": "2026-11-10T11:00:00Z"},
+    ]
+    filings = build_filings(rows)
+    assert [f["id"] for f in filings] == [
+        "tceq-permit-portal:441601272026317", "opsb-dockets:26-0001-EL-BGN"]
+    starwood = filings[0]
+    assert starwood["registry_status"] == "ISSUED PERMIT"
+    assert starwood["first_seen"] == "2026-11-15T11:00:00Z"
+    assert starwood["last_changed"] == "2026-12-01T11:00:00Z"
+    assert starwood["agency"] == "TCEQ" and starwood["record_no"] == "185938"
+    assert filings[1]["agency"] == "Ohio OPSB" and filings[1]["name"] is None

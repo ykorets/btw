@@ -10,7 +10,7 @@ on:
         default: all
 permissions:
   contents: write
-  pull-requests: write
+  actions: write
 jobs:
   watch:
     runs-on: ubuntu-latest
@@ -57,16 +57,43 @@ jobs:
           R2_ACCESS_KEY: ${{ secrets.R2_ACCESS_KEY }}
           R2_SECRET: ${{ secrets.R2_SECRET }}
         run: engine/.venv/bin/python -m btw_engine.normalize
-      - name: Open review PR
-        if: inputs.source == '' || inputs.source == 'all'
+      - name: Auto-promote truth-gate-passing facts (no human merge, owner decision 2026-11-16)
+        if: always() && (inputs.source == '' || inputs.source == 'all')
         env:
           BTW_API_URL: https://data-api.behindthewatt.com
           BTW_API_KEY: ${{ secrets.BTW_API_KEY }}
           BTW_ACCESS_CLIENT_ID: ${{ secrets.BTW_ACCESS_CLIENT_ID }}
           BTW_ACCESS_CLIENT_SECRET: ${{ secrets.BTW_ACCESS_CLIENT_SECRET }}
-          GITHUB_TOKEN: ${{ github.token }}
-          AUTOMERGE: "false"
-        run: engine/.venv/bin/python -m btw_engine.review --open
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: engine/.venv/bin/python -m btw_engine.review --auto --merge-sha "$GITHUB_SHA"
+      - name: Generate mirror files from Postgres
+        id: publish
+        if: always() && (inputs.source == '' || inputs.source == 'all')
+        env:
+          BTW_API_URL: https://data-api.behindthewatt.com
+          BTW_API_KEY: ${{ secrets.BTW_API_KEY }}
+          BTW_ACCESS_CLIENT_ID: ${{ secrets.BTW_ACCESS_CLIENT_ID }}
+          BTW_ACCESS_CLIENT_SECRET: ${{ secrets.BTW_ACCESS_CLIENT_SECRET }}
+          BTW_ARCHIVE_BASE_URL: ${{ vars.BTW_ARCHIVE_BASE_URL }}
+        run: engine/.venv/bin/python -m btw_engine.publish --out out
+      - name: Push mirror branch and rebuild the site
+        if: always() && steps.publish.outcome == 'success'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          git clone --no-checkout https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git mirror-repo
+          cd mirror-repo
+          git checkout mirror
+          mkdir -p data
+          cp ../out/* data/
+          printf '# btw mirror (generated)\n\nDo not edit by hand. Regenerated daily from Postgres.\nLicense: CC BY 4.0. Cite as: Behind the Watt, behindthewatt.com.\n' > README.md
+          git config user.name "btw-bot"
+          git config user.email "bot@behindthewatt.com"
+          git add -A
+          git diff --cached --quiet && echo "no changes" && exit 0
+          git commit -m "publish: $(date -u +%F) daily export"
+          git push origin mirror
+          gh workflow run pages.yml --ref main
       - name: SLO staleness check
         if: always() && (inputs.source == '' || inputs.source == 'all')
         env:

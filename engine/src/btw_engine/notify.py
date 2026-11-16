@@ -2,7 +2,8 @@
 
 Runs as the last step of daily-intake (if: always()). On success sends the
 day's digest: source health, fresh candidates with keyword hits (the
-companies moving right now), staged facts awaiting review, LLM spend,
+companies moving right now; published as New filings), staged facts the
+auto-promote truth gate held back, LLM spend,
 fleet aggregate. On failure sends a red alert with the run link and the
 usual fix list.
 
@@ -21,6 +22,9 @@ import httpx
 from btw_engine import db
 
 
+MANUAL_SOURCES = {"manual-genesis"}
+
+
 def _rest(path: str, params: dict) -> list[dict]:
     base = db.url(path)
     r = httpx.get(base, headers=db.headers(), params=params, timeout=30)
@@ -33,7 +37,9 @@ def gather() -> str:
         "select": "id,last_hit_at",
         "adapter": "not.is.null", "order": "id"})
     ok = [s for s in src if s["last_hit_at"]]
-    silent = [s["id"] for s in src if not s["last_hit_at"]]
+    # manual-genesis is hand intake, not a watcher: no sweep, never "silent".
+    silent = [s["id"] for s in src
+              if not s["last_hit_at"] and s["id"] not in MANUAL_SOURCES]
 
     cands = _rest("candidate", {
         "select": "source_id,title,payload,found_at",
@@ -59,9 +65,12 @@ def gather() -> str:
              f"📥 Кандидатов за сутки: {len(cands)}, kw-хиты: {len(hits)}"]
     for h in hits[:5]:
         lines.append("• " + (h["title"] or "")[:120])
+    if hits:
+        lines.append("🌐 Заявки опубликованы на сайте в New filings, "
+                     "сайт пересобирается автоматически")
     if staged_u or staged_e:
-        lines.append(f"📋 Ждёт ревью: {len(staged_u)} unit-правок, "
-                     f"{len(staged_e)} событий — merge review PR = approve")
+        lines.append(f"⛔ Не прошло truth gate: {len(staged_u)} unit-правок, "
+                     f"{len(staged_e)} событий — на сайт не попали")
     if silent:
         lines.append("⚠️ Молчат: " + ", ".join(silent))
     lines.append(f"💸 LLM за 7 дней: ${spend:.2f}")

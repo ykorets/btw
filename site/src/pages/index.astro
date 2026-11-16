@@ -4,6 +4,7 @@ import SiteHeader from "../components/home/SiteHeader.astro";
 import Hero from "../components/home/Hero.astro";
 import AnnouncedCapacity from "../components/home/AnnouncedCapacity.astro";
 import LatestFilings from "../components/home/LatestFilings.astro";
+import NewFilings from "../components/home/NewFilings.astro";
 import FacilityMap from "../components/home/FacilityMap.astro";
 import FleetTracker from "../components/home/FleetTracker.astro";
 import TimeToPower from "../components/home/TimeToPower.astro";
@@ -33,6 +34,7 @@ const mirror = await loadMirror();
   />
   {mirror.announcements.summary.projects > 0 && <AnnouncedCapacity data={mirror.announcements} />}
   <LatestFilings events={mirror.events.events} />
+  <NewFilings data={mirror.filings} />
   <FacilityMap />
   <FleetTracker facilities={mirror.facilities.facilities} events={mirror.events.events} />
   <TimeToPower facilities={mirror.facilities.facilities} />

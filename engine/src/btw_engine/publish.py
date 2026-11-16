@@ -203,6 +203,82 @@ def fetch_coverage() -> list[dict]:
     return sources
 
 
+# Registries whose keyword candidates are filing records (an application,
+# permit action, docket or court filing). News, satellite scenes, gas flows
+# and page-hash changes are signals, not filings, and stay unpublished here.
+FILING_SOURCES = {
+    "tceq-permit-portal": "TCEQ",
+    "mdeq-ensearch": "MDEQ",
+    "opsb-dockets": "Ohio OPSB",
+    "ferc-elibrary": "FERC",
+    "courtlistener": "CourtListener",
+}
+FILINGS_LIMIT = 200
+
+
+def fetch_filing_candidates() -> list[dict]:
+    return get("candidate",
+               select="source_id,external_id,url,title,payload,found_at",
+               source_id=f"in.({','.join(FILING_SOURCES)})",
+               **{"payload->>kw_hit": "eq.true"},
+               order="found_at.desc", limit="2000")
+
+
+def _filing_key(row: dict) -> str:
+    snapshot = (row.get("payload") or {}).get("registry_snapshot") or {}
+    if row["source_id"] == "tceq-permit-portal" and snapshot.get("addnId"):
+        return f"tceq-permit-portal:{snapshot['addnId']}"
+    return f"{row['source_id']}:{row['external_id']}"
+
+
+def build_filings(rows: list[dict]) -> list[dict]:
+    """One row per registry record: newest snapshot wins, first sighting kept.
+
+    A filing is what the agency registry lists, verbatim. It is not a verified
+    fact about equipment, capacity or operation.
+    """
+    grouped: dict[str, dict] = {}
+    for row in sorted(rows, key=lambda r: str(r.get("found_at") or "")):
+        key = _filing_key(row)
+        snapshot = (row.get("payload") or {}).get("registry_snapshot") or {}
+        entry = grouped.get(key)
+        first_seen = entry["first_seen"] if entry else row.get("found_at")
+        grouped[key] = {
+            "id": key,
+            "source_id": row["source_id"],
+            "agency": FILING_SOURCES.get(row["source_id"], row["source_id"]),
+            "title": row.get("title"),
+            "name": snapshot.get("aiPermittedName"),
+            "record_no": snapshot.get("aiIdNumber"),
+            "registry_status": snapshot.get("pspStatusCd"),
+            "county": snapshot.get("reCnty"),
+            "city": snapshot.get("reCityName"),
+            "regulated_entity": snapshot.get("reName"),
+            "url": row.get("url"),
+            "first_seen": first_seen,
+            "last_changed": row.get("found_at"),
+        }
+    filings = sorted(grouped.values(),
+                     key=lambda f: (str(f["first_seen"] or ""), f["id"]),
+                     reverse=True)
+    return filings[:FILINGS_LIMIT]
+
+
+def write_filings(out: str, filings: list[dict]) -> None:
+    os.makedirs(out, exist_ok=True)
+    with open(f"{out}/filings.json", "w") as fp:
+        json.dump({
+            "license": "CC BY 4.0",
+            "cite_as": CITE,
+            "generated": date.today().isoformat(),
+            "classification": "registry_record_not_btw_verified",
+            "note": "Keyword-matched records as listed by agency registries, "
+                    "first seen by the BTW watchers. A filing is not verified "
+                    "equipment, capacity or operation.",
+            "filings": filings,
+        }, fp, indent=2, default=str)
+
+
 def facility_mw(f: dict) -> float:
     return sum(float(u["total_mw"])
                if u.get("total_mw") is not None
@@ -359,7 +435,10 @@ def main():
     coverage = fetch_coverage()
     summary = build_summary(facilities, aggregates)
     write_files(args.out, facilities, events, summary, coverage, announcements)
+    filings = build_filings(fetch_filing_candidates())
+    write_filings(args.out, filings)
     print(f"published {len(facilities)} facilities, {len(events)} events, "
+          f"{len(filings)} registry filings, "
           f"{len(announcements)} third-party announcements, "
           f"{len(coverage)} sources in coverage, "
           f"operating_gw={summary['operating_gw']} -> {args.out}/")

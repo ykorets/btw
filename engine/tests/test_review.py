@@ -146,3 +146,39 @@ def test_incomplete_staging_is_held_out_of_manifest():
     assert events == [good_event]
     assert {(item["kind"], item["id"]) for item in held} == {
         ("permit", "permit-staged"), ("event", "event-bad")}
+
+
+def test_auto_promote_holds_nothing_ready_and_skips_manifest(monkeypatch):
+    calls = []
+    monkeypatch.setattr(review, "staged_units", lambda: [])
+    monkeypatch.setattr(review, "staged_permits", lambda: [])
+    monkeypatch.setattr(review, "staged_events", lambda: [])
+    monkeypatch.setattr(review, "_rest", lambda *a, **k: calls.append(a))
+    assert review.auto_promote("a" * 40)["status"] == "nothing"
+    assert calls == []
+
+
+def test_auto_promote_seals_then_promotes_in_one_rpc(monkeypatch):
+    calls = []
+
+    def fake_rest(method, path, **kwargs):
+        calls.append((method, path, kwargs.get("json")))
+        if path == "rpc/btw_create_review_manifest":
+            return Response([{"review_id": REVIEW_ID,
+                              "manifest_hash": MANIFEST_HASH}])
+        return Response({"status": "promoted", "events": 1})
+
+    event = {"id": "e1", "headline": "Permit filed",
+             "source_url": "https://example.gov/doc.pdf"}
+    monkeypatch.setattr(review, "staged_units", lambda: [])
+    monkeypatch.setattr(review, "staged_permits", lambda: [])
+    monkeypatch.setattr(review, "staged_events", lambda: [event])
+    monkeypatch.setattr(review, "_rest", fake_rest)
+    monkeypatch.delenv("RUN_URL", raising=False)
+    result = review.auto_promote("C" * 40)
+    assert result["status"] == "promoted"
+    assert [c[1] for c in calls] == [
+        "rpc/btw_create_review_manifest", "rpc/btw_promote_review"]
+    assert calls[1][2] == {"p_review_id": REVIEW_ID,
+                           "p_manifest_hash": MANIFEST_HASH,
+                           "p_merge_commit_sha": "c" * 40}
