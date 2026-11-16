@@ -79,6 +79,13 @@ enforced by the database, not by convention.
   inline) → **merge webhook promotes staging→published in Postgres** → export
   regenerates the mirror → Pages build publishes files. Merge is still the
   publish button; the DB is still the only writer of record.
+- **Amendment 2026-11-16 (owner decision): no human merge.** The daily run
+  now calls `review --auto`: truth-gate-passing staged facts are sealed and
+  promoted in the same atomic RPC (the DB gate stays fail-closed; held rows
+  are reported in Telegram), then the mirror is regenerated and the site
+  rebuilt. Keyword registry candidates are published daily as
+  `filings.json` ("New filings on watch"), labeled as registry records,
+  not verified facts. The PR merge path still works for manual batches.
 - Community corrections: PRs against the mirror are ingested by the bot as
   staged proposals (with the contributor credited), never merged directly.
 - A repo↔DB consistency check runs on every export and **blocks publish** on

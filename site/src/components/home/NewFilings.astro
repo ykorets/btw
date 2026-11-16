@@ -1,0 +1,26 @@
+---
+import { dateLabel } from "../../lib/facts";
+const { data } = Astro.props;
+const filings = (data?.filings || []).slice(0, 12);
+const title = (v?: string | null) => (v || "").toLowerCase().replace(/\b\w/g, (c) => c.toUpperCase());
+const place = (f: any) => [title(f.city), f.county ? `${title(f.county)} County` : null].filter(Boolean).join(", ");
+---
+{filings.length > 0 && (
+<section id="filings"><div class="wrap"><div class="kicker">New filings on watch</div><h2>What agencies received, as listed</h2>
+<p class="sub">Keyword-matched records from agency registries, updated daily and dated when BTW first saw them. A filing is the agency's listing only. It is not verified equipment, capacity or operation.</p>
+<ul class="feed">{filings.map((f: any) => (
+  <li>
+    <span class="d">{dateLabel(f.first_seen)}</span>
+    <span>{f.name || f.title}{f.record_no ? ` · ${f.agency} ${f.record_no}` : ` · ${f.agency}`}{f.registry_status ? ` · ${String(f.registry_status).toLowerCase()}` : ""}{place(f) ? ` · ${place(f)}` : ""}</span>
+    {f.url && <a class="doc" href={f.url} target="_blank" rel="noopener">registry ↗</a>}
+  </li>
+))}</ul>
+<p class="sub"><a href="/api/v1/filings.json">All filings as JSON</a></p>
+</div></section>
+)}
+<style>
+  @media(max-width:480px){
+    .feed li{display:grid;grid-template-columns:86px minmax(0,1fr);gap:6px 12px}
+    .feed a.doc{grid-column:2;margin-left:0;justify-self:start}
+  }
+</style>

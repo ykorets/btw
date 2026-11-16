@@ -360,6 +360,43 @@ def open_pr() -> None:
         print("AUTOMERGE=true set, but reviews still require a human merge.")
 
 
+# ------------------------------------------------------------------- auto --
+
+def auto_promote(approved_by_sha: str) -> dict:
+    """Owner decision 2026-11-16: publish without a human merge.
+
+    Same gates as the PR path, minus the human: rows that fail the client
+    truth gate are held, the database re-checks the manifest (fail-closed) and
+    promotion stays one atomic RPC. The engine commit that ran the gate is
+    recorded as the approving SHA, so every promotion stays auditable.
+    """
+    day = dt.date.today().isoformat()
+    units, permits, events, held = partition_review_ready(
+        staged_units(), staged_permits(), staged_events())
+    for item in held:
+        print(f"HOLD {item['kind']} {item['label']}: "
+              f"{len(item['violations'])} truth violation(s)")
+    if not units and not permits and not events:
+        print("nothing to promote today")
+        return {"status": "nothing", "held": len(held)}
+    manifest = create_review_manifest(day, units, permits, events)
+    run_url = os.environ.get("RUN_URL")
+    if run_url:
+        _rest("PATCH", "review", params={"id": f"eq.{manifest['review_id']}"},
+              json={"pr_url": run_url})
+    result = _rest("POST", "rpc/btw_promote_review", json={
+        "p_review_id": manifest["review_id"],
+        "p_manifest_hash": manifest["manifest_hash"],
+        "p_merge_commit_sha": approved_by_sha.lower(),
+    }).json()
+    if not isinstance(result, dict):
+        raise RuntimeError(f"promotion RPC returned an unexpected payload: {result!r}")
+    print(f"auto-promoted {len(units)} unit(s), {len(permits)} permit(s), "
+          f"{len(events)} event(s); held {len(held)}")
+    print(json.dumps(result, sort_keys=True))
+    return result
+
+
 # ---------------------------------------------------------------- promote --
 
 def promote(review_file: str | Path, merge_sha: str) -> dict:
@@ -381,17 +418,24 @@ def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--open", action="store_true")
     parser.add_argument("--promote", action="store_true")
+    parser.add_argument("--auto", action="store_true",
+                        help="promote truth-gate-passing staged facts without a PR")
     parser.add_argument("--review-file")
     parser.add_argument("--merge-sha")
     args = parser.parse_args()
     if args.open:
         open_pr()
+    elif args.auto:
+        sha = args.merge_sha or os.environ.get("GITHUB_SHA", "")
+        if not re.fullmatch(r"[0-9a-fA-F]{7,64}", sha):
+            parser.error("--auto requires --merge-sha or GITHUB_SHA")
+        auto_promote(sha)
     elif args.promote:
         if not args.review_file or not args.merge_sha:
             parser.error("--promote requires --review-file and --merge-sha")
         promote(args.review_file, args.merge_sha)
     else:
-        parser.error("need --open or --promote")
+        parser.error("need --open, --auto or --promote")
 
 
 if __name__ == "__main__":

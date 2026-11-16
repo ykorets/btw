@@ -12,6 +12,7 @@ export const GET = () => json({
   datasets: {
     facilities: "/api/v1/facilities.json",
     announcements: "/api/v1/announcements.json",
+    filings: "/api/v1/filings.json",
     events: "/api/v1/events.json",
     changes: "/api/v1/changes.json",
     research_projects: "/api/v1/research-projects.json",
