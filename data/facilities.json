@@ -150,6 +150,91 @@
       ]
     },
     {
+      "slug": "nexus-data-center-hubbard-hill-tx",
+      "name": "Nexus Data Center Hubbard",
+      "aliases": [],
+      "state": "TX",
+      "county": "Hill",
+      "geo": null,
+      "developer": null,
+      "offtaker": null,
+      "status": "filed",
+      "flags": [],
+      "first_permit_filed": null,
+      "first_power": null,
+      "unit": [
+        {
+          "oem": "GE",
+          "fuel": "natural gas",
+          "basis": "permitted",
+          "model": "Frame 7HA.01",
+          "mw_each": 493.9,
+          "total_mw": null,
+          "unit_count": 7,
+          "hours_permitted": null,
+          "verification_state": "source_asserted"
+        },
+        {
+          "oem": "GE",
+          "fuel": "natural gas",
+          "basis": "permitted",
+          "model": "Frame 7F.04",
+          "mw_each": 353.2,
+          "total_mw": null,
+          "unit_count": 4,
+          "hours_permitted": null,
+          "verification_state": "source_asserted"
+        },
+        {
+          "oem": "GE",
+          "fuel": "natural gas",
+          "basis": "permitted",
+          "model": "LM6000 PC",
+          "mw_each": 63.7,
+          "total_mw": null,
+          "unit_count": 8,
+          "hours_permitted": null,
+          "verification_state": "source_asserted"
+        }
+      ],
+      "permit": [
+        {
+          "status": "DRAFT",
+          "filed_at": null,
+          "authority": "TCEQ",
+          "issued_at": null,
+          "permit_no": "183046",
+          "permit_type": null,
+          "verification_state": "source_asserted"
+        }
+      ],
+      "sources": [
+        {
+          "url": "https://records.tceq.texas.gov/cs/idcplg?IdcService=TCEQ_APD_SEARCH_GET_FILE&xAPDParent=8647494&searchType=External",
+          "archive_url": null,
+          "sha256": "377e6525ca8a3e9d59952a5aac6810e2f1fd339b9b17a1659f6bc8e1905ad08e",
+          "archived_at": "2026-11-16T22:18:34.283462+00:00",
+          "archive_status": "preserved_private",
+          "doc_genre": "tceq_special_conditions",
+          "facts": [
+            "unit.model",
+            "unit.oem",
+            "unit.fuel",
+            "unit.unit_count",
+            "unit.mw_each",
+            "unit.basis",
+            "unit.verification_state",
+            "permit.authority",
+            "permit.permit_no",
+            "permit.status",
+            "permit.verification_state"
+          ],
+          "quote": "All turbines are GE Frame 7HA.01, each with an annual average heat input of 2,779.3 million British thermal units per hour (MMBtu/hr) and each with a rated gross nominal capacity of 493.9 megawatts (MW).",
+          "page": 1
+        }
+      ]
+    },
+    {
       "slug": "xai-colossus-1",
       "name": "xAI Colossus 1",
       "aliases": [
