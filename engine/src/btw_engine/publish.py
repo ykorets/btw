@@ -13,6 +13,7 @@ import csv
 import hashlib
 import json
 import os
+import re
 import sys
 from pathlib import Path
 from datetime import date
@@ -214,6 +215,13 @@ FILING_SOURCES = {
     "courtlistener": "CourtListener",
 }
 FILINGS_LIMIT = 200
+# The TCEQ portal keyword search is fuzzy ("data center" also returns
+# collision centers, crematories, hospitals). Publish only names that read as
+# a data center, a compute campus or a power plant.
+RELEVANT_NAME = re.compile(
+    r"DATA ?CENTER|DATACENTER|TECHNOLOGY CENTER|TECH CENTER|ENERGY CENTER|"
+    r"POWER (PLANT|CENTER|STATION|FACILITY)|GENERATING|ENERGY SUPPORT|COMPUT|"
+    r"HYPERSCALE|CLOUD|FERMI|\bAI\b|DIGITAL|CAMPUS", re.I)
 
 
 def fetch_filing_candidates() -> list[dict]:
@@ -226,9 +234,19 @@ def fetch_filing_candidates() -> list[dict]:
 
 def _filing_key(row: dict) -> str:
     snapshot = (row.get("payload") or {}).get("registry_snapshot") or {}
-    if row["source_id"] == "tceq-permit-portal" and snapshot.get("addnId"):
-        return f"tceq-permit-portal:{snapshot['addnId']}"
+    if row["source_id"] == "tceq-permit-portal":
+        if snapshot.get("aiIdNumber"):
+            return f"tceq-permit-portal:{snapshot['aiIdNumber']}"
+        if snapshot.get("addnId"):
+            return f"tceq-permit-portal:{snapshot['addnId']}"
     return f"{row['source_id']}:{row['external_id']}"
+
+
+def is_relevant_filing(row: dict) -> bool:
+    if row["source_id"] != "tceq-permit-portal":
+        return True
+    snapshot = (row.get("payload") or {}).get("registry_snapshot") or {}
+    return bool(RELEVANT_NAME.search(snapshot.get("aiPermittedName") or ""))
 
 
 def build_filings(rows: list[dict]) -> list[dict]:
@@ -238,6 +256,7 @@ def build_filings(rows: list[dict]) -> list[dict]:
     fact about equipment, capacity or operation.
     """
     grouped: dict[str, dict] = {}
+    rows = [row for row in rows if is_relevant_filing(row)]
     for row in sorted(rows, key=lambda r: str(r.get("found_at") or "")):
         key = _filing_key(row)
         snapshot = (row.get("payload") or {}).get("registry_snapshot") or {}
