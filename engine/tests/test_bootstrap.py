@@ -192,3 +192,24 @@ def test_planned_rows_and_receipts_pass_the_promotion_truth_gate():
     facility = {"slug": plan["facility"]["slug"], "unit": units,
                 "permit": [permit]}
     assert provenance_violations([facility], provenance) == []
+
+
+def test_intake_retries_provider_rate_limits_then_gives_up_on_other_errors(monkeypatch):
+    monkeypatch.setattr(intake.time, "sleep", lambda _s: None)
+    calls = []
+
+    def flaky():
+        calls.append(1)
+        if len(calls) < 3:
+            raise RuntimeError("litellm.RateLimitError: geminiException")
+        return "ok"
+    assert intake.with_retry(flaky) == "ok" and len(calls) == 3
+
+    def broken():
+        raise ValueError("bad pdf")
+    try:
+        intake.with_retry(broken)
+    except ValueError:
+        pass
+    else:
+        raise AssertionError("non-retryable error must surface")

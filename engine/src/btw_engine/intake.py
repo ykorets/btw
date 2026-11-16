@@ -21,6 +21,7 @@ from __future__ import annotations
 
 import argparse
 import os
+import time
 
 from btw_engine import fetch
 from btw_engine.bootstrap import tceq_filings
@@ -48,6 +49,42 @@ def plan_downloads(found: list[tuple[dict, dict]], known_urls: set[str],
         out.append((filing, doc))
     out.sort(key=lambda item: GENRE_PRIORITY.index(item[1]["genre"]))
     return out[:limit]
+
+
+RETRYABLE = ("RateLimit", "ServiceUnavailable", "overloaded", "429", "503")
+
+
+def with_retry(fn, *args, attempts: int = 4, wait: float = 45.0, **kwargs):
+    """Provider rate limits are routine on a 30-document batch: back off."""
+    for attempt in range(attempts):
+        try:
+            return fn(*args, **kwargs)
+        except Exception as exc:  # noqa: BLE001 — classify by message
+            if attempt == attempts - 1 or not any(
+                    marker in str(exc) for marker in RETRYABLE):
+                raise
+            time.sleep(wait * (attempt + 1))
+    raise AssertionError("unreachable")
+
+
+def unextracted_documents(limit: int) -> list[dict]:
+    """Archived TCEQ documents with no claims yet (an earlier extraction
+    failed, e.g. a provider rate limit). They are retried before new ones."""
+    docs = _rest("GET", "document", params={
+        "select": "id,sha256,r2_key,doc_genre,url",
+        "source_id": f"eq.{SOURCE_ID}",
+        "doc_genre": f"in.({','.join(GENRE_PRIORITY)})",
+        "order": "fetched_at.asc"}).json()
+    if not docs:
+        return []
+    with_claims = set()
+    ids = [d["id"] for d in docs]
+    for i in range(0, len(ids), 100):
+        rows = _rest("GET", "claim", params={
+            "select": "document_id",
+            "document_id": f"in.({','.join(ids[i:i + 100])})"}).json()
+        with_claims |= {r["document_id"] for r in rows}
+    return [d for d in docs if d["id"] not in with_claims][:limit]
 
 
 def llm_available() -> bool:
@@ -91,18 +128,38 @@ def run(max_new: int = 30, dry_run: bool = False) -> dict:
     use_llm = llm_available()
     if not use_llm:
         print("intake: LLM keys absent — deterministic extraction only")
-    for filing, doc in todo:
+
+    def extract(row: dict) -> dict:
+        if row["r2_key"].endswith(".pdf") and use_llm:
+            return with_retry(extract_document, row, quorum=True)
+        return extract_deterministic_document(row)
+
+    retry = unextracted_documents(max_new)
+    stats["retried"] = 0
+    for row in retry:
+        try:
+            result = extract(row)
+            stats["retried"] += 1
+            print(f"OK   retry {row['sha256'][:12]} [{row['doc_genre']}]: "
+                  f"{result['validated']}/{result['claims']} claims validated")
+        except Exception as exc:  # noqa: BLE001 — batch continues
+            stats["failed"] += 1
+            print(f"FAIL retry {row['sha256'][:12]}: {exc}")
+
+    for filing, doc in todo[:max(0, max_new - len(retry))]:
         label = f"{filing['record_no']} {doc['title']} ({doc['date']})"
         try:
             sha, note = fetch.fetch_one(s3, doc["url"], SOURCE_ID, doc["genre"])
             stats["archived"] += 1
+            if note == "cached":
+                # The same file is filed under each permit number of the
+                # project (NSR, PSD, GHG): extract it once.
+                print(f"SAME {label}: {sha[:12]} already archived")
+                continue
             row = _rest("GET", "document", params={
                 "select": "id,sha256,r2_key,doc_genre,url",
                 "sha256": f"eq.{sha}"}).json()[0]
-            if row["r2_key"].endswith(".pdf") and use_llm:
-                result = extract_document(row, quorum=True)
-            else:
-                result = extract_deterministic_document(row)
+            result = extract(row)
             stats["extracted"] += 1
             print(f"OK   {label}: {sha[:12]} ({note}); "
                   f"{result['validated']}/{result['claims']} claims validated")
