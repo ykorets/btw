@@ -145,6 +145,120 @@ def document_pages(body: bytes, r2_key: str) -> list[str]:
     return []
 
 
+TCEQ_PERMIT_LIST = re.compile(
+    r"Permit Numbers\s*:?\s*((?:[0-9A-Z]{4,}(?:\s*,\s*and\s+|\s*,\s*|\s+and\s+)?){2,})")
+TCEQ_HEADER = re.compile(
+    r"TCEQ Interoffice Memorandum|Texas\s+Commission\s+on\s+Environmental\s+Quality")
+TCEQ_COHORT = re.compile(
+    r"(?P<word>[A-Z][a-z]+(?:[- ][a-z]+)?)\s*\((?P<count>\d{1,3})\)\s+"
+    r"(?P<fuel>natural gas|diesel)[- ]fired\s+"
+    r"(?P<kind>CTGs|combustion turbine generators|combustion turbines|turbines|"
+    r"reciprocating internal combustion engines|RICE|engines)\b"
+    r"(?P<body>.{0,400}?)"
+    r"All (?:turbines|engines|units|RICE) are\s+"
+    r"(?P<oem>GE Vernova|GE|General Electric|Siemens Energy|Siemens|"
+    r"Mitsubishi Power|Mitsubishi|Solar Turbines|Solar|Caterpillar|"
+    r"W[a\u00e4]rtsil[a\u00e4]|INNIO Jenbacher|Jenbacher|Bergen|Ansaldo Energia|"
+    r"Ansaldo|Baker Hughes|Rolls-Royce|Cummins)\s+(?:Frame\s+|Model\s+)?"
+    r"(?P<model>[A-Z0-9][A-Za-z0-9.\-]*(?:\s(?:PC|PF|PG|Sprint|DLE|SAC|XPRESS))?)",
+    re.S)
+OEM_NAMES = (r"GE Vernova|General Electric \(GE\)|General Electric|GE|"
+             r"Siemens Energy|Siemens|Mitsubishi Power|Mitsubishi|"
+             r"Solar Turbines|Caterpillar|W[a\u00e4]rtsil[a\u00e4]|"
+             r"INNIO Jenbacher|Jenbacher|Bergen|Ansaldo Energia|Ansaldo|"
+             r"Baker Hughes|Rolls-Royce|Cummins|MAN Energy Solutions")
+# "Twenty-five (25) natural gas fired Bergen B36:45L9AG model engines with
+# approximately 5.18 megawatt (MW) capacity each."
+TCEQ_COHORT_MODEL_FIRST = re.compile(
+    r"(?P<word>[A-Z][a-z]+(?:-[a-z]+)?)\s*\((?P<count>\d{1,3})\)\s+"
+    r"(?P<fuel>natural gas|diesel)[- ]fired\s+(?P<oem>" + OEM_NAMES + r")\s+"
+    r"(?P<model>[A-Z0-9][A-Za-z0-9:.\-]*(?:\s(?:PC|PF|PG|Sprint|DLE|PLUS|GEN \d))?)"
+    r"\s+model\s+(?:engines|turbines|combustion turbines|combustion turbine "
+    r"generators|reciprocating engines)\s+with\s+approximately\s+"
+    r"(?P<mw>\d[\d,]*(?:\.\d+)?)\s*(?:megawatts?|MW)(?:\s*\(MW\))?\s+capacity\s*"
+    r"[\"\u201c\u2022]?\s*each")
+# "Four 224 MW General Electric (GE) model 7F.05 combustion turbine generators"
+TCEQ_COHORT_COUNT_WORD = re.compile(
+    r"\b(?P<word>Two|Three|Four|Five|Six|Seven|Eight|Nine|Ten|Eleven|Twelve|"
+    r"Thirteen|Fourteen|Fifteen|Sixteen|Twenty)\s+(?P<mw>\d[\d,]*(?:\.\d+)?)"
+    r"[- ]MW\s+(?P<oem>" + OEM_NAMES + r")\s+(?:model\s+)?"
+    r"(?P<model>[A-Z0-9][A-Za-z0-9.\-]*)\s+(?:combustion turbine generators|"
+    r"combustion turbines|turbines|engines)")
+TCEQ_CAPACITY = re.compile(
+    r"\Aeach.{0,240}?capacity of\s+(?P<mw>\d[\d,]*(?:\.\d+)?)\s*"
+    r"(?:megawatts|MW)\b(?:\s*\((?:MW|MWe)\))?", re.S)
+
+
+def tceq_unit_cohorts(text: str, page_no: int) -> list[dict]:
+    """Exact TCEQ special-condition cohort sentences -> unit claims.
+
+    One sentence carries count, manufacturer, model and per-unit capacity,
+    so every claim keeps the full sentence as its quote: the model token in
+    the quote is what binds the numbers to the right cohort downstream.
+    """
+    out = []
+    for match in TCEQ_COHORT.finditer(text):
+        end = match.end()
+        rest = text[end:].lstrip(" ,")
+        cap = TCEQ_CAPACITY.match(rest)
+        if cap:
+            end = len(text) - len(rest) + cap.end()
+        quote = text[match.start():end].strip()
+        if len(quote) > 1800:
+            continue
+        model = match.group("model").rstrip(".,")
+        oem = match.group("oem")
+        hint = f"{oem} {model}"
+        count = int(match.group("count"))
+        word = _WORD_NUMS.get(match.group("word").lower())
+        if word is not None and word != count:
+            continue  # "Four (5)" is a typo, not evidence
+        base = {"entity_hint": hint, "unit": None, "quote": quote,
+                "page": page_no}
+        out.append({**base, "field": "unit.count", "value": str(count),
+                    "value_num": count})
+        out.append({**base, "field": "unit.oem", "value": oem,
+                    "value_num": None})
+        out.append({**base, "field": "unit.model", "value": model,
+                    "value_num": None})
+        out.append({**base, "field": "unit.fuel",
+                    "value": match.group("fuel").lower(), "value_num": None})
+        if cap:
+            mw = float(cap.group("mw").replace(",", ""))
+            out.append({**base, "field": "unit.mw_each", "value": f"{mw:g}",
+                        "value_num": mw, "unit": "MW"})
+    for pattern in (TCEQ_COHORT_MODEL_FIRST, TCEQ_COHORT_COUNT_WORD):
+        for match in pattern.finditer(text):
+            groups = match.groupdict()
+            word = _WORD_NUMS.get(groups["word"].lower().replace("-", " ").split()[0])
+            if "-" in groups["word"]:
+                tens, ones = groups["word"].lower().split("-", 1)
+                word = (_WORD_NUMS.get(tens, 0) + _WORD_NUMS.get(ones, 0)) or None
+            count = int(groups["count"]) if groups.get("count") else word
+            if count is None or (word is not None and word != count):
+                continue
+            oem = "GE" if "(GE)" in groups["oem"] else groups["oem"]
+            model = groups["model"].rstrip(".,")
+            quote = match.group(0)
+            base = {"entity_hint": f"{oem} {model}", "unit": None,
+                    "quote": quote, "page": page_no}
+            # A bare "Four" has no digit on the page; the extractor's numeric
+            # inventory reads number words, so the count still re-anchors.
+            out.append({**base, "field": "unit.count", "value": str(count),
+                        "value_num": count})
+            out.append({**base, "field": "unit.oem", "value": oem,
+                        "value_num": None})
+            out.append({**base, "field": "unit.model", "value": model,
+                        "value_num": None})
+            if groups.get("fuel"):
+                out.append({**base, "field": "unit.fuel",
+                            "value": groups["fuel"].lower(), "value_num": None})
+            mw = float(groups["mw"].replace(",", ""))
+            out.append({**base, "field": "unit.mw_each", "value": f"{mw:g}",
+                        "value_num": mw, "unit": "MW"})
+    return out
+
+
 def deterministic_claims(pages: list[str]) -> list[dict]:
     """Exact regulatory phrases -> controlled permit claims.
 
@@ -175,6 +289,41 @@ def deterministic_claims(pages: list[str]) -> list[dict]:
             "quote": quote,
             "page": page,
         })
+
+    # TCEQ NSR documents (special conditions, preliminary determination
+    # summary, MAERT): permit number lists, agency header, draft status and
+    # turbine/engine cohorts written as "Four (4) natural gas fired CTGs ...
+    # All turbines are GE Frame 7F.04, each ... capacity of 353.2 megawatts".
+    for page_no, text in enumerate(pages, start=1):
+        for match in TCEQ_PERMIT_LIST.finditer(text):
+            # pypdf glues the next word on ("GHGPSDTX269Page"): a number
+            # ends where a capitalized word begins.
+            numbers = [n for n in re.findall(
+                r"[0-9A-Z]{4,}?(?=[A-Z][a-z]|[^0-9A-Za-z]|$)",
+                text[match.start(1):match.end(1) + 2])
+                       if re.search(r"\d", n)]
+            for permit_no in numbers:
+                emit(page=page_no, quote=match.group(0), field="permit.no",
+                     value=permit_no, permit_no=permit_no)
+        match = TCEQ_HEADER.search(text)
+        # Pages with the "(TCEQ)" form are handled below, permit-scoped.
+        if match and not re.search(
+                r"Environmental\s+Quality\s*\(TCEQ\)", text, flags=re.I):
+            emit(page=page_no, quote=match.group(0),
+                 field="permit.authority", value="TCEQ")
+        for match in re.finditer(
+                r"has determined that your proposed (?:emissions|facilit(?:y|ies)) "
+                r"(?:are|is) authorized by (?:this|the) standard permit", text):
+            emit(page=page_no, quote=match.group(0), field="permit.status",
+                 value="authorized under standard permit")
+        for match in re.finditer(r"Preliminary Determination Summary", text):
+            emit(page=page_no, quote=match.group(0), field="permit.status",
+                 value="preliminary determination")
+        for claim in tceq_unit_cohorts(text, page_no):
+            key = (claim["field"], _norm(claim["value"]), _norm(claim["quote"]))
+            if key not in seen:
+                seen.add(key)
+                out.append(claim)
 
     permit_no_patterns = (
         r"(?:Standard Permit Registration (?:Number|No\.)|"
