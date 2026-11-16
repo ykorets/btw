@@ -13,7 +13,7 @@ bootstrap.py turns the validated claims into new facilities; normalize.py
 keeps updating facilities that already exist.
 
 Env: BTW_API_URL, BTW_API_KEY, BTW_ACCESS_CLIENT_ID/SECRET, R2_*; optional
-GEMINI_API_KEY + ANTHROPIC_API_KEY for the LLM pass.
+ANTHROPIC_API_KEY for the LLM pass (extractor and cross-checker roles).
 Usage: python -m btw_engine.intake [--max-new 30] [--dry-run]
 """
 
@@ -88,8 +88,10 @@ def unextracted_documents(limit: int) -> list[dict]:
 
 
 def llm_available() -> bool:
-    return bool(os.environ.get("GEMINI_API_KEY")
-                and os.environ.get("ANTHROPIC_API_KEY"))
+    from btw_engine.llm import load_roles, provider_key_present
+    roles = load_roles()
+    return all(provider_key_present(roles[r]["model"])
+               for r in ("default_extractor", "cross_checker"))
 
 
 def run(max_new: int = 30, dry_run: bool = False) -> dict:
