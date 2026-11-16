@@ -287,10 +287,31 @@ def test_build_filings_dedupes_registry_records_and_keeps_first_seen():
     ]
     filings = build_filings(rows)
     assert [f["id"] for f in filings] == [
-        "tceq-permit-portal:441601272026317", "opsb-dockets:26-0001-EL-BGN"]
+        "tceq-permit-portal:185938", "opsb-dockets:26-0001-EL-BGN"]
     starwood = filings[0]
     assert starwood["registry_status"] == "ISSUED PERMIT"
     assert starwood["first_seen"] == "2026-11-15T11:00:00Z"
     assert starwood["last_changed"] == "2026-12-01T11:00:00Z"
     assert starwood["agency"] == "TCEQ" and starwood["record_no"] == "185938"
     assert filings[1]["agency"] == "Ohio OPSB" and filings[1]["name"] is None
+
+
+def test_build_filings_drops_fuzzy_tceq_matches_that_are_not_power_or_compute():
+    from btw_engine.publish import build_filings
+
+    def row(name, no):
+        return {"source_id": "tceq-permit-portal", "external_id": no,
+                "url": None, "title": name, "found_at": "2026-11-14T00:00:00Z",
+                "payload": {"kw_hit": True, "registry_snapshot": {
+                    "addnId": no, "aiIdNumber": no, "aiPermittedName": name}}}
+
+    names = [f["name"] for f in build_filings([
+        row("QUALITY COLLISION REPAIR CTR", "1"),
+        row("HOUSTON CREMATION CENTER", "2"),
+        row("CAMINO TECHNOLOGY CENTER", "185913"),
+        row("FREESTONE ENERGY CENTER", "185939"),
+        row("WOODROW DATA CENTER & POWER PLANT", "3"),
+    ])]
+    assert sorted(names) == ["CAMINO TECHNOLOGY CENTER",
+                             "FREESTONE ENERGY CENTER",
+                             "WOODROW DATA CENTER & POWER PLANT"]
