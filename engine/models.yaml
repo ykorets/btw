@@ -25,13 +25,13 @@ roles:
     note: independent second pass, different model from the extractor; requires ANTHROPIC_API_KEY
 
   escalation:
-    model: "anthropic/claude-sonnet-4-5"
+    model: "anthropic/claude-sonnet-5-5"
     temperature: 0
     max_tokens: 8192
     note: disagreements and low-OCR documents only
 
   digest_writer:
-    model: "anthropic/claude-sonnet-4-5"
+    model: "anthropic/claude-sonnet-5-5"
     temperature: 0.4
     max_tokens: 4096
     note: BTW Weekly drafts; voice per site/brand/design-system.html §06
