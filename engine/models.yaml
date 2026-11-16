@@ -5,22 +5,24 @@
 # price table before M3 evals; evals pick final assignments.
 #
 # Quorum policy (implemented in extractor, M3): default_extractor and
-# cross_checker run independently — different families ON PURPOSE. Agreement
+# cross_checker run independently — two different models (owner decision
+# 2026-11-16: Anthropic only, Gemini removed; independence now comes from
+# different model generations, not different vendors). Agreement
 # after anchor validation -> auto-accept claim; disagreement -> escalation
 # model; still ambiguous -> human review.
 
 roles:
   default_extractor:
-    model: "gemini/gemini-2.5-flash"
+    model: "anthropic/claude-haiku-5-5"
     temperature: 0
     max_tokens: 32768  # thinking tokens count against this; 8192 truncated output
-    note: cheap volume extraction; requires GEMINI_API_KEY
+    note: cheap volume extraction ($0.10/$0.50 per MTok up to 100K prompt); requires ANTHROPIC_API_KEY
 
   cross_checker:
     model: "anthropic/claude-haiku-4-5"
     temperature: 0
     max_tokens: 8192
-    note: independent second pass, different family; requires ANTHROPIC_API_KEY
+    note: independent second pass, different model from the extractor; requires ANTHROPIC_API_KEY
 
   escalation:
     model: "anthropic/claude-sonnet-4-5"
