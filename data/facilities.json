@@ -167,10 +167,10 @@
           "oem": "GE",
           "fuel": "natural gas",
           "basis": "permitted",
-          "model": "Frame 7HA.01",
-          "mw_each": 493.9,
+          "model": "LM6000 PC",
+          "mw_each": 63.7,
           "total_mw": null,
-          "unit_count": 7,
+          "unit_count": 8,
           "hours_permitted": null,
           "verification_state": "source_asserted"
         },
@@ -189,10 +189,10 @@
           "oem": "GE",
           "fuel": "natural gas",
           "basis": "permitted",
-          "model": "LM6000 PC",
-          "mw_each": 63.7,
+          "model": "Frame 7HA.01",
+          "mw_each": 493.9,
           "total_mw": null,
-          "unit_count": 8,
+          "unit_count": 7,
           "hours_permitted": null,
           "verification_state": "source_asserted"
         }
@@ -204,7 +204,7 @@
           "authority": "TCEQ",
           "issued_at": null,
           "permit_no": "183046",
-          "permit_type": null,
+          "permit_type": "Special Conditions Permit",
           "verification_state": "source_asserted"
         }
       ],
@@ -217,19 +217,20 @@
           "archive_status": "preserved_private",
           "doc_genre": "tceq_special_conditions",
           "facts": [
-            "unit.model",
             "unit.oem",
+            "unit.model",
             "unit.fuel",
             "unit.unit_count",
             "unit.mw_each",
             "unit.basis",
             "unit.verification_state",
-            "permit.authority",
             "permit.permit_no",
+            "permit.authority",
             "permit.status",
+            "permit.permit_type",
             "permit.verification_state"
           ],
-          "quote": "All turbines are GE Frame 7HA.01, each with an annual average heat input of 2,779.3 million British thermal units per hour (MMBtu/hr) and each with a rated gross nominal capacity of 493.9 megawatts (MW).",
+          "quote": "Eight (8) natural gas fired CTGs to operate in simple cycle mode (EPNs CT-D1, CT-D2, CT-C.D3, CT-D4, CT-D5, CT-D6, CT-D7, and CT-D8).  All turbines are GE LM6000 PC, each with an annual average heat input of 520.1 million British thermal units per hour (MMBtu/hr) and each with a ",
           "page": 1
         }
       ]
