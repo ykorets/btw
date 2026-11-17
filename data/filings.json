@@ -1,10 +1,25 @@
 {
   "license": "CC BY 4.0",
   "cite_as": "Behind the Watt, behindthewatt.com, CC BY 4.0",
-  "generated": "2026-11-16",
+  "generated": "2026-11-17",
   "classification": "registry_record_not_btw_verified",
   "note": "Keyword-matched records as listed by agency registries, first seen by the BTW watchers. A filing is not verified equipment, capacity or operation.",
   "filings": [
+    {
+      "id": "tceq-permit-portal:184935",
+      "source_id": "tceq-permit-portal",
+      "agency": "TCEQ",
+      "title": "WILD HORSE RANCH ENERGY CENTER \u2014 184935 (ISSUED PERMIT)",
+      "name": "WILD HORSE RANCH ENERGY CENTER",
+      "record_no": "184935",
+      "registry_status": "ISSUED PERMIT",
+      "county": "KERR",
+      "city": "MOUNTAIN HOME",
+      "regulated_entity": "WILD HORSE RANCH ENERGY CENTER",
+      "url": "https://permit-search.tceq.texas.gov/?addnId=505691332026219",
+      "first_seen": "2026-11-17T19:58:28.682254+00:00",
+      "last_changed": "2026-11-17T19:58:28.682254+00:00"
+    },
     {
       "id": "tceq-permit-portal:185939",
       "source_id": "tceq-permit-portal",
@@ -707,21 +722,6 @@
       "city": "HUBBARD",
       "regulated_entity": "NEXUS DATA CENTER HUBBARD",
       "url": "https://permit-search.tceq.texas.gov/?addnId=882368512026050",
-      "first_seen": "2026-10-27T23:56:05.321167+00:00",
-      "last_changed": "2026-10-27T23:56:05.321167+00:00"
-    },
-    {
-      "id": "tceq-permit-portal:HAP89",
-      "source_id": "tceq-permit-portal",
-      "agency": "TCEQ",
-      "title": "LONGHORN DATA CENTER \u2014 HAP89 (NEW APPLICATION)",
-      "name": "LONGHORN DATA CENTER",
-      "record_no": "HAP89",
-      "registry_status": "NEW APPLICATION",
-      "county": "TAYLOR",
-      "city": "ABILENE",
-      "regulated_entity": "LONGHORN DATA CENTER",
-      "url": "https://permit-search.tceq.texas.gov/?addnId=141372012025317",
       "first_seen": "2026-10-27T23:56:05.321167+00:00",
       "last_changed": "2026-10-27T23:56:05.321167+00:00"
     },
@@ -2331,21 +2331,6 @@
       "last_changed": "2026-10-27T23:56:05.321167+00:00"
     },
     {
-      "id": "tceq-permit-portal:175524",
-      "source_id": "tceq-permit-portal",
-      "agency": "TCEQ",
-      "title": "VANTAGE DATA CENTER TX2 \u2014 175524 (ISSUED PERMIT)",
-      "name": "VANTAGE DATA CENTER TX2",
-      "record_no": "175524",
-      "registry_status": "ISSUED PERMIT",
-      "county": "BEXAR",
-      "city": "SAN ANTONIO",
-      "regulated_entity": "VANTAGE DATA CENTER TX2",
-      "url": "https://permit-search.tceq.texas.gov/?addnId=795364282024060",
-      "first_seen": "2026-10-27T23:56:05.321167+00:00",
-      "last_changed": "2026-10-27T23:56:05.321167+00:00"
-    },
-    {
       "id": "tceq-permit-portal:175523",
       "source_id": "tceq-permit-portal",
       "agency": "TCEQ",
@@ -3002,6 +2987,21 @@
       "city": "AUSTIN",
       "regulated_entity": "HADCO TECH CENTER AUSTIN",
       "url": "https://permit-search.tceq.texas.gov/?addnId=86320232002026",
+      "first_seen": "2026-10-27T23:56:05.321167+00:00",
+      "last_changed": "2026-10-27T23:56:05.321167+00:00"
+    },
+    {
+      "id": "tceq-permit-portal:130515",
+      "source_id": "tceq-permit-portal",
+      "agency": "TCEQ",
+      "title": "OAKBEND MEDICAL CENTER WILLIAMS WAY CAMPUS \u2014 130515 (RENEWAL/AMENDMENT)",
+      "name": "OAKBEND MEDICAL CENTER WILLIAMS WAY CAMPUS",
+      "record_no": "130515",
+      "registry_status": "RENEWAL/AMENDMENT",
+      "county": "FORT BEND",
+      "city": "RICHMOND",
+      "regulated_entity": "OAKBEND MEDICAL CENTER",
+      "url": "https://permit-search.tceq.texas.gov/?addnId=767344072015056",
       "first_seen": "2026-10-27T23:56:05.321167+00:00",
       "last_changed": "2026-10-27T23:56:05.321167+00:00"
     }
