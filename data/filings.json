@@ -1,10 +1,55 @@
 {
   "license": "CC BY 4.0",
   "cite_as": "Behind the Watt, behindthewatt.com, CC BY 4.0",
-  "generated": "2026-11-17",
+  "generated": "2026-11-18",
   "classification": "registry_record_not_btw_verified",
   "note": "Keyword-matched records as listed by agency registries, first seen by the BTW watchers. A filing is not verified equipment, capacity or operation.",
   "filings": [
+    {
+      "id": "tceq-permit-portal:185993",
+      "source_id": "tceq-permit-portal",
+      "agency": "TCEQ",
+      "title": "ST LAWRENCE DATA CENTER \u2014 185993 (NEW APPLICATION)",
+      "name": "ST LAWRENCE DATA CENTER",
+      "record_no": "185993",
+      "registry_status": "NEW APPLICATION",
+      "county": "GLASSCOCK",
+      "city": "GARDEN CITY",
+      "regulated_entity": "ST LAWRENCE DATA CENTER",
+      "url": "https://permit-search.tceq.texas.gov/?addnId=692851362026321",
+      "first_seen": "2026-11-18T19:28:50.299555+00:00",
+      "last_changed": "2026-11-18T19:28:50.299555+00:00"
+    },
+    {
+      "id": "tceq-permit-portal:185291",
+      "source_id": "tceq-permit-portal",
+      "agency": "TCEQ",
+      "title": "ROYSE CITY DATA CENTER \u2014 185291 (ISSUED PERMIT)",
+      "name": "ROYSE CITY DATA CENTER",
+      "record_no": "185291",
+      "registry_status": "ISSUED PERMIT",
+      "county": "HUNT",
+      "city": "ROYSE CITY",
+      "regulated_entity": "ROYSE CITY DATA CENTER",
+      "url": "https://permit-search.tceq.texas.gov/?addnId=840546152026251",
+      "first_seen": "2026-11-18T19:28:50.299555+00:00",
+      "last_changed": "2026-11-18T19:28:50.299555+00:00"
+    },
+    {
+      "id": "tceq-permit-portal:185080",
+      "source_id": "tceq-permit-portal",
+      "agency": "TCEQ",
+      "title": "WILD HORSE RANCH ENERGY CENTER \u2014 185080 (ISSUED PERMIT)",
+      "name": "WILD HORSE RANCH ENERGY CENTER",
+      "record_no": "185080",
+      "registry_status": "ISSUED PERMIT",
+      "county": "KERR",
+      "city": "MOUNTAIN HOME",
+      "regulated_entity": "WILD HORSE RANCH ENERGY CENTER",
+      "url": "https://permit-search.tceq.texas.gov/?addnId=842429622026232",
+      "first_seen": "2026-11-18T19:28:50.299555+00:00",
+      "last_changed": "2026-11-18T19:28:50.299555+00:00"
+    },
     {
       "id": "tceq-permit-portal:184935",
       "source_id": "tceq-permit-portal",
@@ -1581,21 +1626,6 @@
       "last_changed": "2026-10-27T23:56:05.321167+00:00"
     },
     {
-      "id": "tceq-permit-portal:185751",
-      "source_id": "tceq-permit-portal",
-      "agency": "TCEQ",
-      "title": "SA01 DATA CENTER \u2014 185751 (ISSUED PERMIT)",
-      "name": "SA01 DATA CENTER",
-      "record_no": "185751",
-      "registry_status": "ISSUED PERMIT",
-      "county": "BEXAR",
-      "city": "SAN ANTONIO",
-      "regulated_entity": "SA01 DATA CENTER",
-      "url": "https://permit-search.tceq.texas.gov/?addnId=249543582026289",
-      "first_seen": "2026-10-27T23:56:05.321167+00:00",
-      "last_changed": "2026-10-27T23:56:05.321167+00:00"
-    },
-    {
       "id": "tceq-permit-portal:185723",
       "source_id": "tceq-permit-portal",
       "agency": "TCEQ",
@@ -1607,21 +1637,6 @@
       "city": "CORSICANA",
       "regulated_entity": "VECTOR LIGHTNING ENERGY CENTER",
       "url": "https://permit-search.tceq.texas.gov/?addnId=581646412026286",
-      "first_seen": "2026-10-27T23:56:05.321167+00:00",
-      "last_changed": "2026-10-27T23:56:05.321167+00:00"
-    },
-    {
-      "id": "tceq-permit-portal:185712",
-      "source_id": "tceq-permit-portal",
-      "agency": "TCEQ",
-      "title": "BORDEN DATA CENTER \u2014 185712 (NEW APPLICATION)",
-      "name": "BORDEN DATA CENTER",
-      "record_no": "185712",
-      "registry_status": "NEW APPLICATION",
-      "county": "BORDEN",
-      "city": "GAIL",
-      "regulated_entity": "BORDEN DATA CENTER",
-      "url": "https://permit-search.tceq.texas.gov/?addnId=339270352026286",
       "first_seen": "2026-10-27T23:56:05.321167+00:00",
       "last_changed": "2026-10-27T23:56:05.321167+00:00"
     },
@@ -1712,21 +1727,6 @@
       "city": "QUANAH",
       "regulated_entity": "CEMCO-403 & 365 CBP CLOCKTOWER DATA CENTER",
       "url": "https://permit-search.tceq.texas.gov/?addnId=463376152026191",
-      "first_seen": "2026-10-27T23:56:05.321167+00:00",
-      "last_changed": "2026-10-27T23:56:05.321167+00:00"
-    },
-    {
-      "id": "tceq-permit-portal:184409",
-      "source_id": "tceq-permit-portal",
-      "agency": "TCEQ",
-      "title": "STAMPEDE DATA CENTER \u2014 184409 (ISSUED PERMIT)",
-      "name": "STAMPEDE DATA CENTER",
-      "record_no": "184409",
-      "registry_status": "ISSUED PERMIT",
-      "county": "BELL",
-      "city": "TEMPLE",
-      "regulated_entity": "STAMPEDE DATA CENTER",
-      "url": "https://permit-search.tceq.texas.gov/?addnId=300590592026166",
       "first_seen": "2026-10-27T23:56:05.321167+00:00",
       "last_changed": "2026-10-27T23:56:05.321167+00:00"
     },
@@ -2481,21 +2481,6 @@
       "last_changed": "2026-10-27T23:56:05.321167+00:00"
     },
     {
-      "id": "tceq-permit-portal:169936",
-      "source_id": "tceq-permit-portal",
-      "agency": "TCEQ",
-      "title": "LEWISVILLE DATA CENTER \u2014 169936 (ISSUED PERMIT)",
-      "name": "LEWISVILLE DATA CENTER",
-      "record_no": "169936",
-      "registry_status": "ISSUED PERMIT",
-      "county": "DENTON",
-      "city": "LEWISVILLE",
-      "regulated_entity": "LEWISVILLE DATA CENTER",
-      "url": "https://permit-search.tceq.texas.gov/?addnId=212602192022222",
-      "first_seen": "2026-10-27T23:56:05.321167+00:00",
-      "last_changed": "2026-10-27T23:56:05.321167+00:00"
-    },
-    {
       "id": "tceq-permit-portal:169833",
       "source_id": "tceq-permit-portal",
       "agency": "TCEQ",
@@ -3002,6 +2987,21 @@
       "city": "RICHMOND",
       "regulated_entity": "OAKBEND MEDICAL CENTER",
       "url": "https://permit-search.tceq.texas.gov/?addnId=767344072015056",
+      "first_seen": "2026-10-27T23:56:05.321167+00:00",
+      "last_changed": "2026-10-27T23:56:05.321167+00:00"
+    },
+    {
+      "id": "tceq-permit-portal:129170",
+      "source_id": "tceq-permit-portal",
+      "agency": "TCEQ",
+      "title": "RESEARCH & TECHNOLOGY CENTER \u2014 129170 (ISSUED PERMIT)",
+      "name": "RESEARCH & TECHNOLOGY CENTER",
+      "record_no": "129170",
+      "registry_status": "ISSUED PERMIT",
+      "county": "GRIMES",
+      "city": "NAVASOTA",
+      "regulated_entity": "RESEARCH & TECHNOLOGY CENTER",
+      "url": "https://permit-search.tceq.texas.gov/?addnId=564332432015013",
       "first_seen": "2026-10-27T23:56:05.321167+00:00",
       "last_changed": "2026-10-27T23:56:05.321167+00:00"
     }
