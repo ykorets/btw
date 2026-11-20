@@ -1,0 +1,100 @@
+{
+  "reviewed_at": "2026-10-28",
+  "cohort": "opsb_review_2026_10_27.json",
+  "content_review_complete": false,
+  "public_files_read": 3,
+  "public_files_pending": 38,
+  "confidential_metadata_only": 3,
+  "publication_status": "Not published; three source reviews held for completion and guarded publication.",
+  "documents": [
+    {
+      "external_id": "18a9efcd-434f-4fe9-9f86-a7faca899f06",
+      "url": "https://dis.puc.state.oh.us/DocumentRecord.aspx?DocID=18a9efcd-434f-4fe9-9f86-a7faca899f06",
+      "payload": {
+        "filed": "10/26/2026",
+        "case_no": "25-0185",
+        "summary": "Notice of Compliance with Condition No. 12 (2026 Q3) electronically filed by Megan S. Zemke on behalf of Herrnstein, Kara.",
+        "case_numbers": [
+          "25-0185"
+        ]
+      },
+      "found_at": "2026-10-28 00:29:33.493766+00",
+      "pdf_url": "https://dis.puc.state.oh.us/ViewImage.aspx?CMID=A1001001A26J26B33000B04652",
+      "sha256": "3c8cafecdce1225e9414fb9534fbb003175c1cba70076944f468c2092bc9e02d",
+      "page_count": 2,
+      "status": "verified_public_pdf",
+      "reviewed_at": "2026-10-28",
+      "review_notes": {
+        "scope": "Applicant quarterly complaint-resolution report, not an independent regulator finding",
+        "q3_2026_reported_complaints": 0,
+        "approval_date_in_letter": "2025-06-05",
+        "approval_date_basis": "Applicant assertion; staff-report corroboration pending"
+      }
+    },
+    {
+      "external_id": "2f6ab0d5-f3fb-4bd7-a41c-cf139e9d6560",
+      "url": "https://dis.puc.state.oh.us/DocumentRecord.aspx?DocID=2f6ab0d5-f3fb-4bd7-a41c-cf139e9d6560",
+      "payload": {
+        "filed": "03/28/2025",
+        "case_no": "25-0185",
+        "summary": "Supplement Notice to Letter of Notification - Permit-to-Install electronically filed by Teresa Orahood on behalf of Dylan F. Borchers.",
+        "case_numbers": [
+          "25-0185"
+        ]
+      },
+      "found_at": "2026-10-28 00:29:33.493766+00",
+      "pdf_url": "https://ukozvhzgrcnkcatjqfoo.supabase.co/storage/v1/object/public/03-00-air-construction/plato_south_PTI_app__rec_d5lamiecevv1v46njr9g_1274e5ec.pdf",
+      "official_pdf_url": "https://dis.puc.state.oh.us/ViewImage.aspx?CMID=A1001001A25C28B62804G02993",
+      "copy_library_url": "https://oilandgaswatch.org/facility/rec_d4f1u60q7easr8ra1g3g",
+      "sha256": "c1f207768ca0eedfa20775cf045de3be0337471a84fa26c69b091e2309863aef",
+      "page_count": 29,
+      "status": "read_public_filing_copy_identity_reconciled",
+      "original_byte_identity_verified": false,
+      "identity_checks": {
+        "official_card_pages": 29,
+        "official_card_timestamp": "3/28/2025 4:28:03 PM",
+        "receipt_case": "25-0185-EL-BLN",
+        "receipt_timestamp": "3/28/2025 4:28:03 PM",
+        "receipt_summary_matches_subject_and_filer": true
+      },
+      "reviewed_at": "2026-10-28",
+      "review_notes": {
+        "scope": "Historical applicant PTI application attached to OPSB filing; external EIP Oil & Gas Watch copy with matching official filing receipt, not government-hosted or independently authenticated original bytes.",
+        "alias": "Page 1 explicitly identifies Plato South as Socrates South.",
+        "permit_stage": "Page 1 says preliminarily/administratively complete and explicitly says this does not imply the application is approvable. This is not the issued permit.",
+        "equipment_requested_pdf_page_8": "15 Caterpillar G3520 2500 kW; 9 Solar Titan 130 17 MW; 3 Solar Titan 250 23 MW; 3 Siemens SGT400 16 MW; 15 line heaters and 8 emergency diesel engines separately described. Historical requested configuration only.",
+        "rating_limit": "Appendix tables use more precise turbine kW values than the rounded project description. Do not promote a summed total, infer an expansion versus the 200 MW OPSB project, or treat requested equipment as the current as-built fleet. Later staff/modification records remain unread.",
+        "visual_review_pages": [
+          7,
+          8,
+          29
+        ],
+        "full_text_reviewed": true
+      }
+    },
+    {
+      "external_id": "619c20b0-0d41-4f41-b4a3-0cc7e207a0c0",
+      "url": "https://dis.puc.state.oh.us/DocumentRecord.aspx?DocID=619c20b0-0d41-4f41-b4a3-0cc7e207a0c0",
+      "payload": {
+        "filed": "10/26/2026",
+        "case_no": "26-0169",
+        "summary": "Notice of Compliance with Condition No. 15 (2026 Q3) electronically filed by Megan S. Zemke on behalf of Herrnstein, Kara.",
+        "case_numbers": [
+          "26-0169"
+        ]
+      },
+      "found_at": "2026-10-28 00:29:33.493766+00",
+      "pdf_url": "https://dis.puc.state.oh.us/ViewImage.aspx?CMID=A1001001A26J26B44930F04740",
+      "sha256": "970e45e3a60ebac5e5f1c2e2b0627c3c8b86f5d78c2c997e5ad704f8350a01f1",
+      "page_count": 2,
+      "status": "verified_public_pdf",
+      "reviewed_at": "2026-10-28",
+      "review_notes": {
+        "scope": "Applicant quarterly complaint-program report; not an independent regulator-wide finding",
+        "q3_2026_reported_complaints": 0,
+        "approval_date_in_letter": "2026-06-25",
+        "viewer_limit": "Chrome viewer showed only one page and truncated a material sentence; saved original contains two complete pages and matching receipt."
+      }
+    }
+  ]
+}
