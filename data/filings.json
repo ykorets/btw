@@ -1,10 +1,25 @@
 {
   "license": "CC BY 4.0",
   "cite_as": "Behind the Watt, behindthewatt.com, CC BY 4.0",
-  "generated": "2026-11-19",
+  "generated": "2026-11-20",
   "classification": "registry_record_not_btw_verified",
   "note": "Keyword-matched records as listed by agency registries, first seen by the BTW watchers. A filing is not verified equipment, capacity or operation.",
   "filings": [
+    {
+      "id": "tceq-permit-portal:186035",
+      "source_id": "tceq-permit-portal",
+      "agency": "TCEQ",
+      "title": "SOUTHRIDGE DATA CENTER \u2014 186035 (NEW APPLICATION)",
+      "name": "SOUTHRIDGE DATA CENTER",
+      "record_no": "186035",
+      "registry_status": "NEW APPLICATION",
+      "county": "LEE",
+      "city": "LEXINGTON",
+      "regulated_entity": "SOUTHRIDGE DATA CENTER",
+      "url": "https://permit-search.tceq.texas.gov/?addnId=462366032026323",
+      "first_seen": "2026-11-20T19:13:07.166261+00:00",
+      "last_changed": "2026-11-20T19:13:07.166261+00:00"
+    },
     {
       "id": "tceq-permit-portal:PSDTX1730",
       "source_id": "tceq-permit-portal",
@@ -1997,21 +2012,6 @@
       "city": "ABILENE",
       "regulated_entity": "VANTAGE DATA CENTERS TX3",
       "url": "https://permit-search.tceq.texas.gov/?addnId=929757112026006",
-      "first_seen": "2026-10-27T23:56:05.321167+00:00",
-      "last_changed": "2026-10-27T23:56:05.321167+00:00"
-    },
-    {
-      "id": "tceq-permit-portal:182126",
-      "source_id": "tceq-permit-portal",
-      "agency": "TCEQ",
-      "title": "LONGHORN DATA CENTER \u2014 182126 (NEW APPLICATION)",
-      "name": "LONGHORN DATA CENTER",
-      "record_no": "182126",
-      "registry_status": "NEW APPLICATION",
-      "county": "TAYLOR",
-      "city": "ABILENE",
-      "regulated_entity": "LONGHORN DATA CENTER",
-      "url": "https://permit-search.tceq.texas.gov/?addnId=890535372025311",
       "first_seen": "2026-10-27T23:56:05.321167+00:00",
       "last_changed": "2026-10-27T23:56:05.321167+00:00"
     },
