@@ -1,6 +1,8 @@
 """M6 — pure-function tests for the new adapters."""
 
-from btw_engine.watch import (normalize_page_text, echo_counter_candidate,
+from btw_engine.watch import (annotate_research_candidate,
+                              connection_mode_signals,
+                              normalize_page_text, echo_counter_candidate,
                               gdelt_candidates, courtlistener_candidates)
 
 
@@ -46,6 +48,31 @@ def test_gdelt_candidates_dedupe_key_is_url_hash():
     assert len(cands) == 1
     assert cands[0]["url"] == "https://example.com/a"
     assert len(cands[0]["external_id"]) == 16
+    assert cands[0]["payload"]["kw_hit"] is True
+    assert "btm_discovery" in cands[0]["payload"]["research_tags"]
+
+
+def test_connection_mode_signals_cover_explicit_discovery_language():
+    text = ("The private-wire microgrid will operate behind the meter under "
+            "a non-export agreement and provide on-site generation.")
+    assert connection_mode_signals(text) == [
+        "behind_the_meter", "non_export", "private_wire",
+        "on_site_generation", "microgrid",
+    ]
+
+
+def test_connection_mode_annotation_is_a_review_signal_not_a_fact():
+    candidate = annotate_research_candidate({
+        "title": "Co-located load interconnection filing",
+        "payload": {"description": "export-limited service"},
+    })
+    payload = candidate["payload"]
+    assert payload["connection_mode_signals"] == [
+        "co_located_load", "export_limited",
+    ]
+    assert payload["research_tags"] == ["connection_mode"]
+    assert payload["kw_hit"] is True
+    assert "connection_mode" not in candidate  # no asserted facility field
 
 
 def test_stac_scene_candidates_cloud_filter_and_mapping():

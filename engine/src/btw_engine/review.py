@@ -1,10 +1,10 @@
 """Immutable review manifests and atomic promotion.
 
 ``--open`` snapshots the exact staged unit, permit, and event row ids into a
-sealed database manifest, embeds its id/hash in the daily review file, and
-opens the human-review PR. ``--promote`` reads those two values from the
-merged file and invokes one database transaction. It never enumerates or
-patches whichever rows happen to be staging at merge time.
+sealed database manifest and opens the human-review PR. ``--promote`` swaps
+the exact approved rows into publication. ``--reject`` retires the exact
+rejected staging rows so later evidence can start a fresh review version.
+Neither transition enumerates whichever rows merely happen to be staging.
 
 Env: SUPABASE_URL, SUPABASE_SERVICE_KEY; for --open also GITHUB_TOKEN and
 GITHUB_REPOSITORY.
@@ -24,6 +24,10 @@ from pathlib import Path
 
 import httpx
 
+from btw_engine.review_state import (
+    PendingReviewMap,
+    load_pending_review_targets,
+)
 from btw_engine.truth import provenance_violations
 
 GH_API = "https://api.github.com"
@@ -126,6 +130,40 @@ def fresh_candidates(hours: int = 36) -> list[dict]:
         "found_at": f"gt.{since}", "payload->>kw_hit": "eq.true",
         "order": "found_at.desc",
     }).json()
+
+
+def exclude_pending_review_targets(
+        units: list[dict], permits: list[dict], events: list[dict],
+        pending: PendingReviewMap,
+) -> tuple[list[dict], list[dict], list[dict], list[dict]]:
+    """Keep an exact fact version out of more than one pending manifest."""
+    ready_units, ready_permits, ready_events, held = [], [], [], []
+
+    def route(kind: str, fact_id: str, item: dict, ready: list[dict],
+              label: str) -> None:
+        review = pending.get((kind, fact_id))
+        if review is None:
+            ready.append(item)
+            return
+        held.append({
+            "kind": kind,
+            "id": fact_id,
+            "label": label,
+            "review": review,
+        })
+
+    for item in units:
+        row = item["staged"]
+        route("unit", row["id"], item, ready_units,
+              row.get("model") or row["id"])
+    for item in permits:
+        row = item["staged"]
+        route("permit", row["id"], item, ready_permits,
+              row.get("permit_no") or row["id"])
+    for event in events:
+        route("event", event["id"], event, ready_events,
+              event.get("headline") or event["id"])
+    return ready_units, ready_permits, ready_events, held
 
 
 def partition_review_ready(units: list[dict], permits: list[dict],
@@ -299,6 +337,12 @@ def open_pr() -> None:
     permits = staged_permits()
     events = staged_events()
     candidates = fresh_candidates()
+    pending = load_pending_review_targets(_rest)
+    units, permits, events, already_pending = exclude_pending_review_targets(
+        units, permits, events, pending)
+    for item in already_pending:
+        print(f"HOLD {item['kind']} {item['label']}: already sealed in "
+              f"{item['review'].label()}")
     if not units and not permits and not events and not candidates:
         print("nothing to review today")
         return
@@ -377,12 +421,30 @@ def promote(review_file: str | Path, merge_sha: str) -> dict:
     return result
 
 
+def reject(review_file: str | Path, reason: str) -> dict:
+    review_id, manifest_hash = parse_manifest(Path(review_file).read_text())
+    if not str(reason or "").strip():
+        raise ValueError("a rejection reason is required")
+    result = _rest("POST", "rpc/btw_reject_review", json={
+        "p_review_id": review_id,
+        "p_manifest_hash": manifest_hash,
+        "p_reason": reason.strip(),
+    }).json()
+    if not isinstance(result, dict):
+        raise RuntimeError(f"rejection RPC returned an unexpected payload: {result!r}")
+    print(json.dumps(result, sort_keys=True))
+    return result
+
+
 def main() -> None:
     parser = argparse.ArgumentParser()
-    parser.add_argument("--open", action="store_true")
-    parser.add_argument("--promote", action="store_true")
+    action = parser.add_mutually_exclusive_group(required=True)
+    action.add_argument("--open", action="store_true")
+    action.add_argument("--promote", action="store_true")
+    action.add_argument("--reject", action="store_true")
     parser.add_argument("--review-file")
     parser.add_argument("--merge-sha")
+    parser.add_argument("--reason")
     args = parser.parse_args()
     if args.open:
         open_pr()
@@ -390,8 +452,10 @@ def main() -> None:
         if not args.review_file or not args.merge_sha:
             parser.error("--promote requires --review-file and --merge-sha")
         promote(args.review_file, args.merge_sha)
-    else:
-        parser.error("need --open or --promote")
+    elif args.reject:
+        if not args.review_file or not args.reason:
+            parser.error("--reject requires --review-file and --reason")
+        reject(args.review_file, args.reason)
 
 
 if __name__ == "__main__":

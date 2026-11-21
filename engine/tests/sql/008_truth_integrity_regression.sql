@@ -89,6 +89,14 @@ values
    '30000000-0000-4000-8000-000000000001',
    'TCEQ', '177263', 'issued', 'source_asserted', 'staging');
 
+insert into public.event
+  (id, facility_id, event_date, event_type, headline, source_url, fact_state)
+values
+  ('60000000-0000-4000-8000-000000000001',
+   '30000000-0000-4000-8000-000000000001', '2026-07-13',
+   'permit_update', 'Fixture review rejection',
+   'https://example.test/event', 'staging');
+
 insert into public.fact_provenance
   (fact_table, fact_id, fact_field, claim_id, support_kind, derivation, note)
 values
@@ -192,6 +200,25 @@ from public.btw_create_review_manifest(
   '{}'::uuid[])
 \gset manifest_
 
+-- One exact fact version cannot be included in two simultaneous pending
+-- reviews, even when their batch dates differ.
+do $$
+begin
+  begin
+    perform public.btw_create_review_manifest(
+      '2026-07-14',
+      array['40000000-0000-4000-8000-000000000002'::uuid],
+      '{}'::uuid[], '{}'::uuid[]);
+    raise exception 'TEST_EXPECTED_FAILURE_MISSING';
+  exception when others then
+    if sqlerrm = 'TEST_EXPECTED_FAILURE_MISSING'
+       or sqlerrm not like 'fact version % already belongs to pending review %' then
+      raise;
+    end if;
+  end;
+end;
+$$;
+
 -- Sealing freezes both the staged row and its evidence bundle.
 do $$
 begin
@@ -240,6 +267,58 @@ begin
   end;
 end;
 $$;
+
+-- Rejection is hash-bound, atomic and replay-safe. It retires the exact
+-- staging versions without making their sealed audit snapshot mutable.
+select review_id, manifest_hash as sealed_hash
+from public.btw_create_review_manifest(
+  '2026-07-15', '{}'::uuid[], '{}'::uuid[],
+  array['60000000-0000-4000-8000-000000000001'::uuid])
+\gset reject_
+
+do $$
+begin
+  begin
+    perform public.btw_reject_review(
+      (select id from public.review where batch_date = '2026-07-15'),
+      repeat('0', 64), 'fixture rejected');
+    raise exception 'TEST_EXPECTED_FAILURE_MISSING';
+  exception when others then
+    if sqlerrm = 'TEST_EXPECTED_FAILURE_MISSING'
+       or sqlerrm <> 'review manifest hash mismatch' then
+      raise;
+    end if;
+  end;
+  if (select fact_state from public.event
+      where id = '60000000-0000-4000-8000-000000000001') <> 'staging' then
+    raise exception 'wrong-hash rejection changed event state';
+  end if;
+end;
+$$;
+
+select public.btw_reject_review(
+  :'reject_review_id'::uuid, :'reject_sealed_hash', 'fixture rejected');
+
+do $$
+begin
+  if (select fact_state from public.event
+      where id = '60000000-0000-4000-8000-000000000001') <> 'retracted' then
+    raise exception 'rejected manifest event was not retracted';
+  end if;
+  if not exists (
+    select 1 from public.review
+    where batch_date = '2026-07-15'
+      and decision = 'rejected'
+      and rejection_reason = 'fixture rejected'
+      and rejected_at is not null) then
+    raise exception 'review rejection audit metadata is incomplete';
+  end if;
+end;
+$$;
+
+-- Same rejection request is idempotent.
+select public.btw_reject_review(
+  :'reject_review_id'::uuid, :'reject_sealed_hash', 'fixture rejected');
 
 -- A wrong hash cannot cause any partial fact transition.
 do $$

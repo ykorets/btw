@@ -43,12 +43,12 @@ jobs:
           create schema extensions;
           alter extension "uuid-ossp" set schema extensions;
           alter database postgres set search_path to public, extensions;'
-      - name: Apply migrations 002 through 008
+      - name: Apply migrations 002 through 009
         run: |
-          for file in engine/schema/00{2..8}_*.sql; do
+          for file in engine/schema/00{2..9}_*.sql; do
             psql "$PGURL" -v ON_ERROR_STOP=1 -f "$file"
           done
-      - name: Verify immutable manifest and atomic promotion
+      - name: Verify immutable manifest and atomic review transitions
         run: >-
           psql "$PGURL" -v ON_ERROR_STOP=1
           -f engine/tests/sql/008_truth_integrity_regression.sql

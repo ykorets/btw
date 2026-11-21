@@ -1,6 +1,7 @@
 """M3.5 — cross-page anchoring + quorum verdict tests (pure functions)."""
 
 from btw_engine.extract import (
+    PROMPT,
     MATCH_THRESHOLD,
     _values_match,
     canonical_claims,
@@ -21,6 +22,13 @@ PAGES = [PAGE1, PAGE2, "Unrelated appendix text with the number 99."]
 
 SPANNING_QUOTE = ("authorization to operate fifteen (15) Solar Turbines "
                   "SMT-130 generator sets")
+
+
+def test_prompt_requests_explicit_connection_evidence_without_inference():
+    assert "connection.mode" in PROMPT
+    assert "behind_the_meter" in PROMPT
+    assert "Same parcel, common ownership" in PROMPT
+    assert "Do not infer" in PROMPT
 
 
 def _claim(quote, page, value_num=None):

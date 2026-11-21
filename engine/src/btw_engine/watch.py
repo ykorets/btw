@@ -23,6 +23,7 @@ import argparse
 import datetime as dt
 import glob
 import hashlib
+import html
 import json
 import os
 import random
@@ -44,6 +45,64 @@ BROWSER_HEADERS = {
     "Accept-Language": "en-US,en;q=0.9",
 }
 
+# Discovery signals only.  A phrase in a registry row or search result is a
+# reason to fetch and review the underlying document; it is never sufficient
+# to publish a facility connection mode.  Keep these labels stable because
+# they land in candidate.payload and are useful for review/search analytics.
+CONNECTION_MODE_PATTERNS = {
+    "behind_the_meter": r"\bbehind[\s-]+the[\s-]+meter\b",
+    "non_export": r"\b(?:non[\s-]+export|no[\s-]+export)\b",
+    "export_limited": r"\bexport[\s-]+limit(?:ed|ation)?\b",
+    "private_wire": r"\bprivate[\s-]+wire\b",
+    "on_site_generation": (
+        r"\b(?:on[\s-]*site|onsite)[\s-]+(?:power|generation|generator)\b"
+    ),
+    "self_generation": r"\bself[\s-]+generat(?:e|ed|ion|ing)\b",
+    "dedicated_generation": r"\bdedicated[\s-]+generation\b",
+    "microgrid": r"\bmicro[\s-]*grid\b",
+    "co_located_load": (
+        r"\bco[\s-]*locat(?:ed|ion)[\s-]+(?:load|generation|facility)\b"
+    ),
+    "islandable": r"\bisland(?:able|ed|ing)[\s-]+(?:operation|mode|system)\b",
+}
+
+
+def connection_mode_signals(text: str) -> list[str]:
+    """Return explicit connection/power-topology phrases found in *text*.
+
+    The result deliberately says ``signals``, not ``connection_mode``.  Even
+    strong language such as "behind the meter" may describe a tariff or a
+    hypothetical configuration rather than the facility named in the result.
+    Entity binding and publication therefore stay downstream of archive,
+    anchored extraction, and human review.
+    """
+    normalized = str(text or "").lower().replace("–", "-").replace("—", "-")
+    return [label for label, pattern in CONNECTION_MODE_PATTERNS.items()
+            if re.search(pattern, normalized, flags=re.I)]
+
+
+def annotate_research_candidate(candidate: dict) -> dict:
+    """Attach discovery tags without promoting a search hit into a fact."""
+    row = dict(candidate)
+    payload = dict(row.get("payload") or {})
+    searchable = " ".join((
+        str(row.get("title") or ""),
+        json.dumps(payload, ensure_ascii=False, sort_keys=True, default=str),
+    ))
+    signals = sorted(set(payload.get("connection_mode_signals") or [])
+                     | set(connection_mode_signals(searchable)))
+    if signals:
+        payload["connection_mode_signals"] = signals
+        tags = set(payload.get("research_tags") or [])
+        tags.add("connection_mode")
+        payload["research_tags"] = sorted(tags)
+        # Existing review/notification paths surface payload.kw_hit=true.
+        # A connection-mode phrase deserves that review, but remains only a
+        # candidate until its source document is archived and anchored.
+        payload["kw_hit"] = True
+    row["payload"] = payload
+    return row
+
 
 def _rest(method: str, path: str, **kw) -> httpx.Response:
     base = os.environ["SUPABASE_URL"].rstrip("/") + "/rest/v1/" + path
@@ -63,6 +122,25 @@ def load_sources() -> list[dict]:
             continue
         out.append(cfg)
     return out
+
+
+def describe_error(e: BaseException) -> str:
+    """Turn an adapter exception into something diagnosable from the DB.
+
+    `FAIL tceq-nsr-stdpmt: Client error '403 Forbidden'` in a runner log that
+    nobody reads is not an alarm. These strings land in source.last_error, so
+    the shape of the failure (WAF challenge page vs timeout vs parser drift)
+    is visible from a SQL query and from the morning report.
+    """
+    if isinstance(e, httpx.HTTPStatusError):
+        r = e.response
+        body = re.sub(r"\s+", " ", r.text[:300]).strip()
+        return (f"HTTP {r.status_code} | ct={r.headers.get('content-type', '?')}"
+                f" len={len(r.text)} | body: {body}")
+    if isinstance(e, httpx.RequestError):
+        url = getattr(getattr(e, "request", None), "url", "?")
+        return f"{type(e).__name__}: {e} | url={url}"
+    return f"{type(e).__name__}: {e}"
 
 
 # ---------------------------------------------------------------- TCEQ NSR --
@@ -87,6 +165,10 @@ def parse_tceq_ascii(text: str) -> list[dict]:
     """
     text = text.replace("&nbsp;", " ")
     text = re.sub(r"<[^>]+>", " ", text)
+    # Company names carry real entities ("Eagle Ready Mix &amp; Concrete"),
+    # which otherwise leak into candidate titles and payload values verbatim.
+    # Unescape AFTER stripping tags so a literal "&lt;b&gt;" can't become one.
+    text = html.unescape(text)
     text = re.sub(r"\s+", " ", text)
     rows = []
     for chunk in re.findall(r"NSR\|(?:(?!NSR\|).)*", text):
@@ -200,11 +282,14 @@ def run_pagehash(cfg: dict) -> list[dict]:
         raise RuntimeError(f"suspiciously short page ({len(text)} chars) — "
                            f"error page or block")
     h = hashlib.sha256(text.encode()).hexdigest()
+    signals = connection_mode_signals(text)
     return [{
         "external_id": h[:16],
         "url": cfg["url"],
         "title": f"{cfg['id']}: content version {h[:8]} ({len(text)} chars)",
-        "payload": {"hash": h, "chars": len(text), "excerpt": text[:400]},
+        "payload": {"hash": h, "chars": len(text), "excerpt": text[:400],
+                    "connection_mode_signals": signals,
+                    "kw_hit": bool(signals)},
     }]
 
 
@@ -269,9 +354,32 @@ def gdelt_candidates(payload: dict) -> list[dict]:
                      f"({a.get('domain')}, {a.get('seendate')})",
             "payload": {"domain": a.get("domain"),
                         "seendate": a.get("seendate"),
-                        "title": a.get("title")},
+                        "title": a.get("title"),
+                        # This source's query is itself narrowly scoped to
+                        # data-centre self-supply/connection evidence.
+                        "research_tags": ["btm_discovery"],
+                        "kw_hit": True},
         })
     return out
+
+
+def is_gdelt_throttled(r: httpx.Response) -> bool:
+    """True when GDELT is refusing the query for rate-limit reasons.
+
+    GDELT does not always signal this with a status code: the DOC API happily
+    returns HTTP 200 with a plain-text notice ("Please limit requests to one
+    every 5 seconds...") instead of JSON. Treating only 429/503 as throttling
+    turned a retryable condition into a hard parse failure.
+    """
+    if r.status_code in (429, 503):
+        return True
+    if r.status_code == 200 and "json" not in (
+            r.headers.get("content-type") or ""):
+        head = r.text[:400].lower()
+        return ("please limit requests" in head
+                or "rate limit" in head
+                or "too many requests" in head)
+    return False
 
 
 def run_gdelt(cfg: dict) -> list[dict]:
@@ -283,30 +391,38 @@ def run_gdelt(cfg: dict) -> list[dict]:
         "maxrecords": str(p.get("maxrecords", 40)),
     }
     # GDELT's free DOC API rate-limits by IP, and shared CI egress (GitHub
-    # runners) gets 429/503 in bursts. We issue one query per day, so a short
-    # backoff almost always clears the throttle before the SLO alarm fires.
+    # runners) gets throttled in bursts — often for the whole pool, not just
+    # us, so the wait has to outlast someone else's burst rather than our own.
     # Retry-After is honored when present; jitter avoids lockstep with other
     # callers on the same runner IP pool.
-    backoffs = [5, 15, 40]
+    backoffs = [15, 60, 180]
+    last = None
     for attempt in range(len(backoffs) + 1):
         r = httpx.get(cfg["url"], params=params, headers=BROWSER_HEADERS,
                       timeout=60)
-        if r.status_code in (429, 503) and attempt < len(backoffs):
+        last = r
+        if is_gdelt_throttled(r) and attempt < len(backoffs):
             ra = r.headers.get("Retry-After")
             try:
                 wait = float(ra) if ra else backoffs[attempt]
             except ValueError:
                 wait = backoffs[attempt]
-            print(f"gdelt: HTTP {r.status_code}, retry in ~{wait:.0f}s "
+            print(f"gdelt: throttled (HTTP {r.status_code}), retry in ~{wait:.0f}s "
                   f"(attempt {attempt + 1}/{len(backoffs)})")
             time.sleep(wait + random.uniform(0, 3))
             continue
+        if is_gdelt_throttled(r):
+            break  # out of retries — fall through to the throttle error below
         r.raise_for_status()
         try:
             payload = r.json()
         except ValueError as e:
             raise RuntimeError(f"GDELT non-JSON reply: {r.text[:120]}") from e
         return gdelt_candidates(payload)
+    body = re.sub(r"\s+", " ", last.text[:160]).strip()
+    raise RuntimeError(
+        f"GDELT throttled after {len(backoffs) + 1} attempts "
+        f"(HTTP {last.status_code}): {body}")
 
 
 # ------------------------------------------------- Sentinel-2 (Island Watch) --
@@ -638,7 +754,10 @@ def _count(source_id: str) -> int:
     r = _rest("GET", "candidate", params={
         "select": "id", "source_id": f"eq.{source_id}"},
         headers={"Prefer": "count=exact", "Range": "0-0"})
-    return int(r.headers.get("content-range", "*/0").split("/")[1])
+    # PostgREST answers "0-24/1234", but degrades to ".../*" when it declines
+    # to plan an exact count. int("*") would turn a healthy run into a failure.
+    total = r.headers.get("content-range", "*/0").split("/")[-1]
+    return int(total) if total.isdigit() else 0
 
 
 def store_candidates(source_id: str, cands: list[dict]) -> int:
@@ -653,9 +772,31 @@ def store_candidates(source_id: str, cands: list[dict]) -> int:
     return _count(source_id) - before
 
 
-def touch_source(source_id: str) -> None:
+def _now_iso() -> str:
+    return dt.datetime.now(dt.timezone.utc).isoformat()
+
+
+def touch_source(source_id: str, yield_rows: int | None = None) -> None:
+    """Mark a successful run and clear any recorded failure."""
     _rest("PATCH", "source", params={"id": f"eq.{source_id}"},
-          json={"last_hit_at": dt.datetime.now(dt.timezone.utc).isoformat()})
+          json={"last_hit_at": _now_iso(), "last_run_at": _now_iso(),
+                "last_error": None, "last_error_at": None,
+                "last_yield": yield_rows})
+
+
+def record_failure(source_id: str, error: str) -> None:
+    """Persist why an adapter failed.
+
+    Best-effort by design: if the DB write itself fails we still want the sweep
+    to continue and the stdout FAIL line to stand. Losing the telemetry must
+    not cost us the remaining sources.
+    """
+    try:
+        _rest("PATCH", "source", params={"id": f"eq.{source_id}"},
+              json={"last_run_at": _now_iso(), "last_error": error[:2000],
+                    "last_error_at": _now_iso()})
+    except Exception as e:  # noqa: BLE001
+        print(f"     (could not record failure for {source_id}: {e})")
 
 
 def slo_check() -> int:
@@ -725,18 +866,20 @@ def main() -> None:
         if not args.dry_run:
             upsert_source(cfg)  # track the source even if today's run fails
         try:
-            cands = fn(cfg)
+            cands = [annotate_research_candidate(c) for c in fn(cfg)]
             if args.dry_run:
                 print(f"DRY  {cfg['id']}: {len(cands)} candidates")
                 for c in cands[:5]:
                     print("     ", c["external_id"], c["title"][:100])
                 continue
             new = store_candidates(cfg["id"], cands)
-            touch_source(cfg["id"])
+            touch_source(cfg["id"], yield_rows=len(cands))
             print(f"OK   {cfg['id']}: {len(cands)} rows, {new} new")
         except Exception as e:  # noqa: BLE001 — one bad source must not kill the rest
             failures += 1
-            print(f"FAIL {cfg['id']}: {e}")
+            detail = describe_error(e)
+            print(f"FAIL {cfg['id']}: {detail}")
+            record_failure(cfg["id"], detail)
 
     # Individual source failures do NOT fail the run — the SLO check is the
     # alarm (grace window, then red). A run with zero successes still fails.

@@ -7,6 +7,9 @@ url: https://api.gdeltproject.org/api/v2/doc/doc
 schedule: daily
 slo_interval_days: 3
 params:
-  query: '"data center" ("gas turbines" OR "behind the meter" OR "air permit" OR "on-site generation")'
+  # Discovery only: a match becomes a candidate, never a published topology.
+  # Include UK spelling because Dublin/London private-power projects are now
+  # useful leads even while the verified fleet remains US-first.
+  query: '("data center" OR "data centre") ("behind the meter" OR "on-site generation" OR "onsite power" OR "self-generation" OR microgrid OR "private wire" OR "non-export" OR "co-located load")'
   timespan: 2d
   maxrecords: 40

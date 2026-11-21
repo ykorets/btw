@@ -56,7 +56,8 @@ Fields to extract WHEN PRESENT (skip absent ones):
 facility.name, facility.operator, unit.oem, unit.model, unit.fuel, unit.count,
 unit.mw_each, unit.mw_total, unit.hours_permitted, permit.no, permit.type,
 permit.authority, permit.status, permit.filed_at, permit.issued_at,
-observation.unit_count, observation.mw.
+observation.unit_count, observation.mw, connection.mode,
+connection.export_status, connection.served_load.
 
 Hard rules:
 - "quote" MUST be a verbatim span copied character-for-character from the
@@ -68,6 +69,15 @@ Hard rules:
   received, or application date. Use permit.issued_at only when it explicitly
   says issued, approved, effective, or permit date. Never emit an ambiguous
   generic permit date.
+- connection.mode is one of: behind_the_meter, private_wire, grid_export.
+  Emit it ONLY when the quote explicitly describes how the named generation
+  connects to or serves the named facility. Same parcel, common ownership,
+  nearby equipment, or generic policy language are not enough.
+- connection.export_status is one of: non_export, export_limited,
+  export_capable. Emit only from explicit source language.
+- connection.served_load is "data_center" only when the quote explicitly
+  states that the generation supplies a data center. Do not infer it from a
+  document's general subject or from co-location alone.
 - JSON only. No commentary."""
 
 

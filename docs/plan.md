@@ -186,6 +186,9 @@ alert observed once on purpose" — tested live against Watchtower
 (self-hosted Healthchecks): /fail signal → check DOWN → Telegram alert
 received → success ping → UP-again alert. The dead-man switch works
 end-to-end; daily-intake pings it on every green run.
+Addendum 2026-07-14: the true missed-heartbeat path (silence, not /fail)
+also observed — Period temporarily 1h, no ping → DOWN at 01:57 UTC →
+Telegram alert delivered; check restored to Period = 1 day, Grace 6h.
 
 ## M5 — Review loop end-to-end (days 10–12)
 

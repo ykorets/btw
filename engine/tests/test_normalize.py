@@ -1,5 +1,7 @@
 """M5 — deterministic planner tests for normalize (+M3.5 context binding)."""
 
+import pytest
+
 from btw_engine import normalize
 
 from btw_engine.normalize import (
@@ -17,8 +19,10 @@ from btw_engine.normalize import (
     resolve_facility,
     resolve_permit,
     staged_copy,
+    staged_permit_copy,
     unseen_receipts,
 )
+from btw_engine.review_state import PendingReview, PendingReviewBlocked
 
 TITAN = {"id": "u-titan", "facility_id": "f1", "oem": "Solar Turbines",
          "model": "Titan 350", "unit_count": 6, "mw_each": 31.7,
@@ -461,98 +465,105 @@ def test_staged_copy_reuses_logical_identity_and_never_publishes(monkeypatch):
     assert posted["verification_state"] == "source_asserted"
 
 
-def test_permit_quantities_win_over_unrelated_observation_for_basis():
-    permit_count = {
-        **_c("permit-count", "unit.count", "5", 5,
-             "The permit authorizes five Titan 350 turbines."),
-        "document": {"doc_genre": "permit"},
+def test_staged_permit_copy_holds_an_existing_sealed_version(monkeypatch):
+    calls = []
+
+    class Response:
+        def json(self):
+            return [{"id": "sealed-permit"}]
+
+    monkeypatch.setattr(
+        normalize, "_rest",
+        lambda method, path, **kwargs: calls.append((method, path, kwargs))
+        or Response())
+    permit = {
+        "logical_id": "logical-permit", "facility_id": "facility",
+        "authority": "TCEQ", "permit_no": "177263", "permit_type": None,
+        "status": "issued", "filed_at": None, "issued_at": None,
     }
-    satellite_total = {
-        **_c("satellite-mw", "observation.mw", "190 MW", 190,
-             "Estimated visible generation capacity is 190 MW."),
-        "document": {"doc_genre": "satellite_scene"},
+    pending = {("permit", "sealed-permit"): PendingReview(
+        "review-id", pr_url="https://github.com/ykorets/btw/pull/59")}
+
+    with pytest.raises(PendingReviewBlocked, match="pull/59"):
+        staged_permit_copy(
+            permit, {}, verification_state="corroborated",
+            pending_reviews=pending)
+
+    assert [method for method, _path, _kwargs in calls] == ["GET"]
+
+
+def test_staged_permit_copy_translates_a_concurrent_seal(monkeypatch):
+    class Response:
+        def json(self):
+            return [{"id": "racing-permit"}]
+
+    def fake_rest(method, _path, **_kwargs):
+        if method == "GET":
+            return Response()
+        raise RuntimeError(
+            "Supabase PATCH permit failed (400): fact version racing-permit "
+            "is frozen by a sealed review")
+
+    monkeypatch.setattr(normalize, "_rest", fake_rest)
+    permit = {
+        "logical_id": "logical-permit", "facility_id": "facility",
+        "authority": "TCEQ", "permit_no": "177263", "permit_type": None,
+        "status": "issued", "filed_at": None, "issued_at": None,
     }
 
-    basis, derivation = _unit_basis([satellite_total, permit_count])
-
-    assert basis == "permitted"
-    assert "regulatory" in derivation
-    assert _basis_claim([satellite_total, permit_count], basis) == permit_count
-    assert _unit_receipt_compatible(basis, "unit_count", permit_count)
+    with pytest.raises(PendingReviewBlocked, match="concurrently sealed"):
+        staged_permit_copy(
+            permit, {}, verification_state="corroborated",
+            pending_reviews={})
 
 
-def test_observed_cohort_stays_observed_when_model_metadata_is_present():
-    observed_count = _c(
-        "observed-count", "observation.unit_count", "27", 27,
-        "Twenty-seven generator enclosures are visible.")
-    model = _c(
-        "model", "unit.model", "FlexTitan", None,
-        "The equipment resembles FlexTitan packages.")
+# --- cohort separation (truth gate parity, schema/008) ---------------------
 
-    basis, _derivation = _unit_basis([model, observed_count])
+OBSERVED_COHORT = {"id": "u-obs", "facility_id": "f2", "oem": None,
+                   "model": "unverified", "unit_count": 27, "mw_each": None,
+                   "fuel": None, "hours_permitted": None}
 
+
+def test_observation_claim_never_binds_to_a_permitted_cohort():
+    """A satellite count is not evidence about what the permit allows."""
+    claims = [_c("c1", "observation.unit_count", "8", 8.0,
+                 "eight Titan 350 units visible on the pad")]
+    links, updates, conflicts = plan_unit_changes([TITAN, LM], claims)
+    assert links == [] and updates == {} and conflicts == []
+
+
+def test_permit_claim_never_binds_to_an_observed_cohort():
+    claims = [_c("c2", "unit.count", "41", 41.0,
+                 "41 units permitted at the Southaven plant")]
+    links, updates, _c_ = plan_unit_changes([OBSERVED_COHORT], claims)
+    assert links == [] and updates == {}
+
+
+def test_observation_binds_to_the_observed_cohort():
+    claims = [_c("c3", "observation.unit_count", "57", 57.0,
+                 "57 turbines counted on site")]
+    _l, updates, _c_ = plan_unit_changes([OBSERVED_COHORT], claims)
+    assert updates["u-obs"]["unit_count"][0] == 57.0
+
+
+def test_basis_follows_the_row_family_not_the_document():
+    permit_claim = {"field": "unit.count",
+                    "document": {"doc_genre": "tceq_standard_permit_review"}}
+    satellite = {"field": "observation.unit_count",
+                 "document": {"doc_genre": "satellite_scene"}}
+    # a permitted row stays permitted even when the batch also saw satellites
+    basis, why = normalize._unit_basis([permit_claim, satellite], TITAN)
+    assert basis == "permitted" and why
+    basis, _ = normalize._unit_basis([satellite], OBSERVED_COHORT)
     assert basis == "observed"
-    assert _basis_claim([model, observed_count], basis) == observed_count
-    assert _unit_receipt_compatible(basis, "unit_count", observed_count)
-    assert not _unit_receipt_compatible(
-        basis, "unit_count", _c("permit", "unit.count", "27", 27, "27"))
 
 
-def test_observed_count_wins_when_same_cohort_has_a_reported_total():
-    observed_count = _c(
-        "observed-count", "observation.unit_count", "27", 27,
-        "Twenty-seven generator enclosures are visible.")
-    reported_total = _c(
-        "reported-total", "unit.mw_total", "495 MW", 495,
-        "The filing reports at least 495 MW in total.")
-
-    basis, _derivation = _unit_basis([reported_total, observed_count])
-
-    assert basis == "observed"
-    assert _basis_claim([reported_total, observed_count], basis) == observed_count
-
-
-def test_reported_quantitative_claim_is_not_reclassified_by_observation():
-    reported_count = {
-        **_c("reported", "unit.count", "15", 15,
-             "The filing reports fifteen generator units."),
-        "document": {"doc_genre": "court_filing"},
-    }
-    observation = {
-        **_c("observation", "observation.mw", "250 MW", 250,
-             "The scene is consistent with roughly 250 MW."),
-        "document": {"doc_genre": "satellite_scene"},
-    }
-
-    basis, _derivation = _unit_basis([observation, reported_count])
-
-    assert basis == "reported"
-    assert _basis_claim([observation, reported_count], basis) == reported_count
-
-
-def test_reported_basis_cannot_be_derived_from_metadata_only():
-    model = _c("model", "unit.model", "SMT-130", None,
-               "The filing identifies SMT-130 equipment.")
-
-    try:
-        _basis_claim([model], "reported")
-    except ValueError as exc:
-        assert "quantitative" in str(exc)
-    else:
-        raise AssertionError("metadata-only basis receipt was accepted")
-
-
-def test_unit_plan_skips_alternative_count_receipt_instead_of_blocking():
-    permit_count = _c("permit", "unit.count", "5", 5,
-                      "The permit authorizes five units.")
-    observed_count = _c("observed", "observation.unit_count", "5", 5,
-                        "Five units are visible.")
-
-    plan, skipped, error = prepare_unit_receipts(
-        [("unit_count", observed_count), ("unit_count", permit_count)], {})
-
-    assert error is None
-    assert plan["basis"] == "reported"
-    assert plan["unit_links"] == [("unit_count", permit_count)]
-    assert skipped == [("unit_count", observed_count)]
-    assert plan["representative"] == permit_count
+def test_direct_support_matrix_mirrors_the_database_gate():
+    ok = normalize.direct_support_ok
+    assert ok("unit", "unit_count", "unit.count", "permitted")
+    assert not ok("unit", "unit_count", "unit.count", "observed")
+    assert ok("unit", "unit_count", "observation.unit_count", "observed")
+    assert not ok("unit", "unit_count", "observation.unit_count", "permitted")
+    assert ok("unit", "total_mw", "observation.mw", "observed")
+    assert ok("permit", "permit_no", "permit.no", None)
+    assert not ok("permit", "permit_no", "unit.model", None)

@@ -8,6 +8,7 @@ os.environ.setdefault("SUPABASE_URL", "https://example.test")
 os.environ.setdefault("SUPABASE_SERVICE_KEY", "test-key")
 
 from btw_engine import review  # noqa: E402
+from btw_engine.review_state import PendingReview  # noqa: E402
 
 
 REVIEW_ID = "11111111-1111-4111-8111-111111111111"
@@ -120,6 +121,54 @@ def test_promote_is_one_rpc_and_never_client_side_fact_patches(
     })]
     assert not any(path in {"unit", "permit", "event"}
                    for _method, path, _kwargs in calls)
+
+
+def test_reject_is_one_rpc_and_never_client_side_fact_patches(
+        monkeypatch, tmp_path):
+    review_file = tmp_path / "review.md"
+    review_file.write_text(
+        f"<!-- BTW_REVIEW_ID: {REVIEW_ID} -->\n"
+        f"<!-- BTW_MANIFEST_HASH: {MANIFEST_HASH} -->\n")
+    calls = []
+
+    def fake_rest(method, path, **kwargs):
+        calls.append((method, path, kwargs))
+        return Response({"status": "rejected", "units": 1, "permits": 1})
+
+    monkeypatch.setattr(review, "_rest", fake_rest)
+    result = review.reject(review_file, "source classification is incorrect")
+
+    assert result["status"] == "rejected"
+    assert calls == [("POST", "rpc/btw_reject_review", {
+        "json": {
+            "p_review_id": REVIEW_ID,
+            "p_manifest_hash": MANIFEST_HASH,
+            "p_reason": "source classification is incorrect",
+        },
+    })]
+    assert not any(path in {"unit", "permit", "event"}
+                   for _method, path, _kwargs in calls)
+
+
+def test_pending_fact_version_is_held_out_of_a_second_review():
+    unit = {"staged": {"id": "unit-staged", "model": "Titan 350"}}
+    permit = {"staged": {"id": "permit-staged", "permit_no": "177263"}}
+    event = {"id": "event-staged", "headline": "Permit issued"}
+    pending_review = PendingReview(
+        REVIEW_ID, pr_url="https://github.com/ykorets/btw/pull/59")
+
+    units, permits, events, held = review.exclude_pending_review_targets(
+        [unit], [permit], [event], {
+            ("permit", "permit-staged"): pending_review,
+        })
+
+    assert units == [unit]
+    assert permits == []
+    assert events == [event]
+    assert held == [{
+        "kind": "permit", "id": "permit-staged", "label": "177263",
+        "review": pending_review,
+    }]
 
 
 def test_incomplete_staging_is_held_out_of_manifest():

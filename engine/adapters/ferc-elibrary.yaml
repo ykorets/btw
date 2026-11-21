@@ -16,8 +16,18 @@ params:
   max_results: 100
 keywords:
   - behind-the-meter
+  - behind the meter
   - colocat      # colocated / colocation
   - co-locat
   - interconnection
+  - non-export
+  - export limited
+  - private wire
+  - self-generation
+  - on-site generation
+  - onsite generation
+  - dedicated generation
+  - microgrid
+  - load limited resource
   - gas turbine
   - generation facility
