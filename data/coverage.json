@@ -1,7 +1,7 @@
 {
   "license": "CC BY 4.0",
   "cite_as": "Behind the Watt, behindthewatt.com, CC BY 4.0",
-  "generated": "2026-11-20",
+  "generated": "2026-11-21",
   "note": "registries watched by the engine; last_hit_at = last successful sweep",
   "sources": [
     {
@@ -11,11 +11,11 @@
       "url": "https://www.courtlistener.com/api/rest/v4/search/",
       "schedule": "daily",
       "slo_interval": "7 days",
-      "last_hit_at": "2026-11-19T19:31:19.594083+00:00",
+      "last_hit_at": "2026-11-21T18:03:38.367782+00:00",
       "created_at": "2026-07-11T20:20:45.944142+00:00",
       "collector_status": "active",
       "coverage_note": null,
-      "candidates": 55
+      "candidates": 56
     },
     {
       "id": "eia-860m",
@@ -24,7 +24,7 @@
       "url": "https://www.eia.gov/electricity/data/eia860m/",
       "schedule": "daily",
       "slo_interval": "45 days",
-      "last_hit_at": "2026-11-20T19:10:31.44851+00:00",
+      "last_hit_at": "2026-11-21T18:03:39.483756+00:00",
       "created_at": "2026-07-11T20:20:47.158128+00:00",
       "collector_status": "active",
       "coverage_note": null,
@@ -37,7 +37,7 @@
       "url": "https://echodata.epa.gov/echo/air_rest_services.get_facilities",
       "schedule": "daily",
       "slo_interval": "3 days",
-      "last_hit_at": "2026-11-20T19:10:37.581615+00:00",
+      "last_hit_at": "2026-11-21T18:03:45.495859+00:00",
       "created_at": "2026-07-11T20:20:58.033277+00:00",
       "collector_status": "active",
       "coverage_note": null,
@@ -50,7 +50,7 @@
       "url": "https://elibrary.ferc.gov/eLibraryWebAPI/api/Search/AdvancedSearch",
       "schedule": "daily",
       "slo_interval": "7 days",
-      "last_hit_at": "2026-11-20T19:10:41.69626+00:00",
+      "last_hit_at": "2026-11-21T18:03:46.649228+00:00",
       "created_at": "2026-07-13T18:49:00.149788+00:00",
       "collector_status": "active",
       "coverage_note": null,
@@ -63,11 +63,11 @@
       "url": "https://reporting.prod.bwpmlp.org/infopost",
       "schedule": "daily",
       "slo_interval": "7 days",
-      "last_hit_at": "2026-11-20T19:10:43.397646+00:00",
+      "last_hit_at": "2026-11-21T18:03:48.311858+00:00",
       "created_at": "2026-07-13T17:51:06.804345+00:00",
       "collector_status": "active",
       "coverage_note": null,
-      "candidates": 125
+      "candidates": 126
     },
     {
       "id": "gdelt-news",
@@ -76,11 +76,11 @@
       "url": "https://api.gdeltproject.org/api/v2/doc/doc",
       "schedule": "daily",
       "slo_interval": "3 days",
-      "last_hit_at": "2026-11-19T19:32:12.413221+00:00",
+      "last_hit_at": "2026-11-21T18:05:58.266338+00:00",
       "created_at": "2026-07-11T20:21:03.611542+00:00",
       "collector_status": "active",
       "coverage_note": null,
-      "candidates": 1176
+      "candidates": 1177
     },
     {
       "id": "iw-sentinel",
@@ -89,11 +89,11 @@
       "url": "https://earth-search.aws.element84.com/v1/collections/sentinel-2-l2a/items",
       "schedule": "daily",
       "slo_interval": "7 days",
-      "last_hit_at": "2026-11-20T19:12:38.12183+00:00",
+      "last_hit_at": "2026-11-21T18:06:02.996972+00:00",
       "created_at": "2026-07-11T20:48:13.966667+00:00",
       "collector_status": "active",
       "coverage_note": null,
-      "candidates": 200
+      "candidates": 204
     },
     {
       "id": "manual-genesis",
@@ -115,11 +115,11 @@
       "url": "https://opcgis.deq.state.ms.us/ensearchonline/epd-permits-at-public-notice.aspx",
       "schedule": "daily",
       "slo_interval": "7 days",
-      "last_hit_at": "2026-11-20T19:12:39.37098+00:00",
+      "last_hit_at": "2026-11-21T18:06:04.267133+00:00",
       "created_at": "2026-07-13T18:49:33.376773+00:00",
       "collector_status": "active",
       "coverage_note": null,
-      "candidates": 131
+      "candidates": 132
     },
     {
       "id": "ohio-epa-air",
@@ -141,7 +141,7 @@
       "url": "https://dis.puc.state.oh.us/CaseRecord.aspx",
       "schedule": "daily",
       "slo_interval": "30 days",
-      "last_hit_at": "2026-11-20T19:12:56.559253+00:00",
+      "last_hit_at": "2026-11-21T18:06:11.228355+00:00",
       "created_at": "2026-07-11T19:19:57.284848+00:00",
       "collector_status": "active",
       "coverage_note": "Two named docket filing lists via the official anonymous browser search and View All. Every docket is checked against its advertised document count. Shared documents are deduplicated; collection is discovery, not review or proof of operation. Partial or blocked access never advances the successful-sweep timestamp.",
@@ -154,7 +154,7 @@
       "url": "https://www.shelbytnhealth.com/310/Air-Pollution-Control-Public-Notices",
       "schedule": "daily",
       "slo_interval": "7 days",
-      "last_hit_at": "2026-11-20T19:12:58.051684+00:00",
+      "last_hit_at": "2026-11-21T18:06:12.27261+00:00",
       "created_at": "2026-07-11T20:21:25.255373+00:00",
       "collector_status": "active",
       "coverage_note": null,
@@ -193,11 +193,11 @@
       "url": "https://permit-search.tceq.texas.gov/",
       "schedule": "daily",
       "slo_interval": "3 days",
-      "last_hit_at": "2026-11-20T19:13:07.642249+00:00",
+      "last_hit_at": "2026-11-21T18:06:19.103901+00:00",
       "created_at": "2026-10-27T23:55:58.751241+00:00",
       "collector_status": "active",
       "coverage_note": "Keyword-matched AIRNSR registry snapshots for data center and Fermi searches; all returned pages. Includes applications and issued records. Not every Texas project, permit document or operating measurement.",
-      "candidates": 1409
+      "candidates": 1415
     }
   ]
 }
