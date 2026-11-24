@@ -1,10 +1,25 @@
 {
   "license": "CC BY 4.0",
   "cite_as": "Behind the Watt, behindthewatt.com, CC BY 4.0",
-  "generated": "2026-11-23",
+  "generated": "2026-11-24",
   "classification": "registry_record_not_btw_verified",
   "note": "Keyword-matched records as listed by agency registries, first seen by the BTW watchers. A filing is not verified equipment, capacity or operation.",
   "filings": [
+    {
+      "id": "tceq-permit-portal:186119",
+      "source_id": "tceq-permit-portal",
+      "agency": "TCEQ",
+      "title": "PCXAUS-12 ENERGY CENTER \u2014 186119 (NEW APPLICATION)",
+      "name": "PCXAUS-12 ENERGY CENTER",
+      "record_no": "186119",
+      "registry_status": "NEW APPLICATION",
+      "county": "BASTROP",
+      "city": "CEDAR CREEK",
+      "regulated_entity": "PCXAUS-12 ENERGY CENTER",
+      "url": "https://permit-search.tceq.texas.gov/?addnId=712593242026327",
+      "first_seen": "2026-11-24T21:23:42.479286+00:00",
+      "last_changed": "2026-11-24T21:23:42.479286+00:00"
+    },
     {
       "id": "tceq-permit-portal:186098",
       "source_id": "tceq-permit-portal",
@@ -2192,21 +2207,6 @@
       "city": "HUBBARD",
       "regulated_entity": "NEXUS DATA CENTER HUBBARD",
       "url": "https://permit-search.tceq.texas.gov/?addnId=472476502025150",
-      "first_seen": "2026-10-27T23:56:05.321167+00:00",
-      "last_changed": "2026-10-27T23:56:05.321167+00:00"
-    },
-    {
-      "id": "tceq-permit-portal:180320",
-      "source_id": "tceq-permit-portal",
-      "agency": "TCEQ",
-      "title": "NEXUS DATA CENTER HUBBARD \u2014 180320 (ISSUED PERMIT)",
-      "name": "NEXUS DATA CENTER HUBBARD",
-      "record_no": "180320",
-      "registry_status": "ISSUED PERMIT",
-      "county": "HILL",
-      "city": "HUBBARD",
-      "regulated_entity": "NEXUS DATA CENTER HUBBARD",
-      "url": "https://permit-search.tceq.texas.gov/?addnId=441469152025149",
       "first_seen": "2026-10-27T23:56:05.321167+00:00",
       "last_changed": "2026-10-27T23:56:05.321167+00:00"
     },
